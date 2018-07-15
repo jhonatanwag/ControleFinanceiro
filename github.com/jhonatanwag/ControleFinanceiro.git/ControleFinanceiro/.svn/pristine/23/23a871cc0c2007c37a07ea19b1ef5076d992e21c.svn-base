@@ -1,0 +1,56 @@
+package br.com.sistemacomercial.enums;
+
+public enum CaixaStatus {
+
+    A("Aberto"),
+    F("Fechado"),
+    R("Recebido"),
+    D("Divergência"),
+    C("Conferido");
+    private String value;
+
+    private CaixaStatus(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static CaixaStatus getCaixaStatus(Integer value) {
+        switch (value) {
+            case 0:
+                return A;
+            case 1:
+                return F;
+            case 2:
+                return R;
+            case 3:
+                return D;
+            case 4:
+                return C;
+            default:
+                return null;
+        }
+    }
+
+    public static String getCaixaStatus(CaixaStatus caixaStatus) {
+        switch (caixaStatus) {
+            case A:
+                return "A";
+            case F:
+                return "F";
+            case R:
+                return "R";
+            case D:
+                return "D";
+            case C:
+                return "C";
+            default:
+                return null;
+        }
+    }
+    
+    
+}

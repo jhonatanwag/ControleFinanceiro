@@ -1,0 +1,68 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+public class Fornecedor implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "foreignFornecedor")
+    @GenericGenerator(name = "foreignFornecedor", strategy = "foreign", parameters = {
+        @Parameter(name = "property", value = "pessoa")})
+    @Column(name = "fornecedor_id")
+    private Long id;
+    @OneToOne(targetEntity = Pessoa.class, optional = false)
+    @PrimaryKeyJoinColumn
+    @Cascade(CascadeType.ALL)
+    private Pessoa pessoa;
+
+    public Fornecedor() {
+        this.pessoa = new Pessoa();
+        this.pessoa.setFornecedor(true);
+    }
+
+    public Fornecedor(Pessoa pessoa) {
+        this.pessoa = pessoa;
+        //this.pessoa.setFornecedor(true);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Pessoa getPessoa() {
+        return pessoa;
+    }
+
+    public void setPessoa(Pessoa pessoa) {
+        this.pessoa = pessoa;
+    }
+
+    public String getDescricaoCompletaFornecedor() {
+        return this.pessoa.getNome() + " - " + this.pessoa.getDocumentoFederal();
+    }
+}

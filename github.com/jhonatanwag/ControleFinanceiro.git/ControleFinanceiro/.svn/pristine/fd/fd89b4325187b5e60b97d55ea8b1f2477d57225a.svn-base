@@ -1,0 +1,321 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.ScheduleEntryMoveEvent;
+import org.primefaces.event.ScheduleEntryResizeEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultScheduleModel;
+import org.primefaces.model.ScheduleEvent;
+import org.primefaces.model.ScheduleModel;
+
+import br.com.sistemacomercial.enums.TipoAgenda;
+import br.com.sistemacomercial.model.Agenda;
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.TipoCorteCabelo;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.TipoCorteCabelos;
+import br.com.sistemacomercial.repository.filter.TipoCorteCabeloFilter;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.security.TerminalLogado;
+import br.com.sistemacomercial.service.AgendaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class AgendaBean extends BeanAbstrato<Agenda> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private AgendaService agendaService;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private TipoCorteCabelos tipoCorteCabelos;
+	@Inject
+	@TerminalLogado
+	private Terminal terminalLogado;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+	private Funcionario funcionarioSelecionado = new Funcionario();
+	private TipoAgenda tipoAgenda;
+	private ScheduleModel eventModel;
+	private List<Agenda> listaAgenda = new ArrayList();
+	private List<Funcionario> listaFuncionarios;
+	private List<Cliente> listaClientes;
+	private List<TipoCorteCabelo> listaTipoCorteCabelo;
+
+	@Override
+	public void inicializar() {
+		if (FacesUtil.isNotPostback()) {
+			setObjeto(new Agenda());
+			eventModel = new DefaultScheduleModel();
+			tipoAgenda = TipoAgenda.PESSOAL;			
+			listaClientes = pessoas.listaClientes();
+			listaTipoCorteCabelo = tipoCorteCabelos.filtrados(new TipoCorteCabeloFilter());
+			pesquisaFuncionarios();
+			montaAgendaFuncionarioSelecionado();
+		}
+	}
+
+	@Override
+	public void setObjeto(Agenda objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Agenda());
+	}
+
+	public void montaAgendaFuncionarioSelecionado() {
+		eventModel = new DefaultScheduleModel();
+		tipoAgenda = TipoAgenda.PESSOAL;
+
+		try {
+			if (funcionarioSelecionado != null) {
+
+				listaAgenda = agendaService.buscarAgenda(funcionarioSelecionado);
+			} else {
+				funcionarioSelecionado = funcionarioLogado;
+				listaAgenda = agendaService.buscarAgenda(funcionarioLogado);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// percorre a lista de eventos e popula o calendario
+		for (Agenda agenda : listaAgenda) {
+			
+
+			DefaultScheduleEvent evento = new DefaultScheduleEvent();
+			evento.setAllDay(agenda.isDiaTodo());
+			evento.setEndDate(agenda.getDataFim());
+			evento.setStartDate(agenda.getDataInicio());
+			evento.setTitle(agenda.getTitulo());
+			evento.setData(agenda.getId());
+			evento.setEditable(true); // pertir que o usuario edite
+
+			// aqui e setado um tipo especifico de css para cada tipo de
+			if(agenda.getTipoAgenda() == null){
+				agenda.setTipoAgenda(TipoAgenda.PESSOAL);
+			}
+			if (agenda.getTipoAgenda().equals(TipoAgenda.GLOBAL)) {
+				evento.setStyleClass("global");
+			} else {
+				evento.setStyleClass("pessoal");
+			}
+			eventModel.addEvent(evento); // o evento e adicionado na lista
+		}
+	}
+
+	@Override
+	public void salvar() {
+		System.out.println(funcionarioLogado);
+		//getObjeto().setFuncionario(funcionarioLogado);
+		getObjeto().setFuncionario(funcionarioSelecionado);
+		getObjeto().setTitulo(getObjeto().getTipoCorteCabelo().getDescricao()+" - "+getObjeto().getCliente().getPessoa().getNome());
+		setObjeto(agendaService.salvar(getObjeto()));
+		// limpar();
+		montaAgendaFuncionarioSelecionado();
+		FacesUtil.addInfoMessage("Salvo com sucesso!");
+	}
+	
+	public void excluir(){
+		agendaService.remover(getObjeto());
+		montaAgendaFuncionarioSelecionado();
+		FacesUtil.addInfoMessage("Evento excluído com sucesso!");
+	}
+	
+	public void cancelar(){
+		montaAgendaFuncionarioSelecionado();
+		FacesUtil.addInfoMessage("Evento cancelado com sucesso!");
+	}
+	
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public List<TipoAgenda> getTiposAgenda() {
+		return Arrays.asList(TipoAgenda.values());
+	}
+
+	public void pessoaPorId() {
+		Funcionario pessoa = pessoas.porIdFuncionario(
+				(getFuncionarioSelecionado().getId() == null ? -1 : getFuncionarioSelecionado().getId()));
+		if (pessoa != null) {
+			setFuncionarioSelecionado(pessoa);
+		} else {
+			setFuncionarioSelecionado(new Funcionario());
+			FacesUtil.addErrorMessage("Funcionário não encontrada para o código informado!");
+		}
+	}
+
+	public void pessoaSelecao(SelectEvent event) {
+		Funcionario pessoa = (Funcionario) event.getObject();
+		this.funcionarioSelecionado = pessoa;
+	}
+
+	public Funcionario getFuncionarioSelecionado() {
+		return funcionarioSelecionado;
+	}
+
+	public List<Cliente> getListaClientes() {
+		return listaClientes;
+	}
+
+	public void setListaClientes(List<Cliente> listaClientes) {
+		this.listaClientes = listaClientes;
+	}
+
+	public void setFuncionarioSelecionado(Funcionario funcionarioSelecionado) {
+		this.funcionarioSelecionado = funcionarioSelecionado;
+	}
+
+	/**/
+
+	private void pesquisaFuncionarios() {
+		listaFuncionarios = pessoas.listaFuncionariosAgendasPublicas();
+		if (listaFuncionarios.size() == 1) {
+			funcionarioSelecionado = listaFuncionarios.get(0);
+		} else {
+			funcionarioSelecionado = funcionarioLogado;
+		}
+	}	
+
+	public List<Funcionario> getFuncionarios() {
+		return listaFuncionarios;
+	}
+
+	public void autoCompletaDataFim() {
+		if (getObjeto().getDataFim().getTime() <= getObjeto().getDataInicio().getTime()) {
+			Date afterAddingTenMins = new Date(getObjeto().getDataInicio().getTime() + (30 * 60000));
+			getObjeto().setDataFim(afterAddingTenMins);
+		}
+	}
+	
+	public void autoCompletaDataFimTipo() {
+		if (getObjeto().getDataFim().getTime() <= getObjeto().getDataInicio().getTime()) {
+			Date afterAddingTenMins = new Date(getObjeto().getDataInicio().getTime() + (getObjeto().getTipoCorteCabelo().getMinutos() * 60000));
+			getObjeto().setDataFim(afterAddingTenMins);
+		}
+	}
+
+	public ScheduleModel getEventModel() {
+		return eventModel;
+	}
+
+	public void setEventModel(ScheduleModel eventModel) {
+		this.eventModel = eventModel;
+	}
+
+	public TipoAgenda getTipoAgenda() {
+		return tipoAgenda;
+	}
+
+	public void setTipoAgenda(TipoAgenda tipoAgenda) {
+		this.tipoAgenda = tipoAgenda;
+	}
+
+	public List<TipoCorteCabelo> getListaTipoCorteCabelo() {
+		return listaTipoCorteCabelo;
+	}
+
+	public void setListaTipoCorteCabelo(List<TipoCorteCabelo> listaTipoCorteCabelo) {
+		this.listaTipoCorteCabelo = listaTipoCorteCabelo;
+	}
+
+	/**
+	 * Evento para quando o usuario clica em um espaco em branco no calendario
+	 * 
+	 * @param selectEvent
+	 */
+
+	public void quandoNovo(SelectEvent selectEvent) {
+
+		ScheduleEvent event = new DefaultScheduleEvent("", (Date) selectEvent.getObject(),
+				(Date) selectEvent.getObject());
+
+		setObjeto(new Agenda());
+		// recupero a data em q ele clicou
+		getObjeto().setDataInicio(event.getStartDate());
+		getObjeto().setDataFim(event.getEndDate());
+		autoCompletaDataFim();
+	}
+
+	/**
+	 * Evento para quando usuario clica em um enveto ja existente
+	 * 
+	 * @param selectEvent
+	 */
+	public void quandoSelecionado(SelectEvent selectEvent) {
+
+		ScheduleEvent event = (ScheduleEvent) selectEvent.getObject();
+
+		for (Agenda agda : listaAgenda) {
+			if (agda.getId() == null || (agda.getId() == (Long) event.getData())) {
+				setObjeto(agda);
+				salvar();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Evento para quando o usuario 'move' um evento atraves de 'drag and drop'
+	 * 
+	 * @param event
+	 */
+	public void quandoMovido(ScheduleEntryMoveEvent scheduleEntryMoveEvent) {
+
+		for (Agenda agda : listaAgenda) {
+
+			if (agda.getId() == (Long) scheduleEntryMoveEvent.getScheduleEvent().getData()) {
+				setObjeto(agda);
+				Date datInicio = (Date) scheduleEntryMoveEvent.getScheduleEvent().getStartDate();
+				Date datFim = (Date) scheduleEntryMoveEvent.getScheduleEvent().getEndDate();
+				getObjeto().setDataInicio(datInicio);
+				getObjeto().setDataFim(datFim);
+				salvar();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Evento para quando o usuario 'redimenciona' um evento
+	 * 
+	 * @param event
+	 */
+	public void quandoRedimensionado(ScheduleEntryResizeEvent scheduleEntryMoveEvent) {
+
+		for (Agenda agda : listaAgenda) {
+			if (agda.getId() == (Long) scheduleEntryMoveEvent.getScheduleEvent().getData()) {
+				setObjeto(agda);
+				Date datInicio = (Date) scheduleEntryMoveEvent.getScheduleEvent().getStartDate();
+				Date datFim = (Date) scheduleEntryMoveEvent.getScheduleEvent().getEndDate();
+				getObjeto().setDataInicio(datInicio);
+				getObjeto().setDataFim(datFim);
+				salvar();
+				break;
+			}
+		}
+	}
+
+}

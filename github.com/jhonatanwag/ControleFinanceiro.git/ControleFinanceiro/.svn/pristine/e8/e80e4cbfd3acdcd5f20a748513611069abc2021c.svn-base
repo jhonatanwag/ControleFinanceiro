@@ -1,0 +1,105 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.PersistenceException;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.enums.TipoMovimentacao;
+import br.com.sistemacomercial.model.Estoque;
+import br.com.sistemacomercial.model.EstoqueMovimentacao;
+import br.com.sistemacomercial.model.ItemVenda;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.filter.EstoqueFilter;
+import br.com.sistemacomercial.service.NegocioException;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class Estoques extends RepositoryAbstrato<Estoque> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Estoques() {
+		super(Estoque.class);
+	}
+
+	@Override
+	public Estoque salvar(Estoque objeto) {
+		return super.salvar(objeto);
+	}
+
+	@Transactional
+	public void criaMovimentoEstoque(Estoque estoque, Terminal terminal, ItemVenda itemVenda,
+			TipoMovimentacao tipoMovimentacao) {
+		try {
+			if (tipoMovimentacao.equals(TipoMovimentacao.SAIDA)) {
+				saidaEstoque(estoque, itemVenda.getQuantidade());
+			} else if (tipoMovimentacao.equals(TipoMovimentacao.ENTRADA)) {
+				entradaEstoque(estoque, itemVenda.getQuantidade());
+			}
+			EstoqueMovimentacao estoqueMovimentacao = new EstoqueMovimentacao(terminal, itemVenda, tipoMovimentacao);
+			estoqueMovimentacao.setQtdMovimento(itemVenda.getQuantidade());
+			estoqueMovimentacao.setTerminal(terminal);
+			estoque.setDataUltimaVenda(itemVenda.getVenda().getDataVenda());
+			estoqueMovimentacao.setEstoque(estoque);
+			estoqueMovimentacao.setDataMovimentacao(new Date());
+			estoqueMovimentacao.setDesMovimentacao("Venda: " + itemVenda.getVenda().getId() + " Produto: "
+					+ estoque.getProduto().getDescricaoReduzida());
+			estoque.getEstoqueMovimentacoes().add(estoqueMovimentacao);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação do estoque");
+		}
+	}
+
+	@Transactional
+	public void saidaEstoque(Estoque estoque, BigDecimal qtdMovimento) {
+		try {
+			estoque = porId(estoque.getId());
+			BigDecimal sub = estoque.getSaldo().subtract(qtdMovimento);
+			estoque.setSaldo(sub);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problemas ao dar saída no estoque");
+		}
+	}
+
+	@Transactional
+	public void entradaEstoque(Estoque estoque, BigDecimal qtdMovimento) {
+		try {
+			estoque = porId(estoque.getId());
+			BigDecimal add = estoque.getSaldo().add(qtdMovimento);
+			estoque.setSaldo(add);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problemas ao dar entrada no estoque");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Estoque> filtrados(EstoqueFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Estoque.class);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		return criteria.addOrder(Order.asc("id")).list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Estoque> estoquePorProduto(Produto produto) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Estoque.class);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+    	criteria.add(Restrictions.eq("produto.id", produto.getId()));
+	    return criteria.addOrder(Order.asc("id")).list();
+	}
+
+}

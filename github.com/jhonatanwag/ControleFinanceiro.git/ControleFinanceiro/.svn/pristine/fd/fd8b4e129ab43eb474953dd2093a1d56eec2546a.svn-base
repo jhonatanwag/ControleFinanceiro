@@ -1,0 +1,73 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.ObjetoOpcao;
+import br.com.sistemacomercial.model.ObjetoSistema;
+import br.com.sistemacomercial.repository.filter.ObjetoSistemaFilter;
+
+public class ObjetoSistemas extends RepositoryAbstrato<ObjetoSistema> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public ObjetoSistemas() {
+		super(ObjetoSistema.class);
+	}
+
+	@Override
+	public ObjetoSistema salvar(ObjetoSistema objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ObjetoSistema> filtrados(ObjetoSistemaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(ObjetoSistema.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+	public ObjetoOpcao porIdObjetoOpcap(Long id) {
+		return manager.find(ObjetoOpcao.class, id);
+	}
+
+	public List<ObjetoOpcao> ObjetosOpcaoDo(ObjetoSistema objetoSistema) {
+		return manager.createQuery("from ObjetoOpcao where objetoSistema.id = :obj_sis_id", ObjetoOpcao.class)
+				.setParameter("obj_sis_id", objetoSistema.getId()).getResultList();
+	}
+
+	public ObjetoSistema porDescricaoUnico(String descricao, Long id) {
+		try {
+			return manager
+					.createQuery("from ObjetoSistema where upper(descricao) = :descricao and id <> :id",
+							ObjetoSistema.class)
+					.setParameter("descricao", descricao.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public boolean validaExclusaoSubObjetoSistema(ObjetoOpcao objetoOpcao) {
+		return true;
+	}
+
+}

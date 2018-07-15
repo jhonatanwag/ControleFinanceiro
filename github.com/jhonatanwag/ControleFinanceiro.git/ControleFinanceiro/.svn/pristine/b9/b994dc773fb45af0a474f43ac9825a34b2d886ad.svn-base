@@ -1,0 +1,71 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import br.com.sistemacomercial.enums.TipoTitulo;
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.Fornecedor;
+
+public class RecebimentoFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private Cliente cliente;
+	private Date dataRecebimentoDe;
+	private Date dataRecebimentoAte;
+
+	
+	public RecebimentoFilter() {
+		super();
+	}
+
+	public RecebimentoFilter(Date dataRecebimentoDe, Date dataRecebimentoAte) {
+		super();
+		this.dataRecebimentoDe = dataRecebimentoDe;
+		this.dataRecebimentoAte = dataRecebimentoAte;
+	}
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public Date getDataRecebimentoDe() {
+		return dataRecebimentoDe;
+	}
+
+	public void setDataRecebimentoDe(Date dataRecebimentoDe) {
+		this.dataRecebimentoDe = dataRecebimentoDe;
+	}
+
+	public Date getDataRecebimentoAte() {
+		return dataRecebimentoAte;
+	}
+
+	public void setDataRecebimentoAte(Date dataRecebimentoAte) {
+		this.dataRecebimentoAte = dataRecebimentoAte;
+	}
+
+}

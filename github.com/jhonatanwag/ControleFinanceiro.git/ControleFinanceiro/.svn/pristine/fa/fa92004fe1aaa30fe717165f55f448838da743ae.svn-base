@@ -1,0 +1,25 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import javax.inject.Inject;
+import br.com.sistemacomercial.model.Estoque;
+import br.com.sistemacomercial.repository.Estoques;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class EstoqueService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Estoques estoques;
+	@Inject
+	private Produtos produtos;
+
+	@Transactional
+	public Estoque salvar(Estoque receb) {
+		return estoques.salvar(receb);
+	}
+
+	
+}

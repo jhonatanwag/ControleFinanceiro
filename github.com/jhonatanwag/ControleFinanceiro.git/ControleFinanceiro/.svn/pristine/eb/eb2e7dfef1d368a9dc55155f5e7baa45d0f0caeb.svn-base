@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+
+public class TerminalFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private String usuarioSo;
+	private String ip;
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getUsuarioSo() {
+		return usuarioSo;
+	}
+
+	public void setUsuarioSo(String usuarioSo) {
+		this.usuarioSo = usuarioSo;
+	}
+
+}

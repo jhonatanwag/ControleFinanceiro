@@ -1,0 +1,56 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.context.RequestContext;
+
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.repository.filter.ProdutoFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaProdutoBean extends PesquisaBeanAbstrato<Produto, ProdutoFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Produtos produtos;
+
+	public PesquisaProdutoBean() {
+		setFiltro(new ProdutoFilter());
+	}
+
+	@Override
+	public void excluir() {
+		produtos.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Produto " + getObjetoSelecionado().getDescricao() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(produtos.filtrados(getFiltro()));
+	}
+
+	public void abrirDialog() {
+		Map<String, Object> opcoes = new HashMap<>();
+		opcoes.put("modal", true);
+		opcoes.put("resizable", false);
+		opcoes.put("contentHeight", 550);
+		opcoes.put("contentWidth", 770);
+		RequestContext.getCurrentInstance().openDialog("/produto/DlgPesquisaProduto.xhtml", opcoes, null);
+	}
+
+	public void selecionar(Produto produto) {
+		RequestContext.getCurrentInstance().closeDialog(produto);
+	}
+
+}

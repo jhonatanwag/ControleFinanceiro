@@ -1,0 +1,23 @@
+package br.com.sistemacomercial.ws.retorno;
+
+public class AssinadorException
+extends RuntimeException
+{
+private static final long serialVersionUID = 1L;
+
+public AssinadorException(String mensagem)
+{
+  super(mensagem);
+}
+
+public AssinadorException(Throwable causa)
+{
+  super(causa);
+}
+
+public AssinadorException(String mensagem, Throwable causa)
+{
+  super(mensagem, causa);
+}
+}
+

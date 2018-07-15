@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Espelho" widgetVar="DlgEspelho" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+
+		<div class="ContainerIndent ui-fluid">
+			<div class="ContainerIndent">
+
+
+				<h:form id="formDlgEspelho">
+
+
+					<p:carousel value="#{recebimentoBean.vendas}"
+						itemStyle="text-align:center" headerText="Dados da(s) venda(s)"
+						var="venda" numVisible="1" easing="easeOutBounce" cricular="true"
+						responsive="true">
+
+						<h:panelGrid columns="2" style="width:100%"
+							columnClasses="rotulo, campo">
+
+							<h:outputText value="Id:" />
+							<h:outputText value="#{venda.id}" />
+
+							<h:outputText value="Data da Venda" />
+							<h:outputText value="#{venda.dataVenda}" />
+
+						</h:panelGrid>
+
+						<p:dataTable id="dataTableItem" value="#{venda.itensVenda}"
+							reflow="true" var="item" scrollable="false"
+							style="margin-top: 20px">
+
+							<p:column id="item" headerText="Código"
+								style="text-align: right;">
+								<h:outputText value="#{item.produto.id}" />
+							</p:column>
+
+							<p:column id="descricao" headerText="Descrição"
+								style="text-align: left;">
+								<h:outputText value="#{item.produto.descricao}" />
+							</p:column>
+
+							<p:column id="qtd" headerText="Qtd." style="text-align: right;">
+								<h:outputText value="#{item.quantidade}" size="3" />
+							</p:column>
+
+							<p:column id="unitario" headerText="Val. Unit."
+								style="text-align: right;">
+								<h:outputText value="#{item.valorUnitario}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</p:column>
+
+							<p:column id="bruto" headerText="Val. Bruto"
+								style="text-align: right;">
+								<h:outputText value="#{item.valorBruto}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</p:column>
+
+						</p:dataTable>
+
+					</p:carousel>
+
+
+					<h:panelGrid rendered="true" columns="3" cellpadding="5"
+						style="margin: 0 auto;">
+						<p:commandButton value="Fechar" immediate="true"
+							oncomplete="PF('DlgEspelho').hide();">
+						</p:commandButton>
+					</h:panelGrid>
+				</h:form>
+
+			</div>
+		</div>
+	</p:dialog>
+</ui:composition>

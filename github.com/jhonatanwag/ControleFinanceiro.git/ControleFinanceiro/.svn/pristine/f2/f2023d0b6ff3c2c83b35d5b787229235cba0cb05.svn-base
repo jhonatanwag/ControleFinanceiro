@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.enums;
+
+public enum EntradaSaida {
+
+    E("Entrada"),
+    S("Saída");
+    private String value;
+
+    private EntradaSaida(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static EntradaSaida getEntradaSaida(Integer value) {
+        switch (value) {
+            case 0:
+                return E;
+            case 1:
+                return S;
+            default:
+                return null;
+        }
+    }
+
+    public static String getEntradaSaida(EntradaSaida tipoCreditoDebito) {
+        switch (tipoCreditoDebito) {
+            case E:
+                return "E";
+            case S:
+                return "S";
+            default:
+                return null;
+        }
+    }
+}

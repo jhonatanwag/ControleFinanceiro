@@ -1,0 +1,56 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:panelGrid columns="6" style="margin-top: 5px; width:100%;">
+
+		<p:outputLabel value="Seguro" for="seguro" />
+		<p:inputText id="seguro" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+		
+		<p:outputLabel value="Base ICMS" for="baseIcms" />
+		<p:inputText id="baseIcms" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+		
+		<p:outputLabel value="Base Calc. ICMS Sub." for="baseCalcIcms"/>
+		<p:inputText id="baseCalcIcms" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+		
+		<p:outputLabel value="Total IPI" for="totalIpi"/>
+		<p:inputText id="totalIpi" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+		
+		<p:outputLabel value="Total Nota" for="totalNota"/>
+		<p:inputText id="totalNota" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+
+		<p:outputLabel value="Outras Despesas" for="outrasDespesas"/>
+		<p:inputText id="outrasDespesas" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+
+		<p:outputLabel value="Valor ICMS" for="valorIcms"/>
+		<p:inputText id="valorIcms" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+
+		<p:outputLabel value="Valor ICMS Sub." for="valorIcmsSub"/>
+		<p:inputText id="valorIcmsSub" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+
+		<p:outputLabel value="Total Produtos" for="totalProdutos"/>
+		<p:inputText id="totalProdutos" maxlength="20" styleClass="moeda">
+			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+		</p:inputText>
+
+	</p:panelGrid>
+
+</ui:composition>

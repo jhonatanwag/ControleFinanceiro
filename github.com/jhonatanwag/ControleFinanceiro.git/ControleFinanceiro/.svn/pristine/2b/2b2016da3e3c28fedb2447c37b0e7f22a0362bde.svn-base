@@ -1,0 +1,128 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de Conta Correntes</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<div class="ContainerIndent ui-fluid">
+				<div class="ContainerIndent">
+					<p:panel>
+						<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa
+							de Conta Correntes</div>
+						<div class="Separator"></div>
+						<p:panelGrid columns="4"
+							columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+
+							<p:inputText size="10"
+								value="#{pesquisaContaCorrenteBean.filtro.idDe}" maxlength="6" />
+							<p:outputLabel value="até" />
+							<p:inputText size="10"
+								value="#{pesquisaContaCorrenteBean.filtro.idAte}" maxlength="6" />
+
+
+							<p:outputLabel value="Data do cadastro" />
+
+							<p:calendar size="10" pattern="dd/MM/yyyy"
+								value="#{pesquisaContaCorrenteBean.filtro.dataCadastroInicio}" />
+							<p:outputLabel value="até" />
+							<p:calendar size="10" pattern="dd/MM/yyyy"
+								value="#{pesquisaContaCorrenteBean.filtro.dataCadastroFim}" />
+
+
+						</p:panelGrid>
+					</p:panel>
+
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:commandButton value="Pesquisar"
+								action="#{pesquisaContaCorrenteBean.pesquisar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Novo" outcome="CadastroContaCorrente.xhtml" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:dataTable id="contaCorrenteTable"
+						value="#{pesquisaContaCorrenteBean.objetosFiltrados}"
+						var="contaCorrente" style="margin-top: 20px"
+						emptyMessage="Nenhuma conta corrente encontrada." rows="20"
+						paginator="true" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom">
+
+						<p:column headerText="Código"
+							style="text-align: center; width: 15px"
+							sortBy="#{contaCorrente.id}">
+							<h:outputText value="#{contaCorrente.id}" />
+						</p:column>
+
+						<p:column headerText="Data do Cadastro"
+							sortBy="#{contaCorrente.dataCadastro}"
+							style="text-align: center; width: 30px">
+							<h:outputText value="#{contaCorrente.dataCadastro}" />
+						</p:column>
+
+						<p:column headerText="Data da Abertura"
+							sortBy="#{contaCorrente.dataAbertura}"
+							style="text-align: center; width: 30px">
+							<h:outputText value="#{contaCorrente.dataAbertura}" />
+						</p:column>
+
+						<p:column headerText="Banco" style="width: 100px"
+							sortBy="#{contaCorrente.agencia.banco.nomeBanco}">
+							<h:outputText value="#{contaCorrente.agencia.banco.nomeBanco}" />
+						</p:column>
+
+						<p:column headerText="Num. agência" style="width: 40px"
+							sortBy="#{contaCorrente.agencia.numeroAgencia}">
+							<h:outputText value="#{contaCorrente.agencia.numeroAgencia}" />
+						</p:column>
+						
+						<p:column headerText="Conta" style="width: 40px"
+							sortBy="#{contaCorrente.numeroConta}">
+							<h:outputText value="#{contaCorrente.numeroConta}" />
+						</p:column>
+						
+						<p:column headerText="DV" style="width: 40px"
+							sortBy="#{contaCorrente.digitoVerificador}">
+							<h:outputText value="#{contaCorrente.digitoVerificador}" />
+						</p:column>
+
+						<p:column style="width: 100px; text-align: center">
+							<p:button outcome="/contaCorrente/CadastroContaCorrente"
+								icon="ui-icon-pencil" title="Editar">
+								<f:param name="contaCorrente" value="#{contaCorrente.id}" />
+							</p:button>
+							<p:commandButton icon="ui-icon-trash" title="Excluir"
+								oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+								update=":frmPesquisa:confirmacaoExclusaoDialog">
+								<f:setPropertyActionListener
+									target="#{pesquisaContaCorrenteBean.objetoSelecionado}"
+									value="#{contaCorrente}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+					<p:confirmDialog header="Exclusão da conta corrente"
+						message="Tem certeza que deseja excluir a conta corrente: #{pesquisaContaCorrenteBean.objetoSelecionado.nome}?"
+						widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+						<p:button value="Não"
+							onclick="PF('confirmacaoExclusao').hide(); return false;" />
+						<p:commandButton value="Sim"
+							oncomplete="PF('confirmacaoExclusao').hide();"
+							action="#{pesquisaContaCorrenteBean.excluir}" process="@this"
+							update=":frmPesquisa:contaCorrenteTable" />
+					</p:confirmDialog>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

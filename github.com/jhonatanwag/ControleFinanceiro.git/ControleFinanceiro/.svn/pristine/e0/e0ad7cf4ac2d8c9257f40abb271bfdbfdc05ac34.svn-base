@@ -1,0 +1,126 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name="banco")
+public class Banco implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "banco_id")
+	private Long id;
+    @Column(name="codigo", unique=true)
+	private String codigoCompensacao;
+	@Column(name="nome_banco", length = 100)
+	private String nomeBanco;
+	@Column(length = 255)
+	private String site;
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "banco", fetch = FetchType.EAGER)
+	private List<Agencia> agencias = new ArrayList<Agencia>();
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name="situacao_cadastro", nullable=false)
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+
+	public Banco() {
+	}
+
+	public String getCodigoCompensacao() {
+		return codigoCompensacao;
+	}
+
+	public void setCodigoCompensacao(String codigoCompensacao) {
+		this.codigoCompensacao = codigoCompensacao;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getNomeBanco() {
+		return nomeBanco;
+	}
+
+	public void setNomeBanco(String nomeBanco) {
+		this.nomeBanco = nomeBanco;
+	}
+
+	public String getSite() {
+		return site;
+	}
+
+	public void setSite(String site) {
+		this.site = site;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+
+	public List<Agencia> getAgencias() {
+		return agencias;
+	}
+
+	public void setAgencias(List<Agencia> agencias) {
+		this.agencias = agencias;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Banco other = (Banco) obj;
+		if ((this.nomeBanco == null) ? (other.nomeBanco != null)
+				: !this.nomeBanco.equals(other.nomeBanco)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 23 * hash
+				+ (this.nomeBanco != null ? this.nomeBanco.hashCode() : 0);
+		return hash;
+	}
+}

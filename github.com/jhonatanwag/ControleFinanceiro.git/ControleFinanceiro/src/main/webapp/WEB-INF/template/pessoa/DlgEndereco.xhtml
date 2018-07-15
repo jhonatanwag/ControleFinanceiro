@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Endereço" widgetVar="DlgEndereco"
+		modal="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDlgEndereco">
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:panelGrid id="painelEndereco" columns="2"
+				columnClasses="rotuno,campo" layout="tabular"
+				styleClass="ui-panelgrid-blank"
+				style="border:0px none; background-color:transparent;">
+
+				<p:outputLabel value="Padrão:" for="padrao" />
+				<p:selectBooleanCheckbox
+					value="#{cadastroPessoaBean.enderecoSelecionado.padrao}"
+					disabled="false" id="padrao" />
+
+				<p:outputLabel value="Tipo de Endereço:" for="tipoEndereco" />
+				<p:selectOneMenu id="tipoEndereco" required="true" class="campo50"
+					filterMatchMode="startsWith" filter="true"
+					value="#{cadastroPessoaBean.enderecoSelecionado.tipoEndereco}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroPessoaBean.tipoEnderecos}" />
+				</p:selectOneMenu>				
+
+				<p:outputLabel value="Logradouro:" for="logradouro" />
+				<p:inputText
+					value="#{cadastroPessoaBean.enderecoSelecionado.endereco.logradouro}"
+					id="logradouro" required="true" class="campo90 uppercase"
+					converter="#{upperToCaseConverter}" maxlength="80" />
+
+				<p:outputLabel value="Número:" for="numeroEnd" />
+				<p:inputText
+					value="#{cadastroPessoaBean.enderecoSelecionado.endereco.numero}"
+					id="numeroEnd" required="false" class="campo50 uppercase"
+					converter="#{upperToCaseConverter}" maxlength="10" />
+
+				<p:outputLabel value="Bairro:" for="bairro" />
+				<p:inputText
+					value="#{cadastroPessoaBean.enderecoSelecionado.endereco.bairro}"
+					class="campo90 uppercase" converter="#{upperToCaseConverter}"
+					id="bairro" required="false" maxlength="60" />
+
+
+				<p:outputLabel value="CEP:" for="cep" />
+				<p:inputMask mask="99999-999"
+					value="#{cadastroPessoaBean.enderecoSelecionado.endereco.cep}"
+					id="cep" required="false" class="campo50" maxlength="9" />
+
+
+				<p:outputLabel value="Cidade" for="cid" />
+				<p:selectOneMenu id="cid" filter="true" filterMatchMode="startsWith"
+					value="#{cadastroPessoaBean.enderecoSelecionado.endereco.cidade}"
+					required="true" class="campo80">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroPessoaBean.todasCidades}"
+						var="cidade" itemValue="#{cidade}"
+						itemLabel="#{cidade.cidadeEstado}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Complemento:" for="complemento" />
+				<p:inputText
+					value="#{cadastroPessoaBean.enderecoSelecionado.endereco.complemento}"
+					class="campo90 uppercase" converter="#{upperToCaseConverter}"
+					id="complemento" required="false" maxlength="80" />
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{cadastroPessoaBean.confirmarEndereco}"
+					update=":formDlgEndereco, :formCadastroPessoa:tabViewPrincipal:tabView:dataTableEnderecos"
+					oncomplete="if (!args.validationFailed) PF('DlgEndereco').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgEndereco').hide();" />
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+</ui:composition>

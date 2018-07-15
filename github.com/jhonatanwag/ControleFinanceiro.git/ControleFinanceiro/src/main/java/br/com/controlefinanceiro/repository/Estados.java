@@ -1,0 +1,100 @@
+package br.com.controlefinanceiro.repository;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.NoResultException;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.controlefinanceiro.model.Estado;
+import br.com.controlefinanceiro.repository.filter.EstadoFilter;
+
+public class Estados extends RepositoryAbstrato<Estado> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	public Estados() {
+		super(Estado.class);
+	}
+	
+	@Override
+	public Estado salvar(Estado objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Estado> filtrados(EstadoFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Estado.class);
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+		if (filtro.getCodigoIbgeDe() != null && filtro.getCodigoIbgeAte() != null) {
+			criteria.add(Restrictions.between("codigoIbge", filtro.getCodigoIbgeDe(), filtro.getCodigoIbgeAte()));
+		}
+		if (StringUtils.isNotBlank(filtro.getNome())) {
+			criteria.add(Restrictions.ilike("nome", filtro.getNome(), MatchMode.ANYWHERE));
+		}
+		if (filtro.getDataCadastroInicio() != null && filtro.getDataCadastroFim() != null) {
+			criteria.add(
+					Restrictions.between("dataCadastro", filtro.getDataCadastroInicio(), filtro.getDataCadastroFim()));
+		}
+		return criteria.addOrder(Order.asc("nome")).list();
+	}
+
+
+	/**
+	 * 
+	 * @param codigoIbge
+	 * @param id
+	 * @return O Estado verificando se o código ibge já está cadastrado para o mesmo código IBGE
+	 */
+	public Estado porCodigoIbge(Long codigoIbge, Long id) {
+		try {
+			return manager.createQuery("from Estado where codigoIbge = :codigoIbge and id <> :id", Estado.class)
+					.setParameter("codigoIbge", codigoIbge).setParameter("id", (id == null? -1 : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param nome
+	 * @param id
+	 * @return O estado verificando se o mesmo já está cadastrado com o mesmo nome.
+	 */
+	public Estado porNomeUnico(String nome, Long id) {
+		try {
+			return manager.createQuery("from Estado where upper(nome) = :nome and id <> :id", Estado.class)
+					.setParameter("nome", nome.toUpperCase()).setParameter("id", (id == null? -1 : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param uf
+	 * @param id
+	 * @return O estado verificando se a UF já está cadastrado
+	 */
+	public Estado porUfUnico(String uf, Long id) {
+		try {
+			return manager.createQuery("from Estado where upper(uf) = :uf and id <> :id", Estado.class)
+					.setParameter("uf", uf.toUpperCase()).setParameter("id", (id == null? -1 : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<Estado> porNome(String nome) {
+		return this.manager.createQuery("from Estado where upper(nome) like :nome", Estado.class)
+				.setParameter("nome", nome.toUpperCase() + "%").getResultList();
+	}
+
+}

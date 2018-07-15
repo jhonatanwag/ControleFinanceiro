@@ -1,0 +1,110 @@
+package br.com.sistemacomercial.nfe;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
+
+public class WrapperSet<T, E>
+  implements Set<E>
+{
+  private Set<E> set;
+  private T parent;
+  private String setter;
+  
+  public WrapperSet(T parent, Set<E> set)
+  {
+    this.parent = parent;
+    this.set = set;
+    this.setter = ("set" + parent.getClass().getSimpleName());
+  }
+  
+  public WrapperSet(T parent, String setter, Set<E> set)
+  {
+    this.parent = parent;
+    this.set = set;
+    this.setter = setter;
+  }
+  
+  public boolean add(E e)
+  {
+    setParent(e);
+    return this.set.add(e);
+  }
+  
+  private void setParent(E e)
+  {
+    try
+    {
+      Method method = e.getClass().getMethod(this.setter, new Class[] { this.parent.getClass() });
+      method.invoke(e, new Object[] { this.parent });
+    }
+    catch (Exception e1)
+    {
+      throw new RuntimeException(e1);
+    }
+  }
+  
+  public boolean addAll(Collection<? extends E> c)
+  {
+    for (E x : c) {
+      setParent(x);
+    }
+    return this.set.addAll(c);
+  }
+  
+  public void clear()
+  {
+    this.set.clear();
+  }
+  
+  public boolean contains(Object o)
+  {
+    return this.set.contains(o);
+  }
+  
+  public boolean containsAll(Collection<?> c)
+  {
+    return this.set.containsAll(c);
+  }
+  
+  public boolean isEmpty()
+  {
+    return this.set.isEmpty();
+  }
+  
+  public Iterator<E> iterator()
+  {
+    return this.set.iterator();
+  }
+  
+  public boolean remove(Object o)
+  {
+    return this.set.remove(o);
+  }
+  
+  public boolean removeAll(Collection<?> c)
+  {
+    return this.set.removeAll(c);
+  }
+  
+  public boolean retainAll(Collection<?> c)
+  {
+    return this.set.retainAll(c);
+  }
+  
+  public int size()
+  {
+    return this.set.size();
+  }
+  
+  public Object[] toArray()
+  {
+    return this.set.toArray();
+  }
+  
+  public <X> X[] toArray(X[] a)
+  {
+    return this.set.toArray(a);
+  }
+}

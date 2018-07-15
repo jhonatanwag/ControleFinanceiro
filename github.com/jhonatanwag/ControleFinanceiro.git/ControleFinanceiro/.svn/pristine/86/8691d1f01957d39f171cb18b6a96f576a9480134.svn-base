@@ -1,0 +1,78 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.Funcionario;
+
+public class VendaFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private Cliente cliente;
+	private Date dataVendaDe;
+	private Date dataVendaAte;
+	private Funcionario funcionario;
+
+	public VendaFilter() {
+		super();
+	}
+
+	public VendaFilter(Date dataVendaDe, Date dataVendaAte) {
+		super();
+		this.dataVendaDe = dataVendaDe;
+		this.dataVendaAte = dataVendaAte;
+	}
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public Date getDataVendaDe() {
+		return dataVendaDe;
+	}
+
+	public void setDataVendaDe(Date dataVendaDe) {
+		this.dataVendaDe = dataVendaDe;
+	}
+
+	public Date getDataVendaAte() {
+		return dataVendaAte;
+	}
+
+	public void setDataVendaAte(Date dataVendaAte) {
+		this.dataVendaAte = dataVendaAte;
+	}
+
+	public Funcionario getFuncionario() {
+		return funcionario;
+	}
+
+	public void setFuncionario(Funcionario funcionario) {
+		this.funcionario = funcionario;
+	}
+
+}

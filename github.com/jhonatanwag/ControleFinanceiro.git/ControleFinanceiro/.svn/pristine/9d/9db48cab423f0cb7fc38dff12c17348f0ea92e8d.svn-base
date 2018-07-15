@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Seleção de produtos</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<h:outputStylesheet library="css" name="sistema.css" />
+</h:head>
+<h:body>
+
+	<h:form id="formListar">
+		<div class="ContainerIndent">
+			<p:panel>
+
+				<p:panelGrid columns="2" id="painel" columnClasses="rotulo, campo">
+					<p:outputLabel value="Descrição" />
+					<p:inputText
+						value="#{pesquisaProdutoBean.filtro.descricaoCodigoProduto}"
+						maxlength="100" />
+				</p:panelGrid>
+
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:commandButton value="Pesquisar"
+							action="#{pesquisaProdutoBean.pesquisar}" update="@form" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:panel>
+					<p:growl id="messages" showDetail="true" autoUpdate="true"
+						sticky="true" />
+
+					<p:dataTable id="dataTableProduto" reflow="true"
+						value="#{pesquisaProdutoBean.objetosFiltrados}" var="produto"
+						style="margin-top: 20px"
+						emptyMessage="Nenhuma produto encontrado." rows="20"
+						paginator="true" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom">
+
+						<p:column id="idpessoa" headerText="Código" sortBy="#{produto.id}">
+							<h:outputText value="#{produto.id}" />
+						</p:column>
+
+						<p:column id="ean" headerText="Ean13" sortBy="#{produto.ean13}">
+							<h:outputText value="#{produto.ean13}" />
+						</p:column>
+
+						<p:column id="descricao" headerText="Descrição"
+							sortBy="#{produto.descricao}">
+							<h:outputText value="#{produto.descricao}" />
+						</p:column>
+
+						<p:column id="preco" headerText="Preço Atual">
+							<h:outputText value="#{produto.precoAtual}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+
+						<!-- 						<p:column id="marca" headerText="Marca" style="width: 70px" -->
+						<!-- 							sortBy="{produto.marca.descricao}"> -->
+						<!-- 							<h:outputText value="{produto.marca.descricao}" /> -->
+						<!-- 						</p:column> -->
+
+						<p:column id="unidadeMedida" headerText="unidadeMedida"
+							sortBy="#{produto.unidadeMedida.sigla}">
+							<h:outputText value="#{produto.unidadeMedida.sigla}" />
+						</p:column>
+
+						<p:column headerText="Grupo">
+							<h:outputText value="#{produto.subGrupo.grupo.descricao}" />
+						</p:column>
+
+						<p:column headerText="Subgrupo">
+							<h:outputText value="#{produto.subGrupo.descricao}" />
+						</p:column>
+
+
+						<p:column>
+							<p:commandButton icon="ui-icon-check" title="Selecionar"
+								action="#{pesquisaProdutoBean.selecionar(produto)}"
+								process="@this" />
+						</p:column>
+
+
+					</p:dataTable>
+				</p:panel>
+			</p:panel>
+		</div>
+	</h:form>
+</h:body>
+</html>

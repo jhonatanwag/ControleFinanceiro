@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab id="tabInfFuncionario" title="Funcionário"
+			rendered="#{cadastroPessoaBean.objeto.funcionario}"
+			disabled="#{!cadastroPessoaBean.objeto.funcionario}">
+			<p:panel>
+				<p:panelGrid columns="2" id="painelFuncionario"
+					columnClasses="rotulo, campo">
+					<p:outputLabel value="Data admissão" for="dataAdmissao" />
+					<p:calendar id="dataAdmissao" pattern="dd/MM/yyyy"
+						value="#{cadastroPessoaBean.objeto.funcionarioPessoa.dataAdmissao}"
+						required="false" maxlength="10" class="campo25" />
+					<p:outputLabel value="Carteira de trabalho" for="carteira" />
+					<p:inputText id="carteira" maxlength="15"
+						value="#{cadastroPessoaBean.objeto.funcionarioPessoa.numCarteiraTrabalho}"
+						required="false" class="campo25" />
+					<p:outputLabel value="Agenda pública(Somente visualização)" for="ag" />
+					<p:selectBooleanCheckbox id="ag"
+						value="#{cadastroPessoaBean.objeto.funcionarioPessoa.agendaPublica}">
+					</p:selectBooleanCheckbox>
+					<p:outputLabel value="Edição pública(Qualquer pessoa pode modificar sua agenda)" for="agEd" />
+					<p:selectBooleanCheckbox id="agEd"
+						value="#{cadastroPessoaBean.objeto.funcionarioPessoa.permiteEdicaoAgenda}">
+					</p:selectBooleanCheckbox>
+				</p:panelGrid>
+			</p:panel>
+		</p:tab>
+</ui:composition>

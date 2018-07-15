@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Produto Sabor" widgetVar="DlgProdutoSabores" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<p:panelGrid id="painelProdutoSabor" columns="2">
+
+			<p:outputLabel value="Sabor" for="sabor" />
+			<p:selectOneMenu id="sabor" required="false"
+				value="#{cadastroProdutoBean.produtoSaborSelecionado.sabor}">
+				<f:selectItems value="#{cadastroProdutoBean.todosSabores}"
+					var="sabor" itemValue="#{sabor}"
+					itemLabel="#{sabor.descricao}" />
+			</p:selectOneMenu>
+
+		</p:panelGrid>
+
+		<h:panelGrid rendered="true" columns="3" cellpadding="5"
+			style="margin: 0 auto;">
+			<p:commandButton id="bntConfirmarSabor" value="Confirmar"
+				actionListener="#{cadastroProdutoBean.confirmarProdutoSabor()}"
+				update="painelProdutoSabor, :form:tabViewPrincipal:tabelaSabores"
+				oncomplete="if (!args.validationFailed) PF('DlgProdutoSabores').hide();" />
+
+			<p:commandButton id="bntCancelarSabor" value="Cancelar"
+				immediate="true" oncomplete="PF('DlgProdutoSabores').hide();">
+			</p:commandButton>
+		</h:panelGrid>
+	</p:dialog>
+</ui:composition>

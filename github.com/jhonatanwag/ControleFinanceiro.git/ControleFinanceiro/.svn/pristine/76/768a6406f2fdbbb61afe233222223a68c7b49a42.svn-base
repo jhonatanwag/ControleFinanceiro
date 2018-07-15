@@ -1,0 +1,33 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.inject.Inject;
+import br.com.sistemacomercial.model.Inventario;
+import br.com.sistemacomercial.repository.Inventarios;
+import br.com.sistemacomercial.repository.filter.InventarioFilter;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class InventarioService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Inventarios inventarios;
+	
+
+	@Transactional
+	public Inventario salvar(Inventario inv) {
+		return inventarios.salvar(inv);
+	}
+
+
+	public List<Inventario> filtrados(InventarioFilter filtro) {
+		// TODO Auto-generated method stub
+		return inventarios.filtrados(filtro);
+	}
+
+	
+
+}

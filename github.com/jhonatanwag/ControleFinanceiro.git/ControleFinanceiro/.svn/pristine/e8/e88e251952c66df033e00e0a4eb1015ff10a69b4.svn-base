@@ -1,0 +1,43 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import br.com.sistemacomercial.enums.TipoCreditoDebito;
+
+@Entity
+@Table(name="rede_adm")
+public class Administradora implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;	
+	@Id
+	@GeneratedValue()
+	@Column(name = "rede_adm_id")
+	private Long id;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "rede_id")
+	private Rede rede;
+	@Column(name="taxa_adm", nullable=false)
+	private BigDecimal taxaAdm;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name="tipo_carto", nullable=false)
+	private TipoCreditoDebito tipoCartao = TipoCreditoDebito.C;
+	@Column(name="aceita_parc", nullable=false)
+	private Boolean aceitaParcelamento = Boolean.TRUE;
+}

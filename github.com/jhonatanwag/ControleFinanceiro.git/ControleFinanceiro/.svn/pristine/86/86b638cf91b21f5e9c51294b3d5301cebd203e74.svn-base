@@ -1,0 +1,34 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.TipoLogradouro;
+import br.com.sistemacomercial.repository.TipoLogradouros;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroTipoLogradouroService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TipoLogradouros tipoLogradouros;
+
+	@Transactional
+	public TipoLogradouro salvar(TipoLogradouro tipoLogradouro) {
+		TipoLogradouro tipoLogradouroExiste = tipoLogradouros.porDescricaoUnico(tipoLogradouro.getDescricao());
+
+		if (tipoLogradouroExiste != null && !tipoLogradouroExiste.equals(tipoLogradouro)) {
+			throw new NegocioException("Já existe um tipo de logradouro com o mesma descrição cadastrado.");
+		}
+
+		tipoLogradouroExiste = tipoLogradouros.porAbreviacaoUnico(tipoLogradouro.getAbreviacao());
+		if (tipoLogradouroExiste != null && !tipoLogradouroExiste.equals(tipoLogradouro)) {
+			throw new NegocioException("Já existe um tipo de logradouro com a mesma abreviação cadastrada.");
+		}
+
+		return tipoLogradouros.salvar(tipoLogradouro);
+	}
+
+}

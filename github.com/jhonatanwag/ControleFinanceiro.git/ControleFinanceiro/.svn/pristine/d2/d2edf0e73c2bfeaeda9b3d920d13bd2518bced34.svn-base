@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+
+public class RedeFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private String nomeRede;
+	private String codigoRede;
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public String getNomeRede() {
+		return nomeRede;
+	}
+
+	public void setNomeRede(String nomeRede) {
+		this.nomeRede = nomeRede;
+	}
+
+	public String getCodigoRede() {
+		return codigoRede;
+	}
+
+	public void setCodigoRede(String codigoRede) {
+		this.codigoRede = codigoRede;
+	}
+
+}

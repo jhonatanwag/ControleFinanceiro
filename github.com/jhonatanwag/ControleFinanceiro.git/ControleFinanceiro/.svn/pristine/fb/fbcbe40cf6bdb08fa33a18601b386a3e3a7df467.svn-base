@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Últimos Pagamentos" widgetVar="DlgUltimosPgtos" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+
+        <p:dataTable value="#{recebimentoBean.ultimosRecebimentos}" var="recebimento">
+        
+        </p:dataTable>
+
+
+		<h:panelGrid rendered="true" columns="3" cellpadding="5"
+			style="margin: 0 auto;">
+			<p:commandButton value="Fechar" immediate="true"
+				oncomplete="PF('DlgUltimosPgtos').hide();">
+			</p:commandButton>
+		</h:panelGrid>
+	</p:dialog>
+</ui:composition>

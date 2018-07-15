@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ps="http://primefaces.org/sentinel"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:form>
+
+		<div id="layout-menubar" class="Unselectable fontRegular">
+			<div class="layout-menubarinner-box" id="buttonArea">
+				<a href="#" id="layout-menubar-resize" class="BordRad3"
+					title="Menu Resize"><i class="icon-th-list-2"></i></a> <a href="#"
+					id="layout-menubar-resize2" class="BordRad3" title="Open Menu"><i
+					class="icon-menu"></i></a>
+			</div>
+
+			<ps:menu id="sm_leftmenu">
+				<p:menuitem id="sm_dashboard" value="#{msg['label.menu.principal']}"
+					icon="icon-home-outline" url="/DashBoard.xhtml"
+					containerStyleClass="layout-menubar-active" />
+
+				<p:submenu id="smCadastratos" label="#{msg['label.menu.cadastros']}"
+					icon="icon-folder-open">
+
+					<p:submenu id="smCadConta"
+						label="#{msg['label.menu.cadastros.contas']}" icon="icon-users">
+						<p:menuitem id="smLnkConta"
+							value="#{msg['label.menu.cadastros.contas']}"
+							outcome="/conta/PesquisaConta" icon="icon-users-2" />	
+							
+							<p:menuitem id="smLnkGrupo"
+							value="#{msg['label.menu.cadastros.grupo']}"
+							outcome="/grupo/PesquisaGrupo" icon="icon-users-2" />
+							
+							<p:menuitem id="smLnkProgramacao"
+							value="#{msg['label.menu.cadastros.programacao']}"
+							outcome="/programacao/PesquisaProgramacao" icon="icon-users-2" />							
+					</p:submenu>
+
+					<p:submenu id="smCadPessoa"
+						label="#{msg['label.menu.cadastros.pessoas']}" icon="icon-users">
+						<p:menuitem id="smLnkPessoa"
+							value="#{msg['label.menu.cadastros.pessoas.pessoa']}"
+							outcome="/pessoa/PesquisaPessoa" icon="icon-users-2" />
+						<p:menuitem value="Usuários" outcome="/usuario/PesquisaUsuario"
+							icon="icon-users" />
+					</p:submenu>
+
+					<p:submenu label="#{msg['label.menu.cadastros.localizacoes']}"
+						icon="icon-globe">
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.pais']}"
+							outcome="/pais/PesquisaPais" icon="icon-location-outline" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.estado']}"
+							outcome="/estado/PesquisaEstado" icon="icon-location-1" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.cidade']}"
+							outcome="/cidade/PesquisaCidade" icon="icon-location-2" />
+					</p:submenu>
+
+				</p:submenu>
+			</ps:menu>
+
+		</div>
+	</h:form>
+
+</ui:composition>

@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Email" widgetVar="DlgEmail" modal="true" dynamic="true"
+		responsive="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDialogEmail">
+			<p:messages id="messagesEmail" closable="true" autoUpdate="true" />
+			<p:panelGrid id="painelEmail" columns="2"
+				columnClasses="rotulo,campo">
+				<p:outputLabel value="Tipo de Email:" for="tipoEmail" />
+				<p:selectOneMenu id="tipoEmail" required="true"
+					filterMatchMode="startsWith" filter="true"
+					value="#{cadastroPessoaBean.emailSelecionado.tipoEmail}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroPessoaBean.tipoEmails}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Email:" for="email" />
+				<p:inputText value="#{cadastroPessoaBean.emailSelecionado.endereco}"
+					validatorMessage="Informe um email válido." id="email"
+					required="true" class="campo90" maxlength="80">
+					<f:validateRegex
+						pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+				</p:inputText>
+
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmarEmail" value="Confirmar"
+					actionListener="#{cadastroPessoaBean.confirmarEmail()}"
+					update=":formDialogEmail, :formCadastroPessoa:tabViewPrincipal:tabView:dataTableEmails"
+					oncomplete="if (!args.validationFailed) PF('DlgEmail').hide();" />
+
+				<p:commandButton id="bntCancelarEmail" value="Cancelar"
+					immediate="true" oncomplete="PF('DlgEmail').hide();" />
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

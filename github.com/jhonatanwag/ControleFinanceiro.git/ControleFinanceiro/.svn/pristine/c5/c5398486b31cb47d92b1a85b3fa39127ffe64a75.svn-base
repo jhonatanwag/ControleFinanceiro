@@ -1,0 +1,322 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+import br.com.sistemacomercial.enums.TipoPessoa;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name = "pessoa")
+public class Pessoa implements Serializable {
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "pessoa_id")
+	private Long id;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_cadastro", nullable = false)
+	private Date dataCadastro = new Date();
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "situacao_cadastro", nullable = false)
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "tipo_pessoa", nullable = false)
+	private TipoPessoa tipoPessoa;
+	@Column(length = 100, nullable = false)
+	private String nome;
+	@Column(name = "razao_social")
+	private String razaoSocial;
+	@Column(name = "documento_federal", length = 20)
+	private String documentoFederal;
+	@Column(name = "documento_estadual", length = 20)
+	private String documentoEstadual;
+	@Column(name = "observacao")
+	private String observacao;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "pessoa", orphanRemoval = true)
+	private List<Telefone> telefones = new ArrayList<>();
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "pessoa", orphanRemoval = true)
+	private List<Email> emails = new ArrayList<>();
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "pessoa", orphanRemoval = true)
+	private List<Enderecos> enderecos = new ArrayList<>();
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "pessoa", orphanRemoval = true)
+	private List<InformacoesBancaria> informacoesBancarias = new ArrayList<>();
+	private boolean cliente = false;
+	private boolean fornecedor = false;
+	private boolean funcionario = false;
+	@Cascade(CascadeType.ALL)
+	@OneToOne(mappedBy = "pessoa")
+	private Cliente clientePessoa;
+	@Cascade(CascadeType.ALL)
+	@OneToOne(mappedBy = "pessoa")
+	private Funcionario funcionarioPessoa;
+	@Cascade(CascadeType.ALL)
+	@OneToOne(mappedBy = "pessoa")
+	private Fornecedor fornecedorPessoa;
+	@Cascade(CascadeType.ALL)
+	@OneToOne(mappedBy = "pessoa", fetch = FetchType.EAGER)
+	private InformacoesPessoais informacoesPessoais;
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "etnia_id",nullable=true)
+	private Etnia etnia;
+	@Version
+	private Long versao;
+	@Cascade(CascadeType.ALL)
+	public boolean isCliente() {
+		return cliente;
+	}
+
+	public void setCliente(boolean cliente) {
+		this.cliente = cliente;
+		if (cliente == true && clientePessoa == null) {
+			this.clientePessoa = new Cliente(this);
+		}
+	}
+
+	public void setFuncionario(boolean funcionario) {
+		this.funcionario = funcionario;
+		if (funcionario == true && funcionarioPessoa == null) {
+			this.funcionarioPessoa = new Funcionario(this);
+		}
+	}
+
+	public void setFornecedor(boolean fornecedor) {
+		this.fornecedor = fornecedor;
+		if (fornecedor == true && fornecedorPessoa == null) {
+			this.fornecedorPessoa = new Fornecedor(this);
+		}
+	}
+
+	public Funcionario getFuncionarioPessoa() {
+		return funcionarioPessoa;
+	}
+
+	public void setFuncionarioPessoa(Funcionario funcionarioPessoa) {
+		this.funcionarioPessoa = funcionarioPessoa;
+	}
+
+	public Fornecedor getFornecedorPessoa() {
+		return fornecedorPessoa;
+	}
+
+	public void setFornecedorPessoa(Fornecedor fornecedorPessoa) {
+		this.fornecedorPessoa = fornecedorPessoa;
+	}
+
+	public boolean isFornecedor() {
+		return fornecedor;
+	}
+
+	public boolean isFuncionario() {
+		return funcionario;
+	}
+
+	public List<Telefone> getTelefones() {
+		return telefones;
+	}
+
+	public void setTelefones(List<Telefone> telefones) {
+		this.telefones = telefones;
+	}
+
+	public List<Email> getEmails() {
+		return emails;
+	}
+
+	public void setEmails(List<Email> emails) {
+		this.emails = emails;
+	}
+
+	public List<Enderecos> getEnderecos() {
+		return enderecos;
+	}
+
+	public void setEnderecos(List<Enderecos> enderecos) {
+		this.enderecos = enderecos;
+	}
+
+	public List<InformacoesBancaria> getInformacoesBancarias() {
+		return informacoesBancarias;
+	}
+
+	public void setInformacoesBancarias(List<InformacoesBancaria> informacoesBancarias) {
+		this.informacoesBancarias = informacoesBancarias;
+	}
+
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public String getDocumentoEstadual() {
+		return documentoEstadual;
+	}
+
+	public void setDocumentoEstadual(String documentoEstadual) {
+		this.documentoEstadual = documentoEstadual;
+	}
+
+	public String getDocumentoFederal() {
+		return documentoFederal;
+	}
+
+	public void setDocumentoFederal(String documentoFederal) {
+		if (!documentoFederal.equals("   .   .   -  ") && this.tipoPessoa.equals(TipoPessoa.FISICA)) {
+			this.documentoFederal = documentoFederal;
+		} else if (!documentoFederal.equals("  .   .   /    -  ") && this.tipoPessoa.equals(TipoPessoa.JURIDICA)) {
+			this.documentoFederal = documentoFederal;
+		} else {
+			this.documentoFederal = null;
+		}
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getObservacao() {
+		return observacao;
+	}
+
+	public void setObservacao(String observacao) {
+		this.observacao = observacao;
+	}
+
+	public TipoPessoa getTipoPessoa() {
+		return tipoPessoa;
+	}
+
+	public void setTipoPessoa(TipoPessoa tipoPessoa) {
+		this.tipoPessoa = tipoPessoa;
+		if (tipoPessoa.equals(TipoPessoa.FISICA) && this.informacoesPessoais == null) {
+			this.informacoesPessoais = new InformacoesPessoais(this);
+		}
+	}
+
+	public Cliente getClientePessoa() {
+		return clientePessoa;
+	}
+
+	public void setClientePessoa(Cliente clientePessoa) {
+		this.clientePessoa = clientePessoa;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+
+	public InformacoesPessoais getInformacoesPessoais() {
+		return informacoesPessoais;
+	}
+
+	public void setInformacoesPessoais(InformacoesPessoais informacoesPessoais) {
+		this.informacoesPessoais = informacoesPessoais;
+	}
+
+	public Etnia getEtnia() {
+		return etnia;
+	}
+
+	public void setEtnia(Etnia etnia) {
+		this.etnia = etnia;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Pessoa other = (Pessoa) obj;
+		if (this.tipoPessoa != other.tipoPessoa) {
+			return false;
+		}
+		if ((this.nome == null) ? (other.nome != null) : !this.nome.equals(other.nome)) {
+			return false;
+		}
+		if ((this.documentoFederal == null) ? (other.documentoFederal != null)
+				: !this.documentoFederal.equals(other.documentoFederal)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 17 * hash + (this.tipoPessoa != null ? this.tipoPessoa.hashCode() : 0);
+		hash = 17 * hash + (this.nome != null ? this.nome.hashCode() : 0);
+		hash = 17 * hash + (this.documentoFederal != null ? this.documentoFederal.hashCode() : 0);
+		return hash;
+	}
+}

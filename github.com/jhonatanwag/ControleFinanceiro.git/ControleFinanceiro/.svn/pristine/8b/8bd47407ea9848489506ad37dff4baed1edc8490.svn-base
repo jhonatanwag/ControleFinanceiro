@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Trocar Nome" widgetVar="DlgRenomear" modal="true" responsive="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogRenomear">
+			
+				<p:messages id="messagesRenomear" closable="true"
+				autoUpdate="true" />
+			
+			<p:panelGrid columns="2" style="margin-top: 10px">
+				<p:outputLabel value="Descrição(atual)" for="descrAtual" />
+				<h:outputText id="descrAtual" size="100" maxlength="100"
+					style="text-align: right"
+					value="#{vendaBean.itemVendaSelecionado.produto.descricao}"/>					
+				                
+                <p:outputLabel value="Novo nome" for="novoNome" />
+				<p:inputText id="novoNome" size="100" required="true" maxlength="100"
+					 style="text-align: right" 
+					value="#{vendaBean.itemVendaSelecionado.descricao}">									
+				</p:inputText>
+			</p:panelGrid>
+
+			
+			<p:panelGrid rendered="true" columns="2" cellpadding="5"
+					style="margin: 0 auto;">
+
+					<p:commandButton id="bntConfirmar" value="Confirmar"
+						oncomplete="if (!args.validationFailed) PF('DlgRenomear').hide();" />
+
+					<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+						oncomplete="PF('DlgRenomear').hide();" />
+				</p:panelGrid>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,36 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+/**
+ *
+ * @author Danilo
+ */
+public enum TipoPessoa {
+
+    FISICA("Física"),
+    JURIDICA("Jurídica");
+    private String value;
+
+    private TipoPessoa(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static TipoPessoa getTipoPessoa(Integer value) {
+        switch (value) {
+            case 0:
+                return FISICA;
+            case 1:
+                return JURIDICA;
+            default:
+                return FISICA;
+        }
+    }
+}

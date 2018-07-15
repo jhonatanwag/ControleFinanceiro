@@ -1,0 +1,80 @@
+package br.com.sistemacomercial.teste;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
+
+import br.com.sistemacomercial.enums.SituacaoDocumento;
+import br.com.sistemacomercial.enums.TipoTitulo;
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.ItemVenda;
+import br.com.sistemacomercial.model.ParcelaTitulo;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.Titulo;
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.model.Venda;
+
+public class TesteConexao {
+	public static void main(String[] args) {
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("SisComercialPU");
+		EntityManager manager = factory.createEntityManager();
+		Produto p = null;
+		UnidadeMedida unidadeMedida = null;
+		Cliente cliente = null;
+
+		EntityTransaction trx = manager.getTransaction();
+		trx.begin();
+
+		try {
+			p = manager.createQuery("from Produto where id = :id", Produto.class).setParameter("id", 16L)
+					.getSingleResult();
+		} catch (NoResultException e) {
+
+		}
+
+		try {
+			unidadeMedida = manager.createQuery("from UnidadeMedida where id = :id", UnidadeMedida.class)
+					.setParameter("id", 40L).getSingleResult();
+		} catch (NoResultException e) {
+
+		}
+
+		try {
+			cliente = manager.createQuery("from Cliente where id = :id", Cliente.class).setParameter("id", 11L)
+					.getSingleResult();
+		} catch (NoResultException e) {
+
+		}
+
+		Venda venda = new Venda();
+		venda.setDataVenda(new Date());
+		venda.setCliente(cliente);
+
+		ItemVenda itemVenda = new ItemVenda();
+		itemVenda.setProduto(p);
+		itemVenda.setVenda(venda);
+		itemVenda.setQuantidade(BigDecimal.TEN);
+		itemVenda.setValorUnitario(new BigDecimal(25));
+		itemVenda.setUnidadeMedida(unidadeMedida);
+		venda.getItensVenda().add(itemVenda);
+		ItemVenda itemVenda2 = new ItemVenda();
+		itemVenda2.setProduto(p);
+		itemVenda2.setVenda(venda);
+		itemVenda2.setQuantidade(BigDecimal.TEN);
+		itemVenda2.setValorUnitario(new BigDecimal(10));
+		itemVenda2.setUnidadeMedida(unidadeMedida);
+		venda.getItensVenda().add(itemVenda2);
+
+
+		manager.persist(venda);
+
+
+		trx.commit();
+		factory.close();
+	}
+}

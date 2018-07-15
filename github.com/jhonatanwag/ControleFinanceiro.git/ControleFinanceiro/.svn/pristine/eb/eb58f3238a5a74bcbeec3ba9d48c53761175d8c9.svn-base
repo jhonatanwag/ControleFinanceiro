@@ -1,0 +1,86 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de redes</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<h1>Pesquisa de redes</h1>
+
+			<p:panelGrid columns="2" id="painel"
+				style="width: 100%; margin-top: 20px" columnClasses="rotulo, campo">
+				<p:outputLabel value="Código" />
+				<h:panelGroup>
+					<p:inputText size="10" value="#{pesquisaRedeBean.filtro.idDe}"
+						maxlength="6" />
+	    			a
+	    			<p:inputText size="10" value="#{pesquisaRedeBean.filtro.idAte}"
+						maxlength="6" />
+				</h:panelGroup>
+
+				<p:outputLabel value="nomeBanco" />
+				<p:inputText value="#{pesquisaRedeBean.filtro.nomeRede}"
+					size="100" maxlength="100" />
+
+			</p:panelGrid>
+
+
+			<p:toolbar style="margin-top: 20px">
+				<p:toolbarGroup>
+					<p:commandButton value="Pesquisar"
+						action="#{pesquisaRedeBean.pesquisar}" update="@form" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:button value="Novo" outcome="CadastroRede.xhtml" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:dataTable id="bancoTable"
+				value="#{pesquisaRedeBean.objetosFiltrados}" var="rede"
+				style="margin-top: 20px" emptyMessage="Nenhuma rede encontrada."
+				rows="20" paginator="true" paginatorAlwaysVisible="false"
+				paginatorPosition="bottom">
+
+				<p:column headerText="Código"
+					style="text-align: center; width: 70px">
+					<h:outputText value="#{rede.id}" />
+				</p:column>
+
+
+				<p:column headerText="Descrição" sortBy="#{rede.descricao}">
+					<h:outputText value="#{rede.descricao}" />
+				</p:column>
+
+
+				<p:column style="width: 100px; text-align: center">
+					<p:button outcome="/rede/CadastroRede" icon="ui-icon-pencil"
+						title="Editar">
+						<f:param name="rede" value="#{rede.id}" />
+					</p:button>
+					<p:commandButton icon="ui-icon-trash" title="Excluir"
+						oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+						update=":frmPesquisa:confirmacaoExclusaoDialog">
+						<f:setPropertyActionListener
+							target="#{pesquisaRedeBean.objetoSelecionado}" value="#{rede}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+			<p:confirmDialog header="Exclusão da rede"
+				message="Tem certeza que deseja excluir a cor #{pesquisaRedeBean.objetoSelecionado.nomeBanco}?"
+				widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				<p:button value="Não"
+					onclick="PF('confirmacaoExclusao').hide(); return false;" />
+				<p:commandButton value="Sim"
+					oncomplete="PF('confirmacaoExclusao').hide();"
+					action="#{pesquisaRedeBean.excluir}" process="@this"
+					update=":frmPesquisa:bancoTable" />
+			</p:confirmDialog>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

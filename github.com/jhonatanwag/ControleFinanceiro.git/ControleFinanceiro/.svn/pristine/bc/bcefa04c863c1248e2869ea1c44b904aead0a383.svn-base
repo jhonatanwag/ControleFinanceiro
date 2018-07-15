@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab title="Subgrupo">
+		<p:toolbar style="margin-top: 20px">
+			<p:toolbarGroup align="left">
+				<p:commandButton value="Novo" process="@this"
+					oncomplete="PF('DlgSubGrupo').show()"
+					action="#{cadastroGrupoBean.novoSubGrupo}"
+					update=":formDialogSubGrupo" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable value="#{cadastroGrupoBean.objeto.subGrupos}"
+			var="subGrupo" rowIndexVar="linha" id="tabelaSubGrupo"
+			emptyMessage="Nenhum subgrupo encontrado.">
+
+			<p:column id="subGrupoId" headerText="Código" sortBy="#{subGrupo.id}">
+				<h:outputText value="#{subGrupo.id}">
+				</h:outputText>
+			</p:column>
+
+			<p:column headerText="Descrição" sortBy="#{subGrupo.descricao}">
+				<h:outputText value="#{subGrupo.descricao}" />
+			</p:column>
+
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-pencil"
+					action="#{cadastroGrupoBean.alterarSubGrupo()}"
+					oncomplete="PF('DlgSubGrupo').show();" process="@this"
+					update=":formDialogSubGrupo"
+					title="#{msg['label.editar']} #{subGrupo.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroGrupoBean.subGrupoSelecionado}"
+						value="#{subGrupo}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationSubGrupo').show()" process="@this"
+					title="#{msg['label.excluir']} #{subGrupo.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroGrupoBean.subGrupoSelecionado}"
+						value="#{subGrupo}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogSubGrupo" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationSubGrupo">
+			<p:commandButton id="confirm" value="#{msg['confirma.sim']}"
+				update=":form:tabView:tabelaSubGrupo"
+				oncomplete="PF('confirmationSubGrupo').hide();" immediate="true"
+				actionListener="#{cadastroGrupoBean.excluirSubGrupo()}" />
+
+			<p:commandButton id="decline" value="#{msg['confirma.nao']}"
+				onclick="PF('confirmationSubGrupo').hide();" ajax="false" />
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

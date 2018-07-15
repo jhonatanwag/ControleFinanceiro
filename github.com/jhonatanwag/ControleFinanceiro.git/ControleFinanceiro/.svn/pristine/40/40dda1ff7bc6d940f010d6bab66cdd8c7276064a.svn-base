@@ -1,0 +1,115 @@
+package nfe;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ValorPadraoPropriedade
+{
+  private static final ValorPadraoPropriedade INSTANCIA = new ValorPadraoPropriedade();
+  private Map<String, String> mapPropriedade = null;
+  
+  public static ValorPadraoPropriedade getInstancia()
+  {
+    return INSTANCIA;
+  }
+  
+  public ValorPadraoPropriedade()
+  {
+    if (this.mapPropriedade == null)
+    {
+      this.mapPropriedade = new LinkedHashMap();
+      this.mapPropriedade.put("ip", "127.0.0.1");
+      this.mapPropriedade.put("porta", "8080");
+      this.mapPropriedade.put("arquivo.pfx", "certificado.pfx");
+      this.mapPropriedade.put("senha.certificado", "d4nfe5");
+      this.mapPropriedade.put("senha.arquivo.jks", "123456");
+      this.mapPropriedade.put("recuperacao.lotes.incompletos", "sim");
+      this.mapPropriedade.put("recuperacao.envio.consulta.lote", "sim");
+      this.mapPropriedade.put("montagem.lote.normal", "sim");
+      this.mapPropriedade.put("montagem.lote.evt", "sim");
+      this.mapPropriedade.put("montagem.lote.contingencia.sefaz", "sim");
+      this.mapPropriedade.put("gerenciador.nota", "sim");
+      this.mapPropriedade.put("tempo.considerar.lentidao.ws", "5");
+      this.mapPropriedade.put("tempo.ciclo.montador.lote", "3");
+      this.mapPropriedade.put("tempo.ciclo.montador.lote.evt", "3");
+      this.mapPropriedade.put("tempo.ciclo.gerenciador.nota", "3");
+      this.mapPropriedade.put("tempo.default.consulta.lote", "10");
+      this.mapPropriedade.put("tempo.maximo.espera.consulta.lote", "20");
+      this.mapPropriedade.put("tempo.maximo.espera.proxima.tentativa.erro.sefaz", "60");
+      this.mapPropriedade.put("tempo.limite.registrar.demora.processamento.lote", "20");
+      this.mapPropriedade.put("arquivo.logo.danfe", "logo_db1.jpg");
+      this.mapPropriedade.put("nome.servidor", "servidorDefault");
+      this.mapPropriedade.put("qtde.maxima.notas.por.lote", "50");
+      this.mapPropriedade.put("qtde.notas.por.leitura", "80");
+      this.mapPropriedade.put("qtde.tentativas.timeout", "4");
+      this.mapPropriedade.put("tamanho.maximo.lote.em.kbytes", "500");
+      this.mapPropriedade.put("tempo.espera.apos.timeout.em.segundos", "15");
+      this.mapPropriedade.put("tempo.proxima.notificacao.em.segundos", "900");
+      this.mapPropriedade.put("webservice.timeout", "300");
+      this.mapPropriedade.put("dir.temp", "D:/db1/edig/temp");
+      this.mapPropriedade.put("imprimir.infadprod", "nao");
+      this.mapPropriedade.put("dia.envio.email.acao.notas.emitidas.mes", "01");
+      this.mapPropriedade.put("edig.danfe.guia.recibo.embaixo", "nao");
+      this.mapPropriedade.put("remove.caracter.especial.nf", "nao");
+      this.mapPropriedade.put("edig.envio-lote.max-tentativas.normal", "5");
+      this.mapPropriedade.put("edig.envio-lote.max-tentativas.contingencia", "1000");
+      this.mapPropriedade.put("dacce.mensagem.rodape", "null");
+      this.mapPropriedade.put("dacte.mensagem.rodape", "null");
+      this.mapPropriedade.put("danfe.mensagem.rodape", "null");
+      this.mapPropriedade.put("monitor.max.result.empresa", "20");
+      this.mapPropriedade.put("monitor.max.result.documentos", "20");
+      this.mapPropriedade.put("monitor.max.result.operacoes", "20");
+      this.mapPropriedade.put("max.threads.concorrentes", "999");
+      this.mapPropriedade.put("tempo.ciclo.verificacao.email.minutos", "10");
+      this.mapPropriedade.put("verificacao.email", "nao");
+      this.mapPropriedade.put("valida.xml.fornecedor", "nao");
+      this.mapPropriedade.put("max.tentativas.consulta.lote", "999");
+      this.mapPropriedade.put("reenvia.lote.rejeitado", "nao");
+      this.mapPropriedade.put("qtde.notas.fornecedor", "20");
+      this.mapPropriedade.put("cancelamento.nfe.evt", "nao");
+      this.mapPropriedade.put("max.tentativas.consulta.fornecedor", "5");
+      this.mapPropriedade.put("configura.ids.iniciais.edignfeenvio", "sim");
+      this.mapPropriedade.put("estados.desabilitados", "");
+      this.mapPropriedade.put("tempo.ciclo.consulta.destinatario", "1");
+      this.mapPropriedade.put("consulta.destinatario", "sim");
+      this.mapPropriedade.put("horario.execucao.consulta.dest", "");
+      this.mapPropriedade.put("porta.socket.erro", "25497");
+      this.mapPropriedade.put("controla.envio.email.cliente", "nao");
+      this.mapPropriedade.put("monitora.nfe.fornecedor", "nao");
+      this.mapPropriedade.put("qtde.notas.fornecedor.pendentes.consultar", "100");
+      this.mapPropriedade.put("restringe.doc.fornecedor.usuario.final", "sim");
+      this.mapPropriedade.put("qtde.maxima.evt.por.lote", "20");
+      this.mapPropriedade.put("encaminha.email.erro.remetente", "nao");
+      this.mapPropriedade.put("envio.resumo.volume", "01");
+      
+      this.mapPropriedade.put("integrador.edig.erp", "sim");
+      this.mapPropriedade.put("impressao.automatica", "sim");
+      this.mapPropriedade.put("salva.nota.fornecedor", "sim");
+      this.mapPropriedade.put("salva.evento.fornecedor", "sim");
+      this.mapPropriedade.put("tempo.ciclo.integrador.edig", "10");
+      this.mapPropriedade.put("tempo.ciclo.impressao.automatica", "5");
+      this.mapPropriedade.put("tempo.ciclo.salva.nota.fornecedor", "10");
+      this.mapPropriedade.put("tempo.ciclo.salva.evento.fornecedor", "10");
+      this.mapPropriedade.put("copias.impressao.default", "1");
+      this.mapPropriedade.put("copias.impressao.contingencia.default", "2");
+      this.mapPropriedade.put("copias.reimpressao.default", "1");
+      this.mapPropriedade.put("quantidade.maxima.eventos.lote", "50");
+      this.mapPropriedade.put("ativar.modo.cluster", "nao");
+      this.mapPropriedade.put("valida.xml.envio", "nao");
+      this.mapPropriedade.put("max.threads.concorrentes", "999");
+      
+      this.mapPropriedade.put("intervalo.consulta.segundos", "5");
+      this.mapPropriedade.put("caminho.impressora", "\\\\db1-dc\\HpLasfab");
+      this.mapPropriedade.put("impressao.servicos", "");
+      this.mapPropriedade.put("porta.webservice.erp", "8080");
+      this.mapPropriedade.put("nome.servico", "ServicoWS01");
+      this.mapPropriedade.put("ip.webservice.erp", "127.0.0.1");
+    }
+  }
+  
+  public String getValorPropriedade(String paramKey)
+    throws DB1EdigException
+  {
+    return (String)this.mapPropriedade.get(paramKey);
+  }
+}

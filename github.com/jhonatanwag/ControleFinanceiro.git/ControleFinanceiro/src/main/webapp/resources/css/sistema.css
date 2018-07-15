@@ -1,0 +1,87 @@
+@charset "utf-8";
+
+h1 {
+	font-size: 15px;
+	font-weight: 500;
+	padding: 0px;
+	margin: 0px;
+	margin-top: 5px;
+}
+
+/*Body do Layout Padrao*/
+body {
+	font-size: 9px;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0px;
+	font-weight: normal;
+	text-transform: uppercase
+}
+
+
+.botaoConfirmar {
+	color: #ffffff !important;
+	background: #29b6a0 !important;
+	border-color: #23a38f !important;
+}
+
+.painelCinza .ui-widget-content {
+	font-weight: bold; 
+	font-size: 11px;
+	background:none !important;
+	background-color: #dddddd !important;	
+}
+
+.painelRecebimento .ui-widget-content {
+	font-weight: bold; 
+	font-size: 15px;
+	background:none !important;
+	background-color: #dddddd !important;	
+}
+
+.painelTotaisNota .ui-widget-content {
+	font-weight: bold; 
+	font-size: 10px;
+	background:none !important;
+	background-color: #dddddd !important;	
+}
+
+/* Customiza TabView - início */
+.ui-tabs .ui-tabs-panel {
+	padding: 0.5em 0.2em !important;
+}
+
+.ui-tabs {
+	padding: 0px !important;
+}
+
+.ui-tabs .ui-tabs-nav {
+	margin: -1px !important;
+}
+
+.ui-tabs.ui-tabs-top>.ui-tabs-nav {
+	padding: 0px !important;
+}
+/* Customiza TabView - fim */
+
+/*Header da página
+Por enquanto não vou utilizar*/
+/* header { */
+/* 	padding: 5px 0px; */
+/* 	margin-bottom: 20px; */
+/* 	height: 30px; */
+/* 	background-color: #545454; */
+/* 	color: #fff; */
+/* 	box-shadow: 0px 2px 2px #ccc; */
+/* } */
+
+/* header>div { */
+/* 	margin-left: 8px; */
+/* } */
+#conteudo {
+	padding: 0px 8px;
+}
+
+.ui-state-disabled {
+	opacity: .95 !important;
+	background-color: #f2f2f2 !important;
+}

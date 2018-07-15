@@ -1,0 +1,142 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name="agencia")
+public class Agencia implements Serializable, Comparable<Agencia> {
+
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "agencia_id")
+	private Long id;
+	@Column(name = "num_agencia", length = 20, nullable=false)
+	private String numeroAgencia;
+	@Column(name = "nome", length = 100, nullable=false)
+	private String nome;
+	@ManyToOne
+	@JoinColumn(name = "banco_id")
+	private Banco banco;
+	@Embedded
+	private Endereco endereco = new Endereco();
+	@Enumerated(EnumType.ORDINAL)
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+
+	public Agencia() {
+	}
+
+	public Agencia(Banco banco) {
+		this.banco = banco;
+	}
+
+	public Endereco getEndereco() {
+		return endereco;
+	}
+
+	public void setEndereco(Endereco endereco) {
+		this.endereco = endereco;
+	}
+
+	public Banco getBanco() {
+		return banco;
+	}
+
+	public void setBanco(Banco banco) {
+		this.banco = banco;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getNumeroAgencia() {
+		return numeroAgencia;
+	}
+
+	public void setNumeroAgencia(String numeroAgencia) {
+		this.numeroAgencia = numeroAgencia;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+	
+	public String getNomeBancoAgencia(){
+		return banco.getNomeBanco() + "("+banco.getCodigoCompensacao()+")-("+this.numeroAgencia+")"+this.nome;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Agencia other = (Agencia) obj;
+		if ((this.numeroAgencia == null) ? (other.numeroAgencia != null)
+				: !this.numeroAgencia.equals(other.numeroAgencia)) {
+			return false;
+		}
+		if (this.banco != other.banco
+				&& (this.banco == null || !this.banco.equals(other.banco))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 79
+				* hash
+				+ (this.numeroAgencia != null ? this.numeroAgencia.hashCode()
+						: 0);
+		hash = 79 * hash + (this.banco != null ? this.banco.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public int compareTo(Agencia o) {
+		return this.getNumeroAgencia().compareTo(o.getNumeroAgencia());
+	}
+}

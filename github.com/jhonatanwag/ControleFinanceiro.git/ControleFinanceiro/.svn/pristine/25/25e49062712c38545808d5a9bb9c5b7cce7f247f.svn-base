@@ -1,0 +1,33 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.ParcelaTitulo;
+import br.com.sistemacomercial.model.Recebimento;
+import br.com.sistemacomercial.repository.Recebimentos;
+import br.com.sistemacomercial.repository.Titulos;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class RecebimentoService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Recebimentos recebimentos;
+	@Inject
+	private Titulos titulos;
+
+	@Transactional
+	public Recebimento salvar(Recebimento receb) {
+		return recebimentos.salvar(receb);
+	}
+
+	public List<ParcelaTitulo> parcelasReceberPorCliente(Cliente cliente) {
+		return titulos.parcelasReceberPorCliente(cliente);
+	}
+
+}

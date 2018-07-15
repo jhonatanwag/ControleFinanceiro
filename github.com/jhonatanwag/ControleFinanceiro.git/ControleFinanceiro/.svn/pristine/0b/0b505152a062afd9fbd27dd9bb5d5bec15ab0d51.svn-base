@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.TalaoCheque;
+import br.com.sistemacomercial.repository.TalaoCheques;
+import br.com.sistemacomercial.repository.filter.TalaoChequeFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaTalaoChequeBean extends PesquisaBeanAbstrato<TalaoCheque, TalaoChequeFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TalaoCheques talaoCheques;
+
+	public PesquisaTalaoChequeBean() {
+		setFiltro(new TalaoChequeFilter());
+	}
+
+	@Override
+	public void excluir() {
+		talaoCheques.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Talão de cheque: " + getObjetoSelecionado().getNumeroInicial() +"-"+getObjetoSelecionado().getNumeroFinal() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(talaoCheques.filtrados(getFiltro()));
+	}
+
+}

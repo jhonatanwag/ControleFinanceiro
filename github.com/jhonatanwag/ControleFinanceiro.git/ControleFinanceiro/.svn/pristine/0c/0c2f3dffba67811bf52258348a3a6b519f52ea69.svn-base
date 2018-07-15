@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Alterar Senha" widgetVar="DlgAlterarSenha" modal="true"
+		dynamic="true" responsive="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDialogAlterarSenha">
+			<p:messages id="messagesEmail" closable="true" autoUpdate="true" />
+			<p:panelGrid id="painelAlterarSenha" columns="2">
+
+				<p:outputLabel value="Senha" for="senha" />
+				<p:password id="senha" required="true"
+					value="#{usuarioBean.usuario.usuario.novaSenha}" feedback="true"
+					weakLabel="Fraca" goodLabel="Boa" strongLabel="Forte" label="teste"
+					promptLabel="Informe uma senha" inline="true"
+					match="confirmacaoSenha" />
+
+				<p:outputLabel value="Confirme a senha" for="confirmacaoSenha" />
+				<p:password id="confirmacaoSenha" required="true" />
+		
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmarEmail" value="Confirmar"
+					actionListener="#{usuarioBean.alterarSenha()}"
+					oncomplete="if (!args.validationFailed) PF('DlgAlterarSenha').hide();" />
+
+				<p:commandButton id="bntCancelarEmail" value="Cancelar"
+					immediate="true" oncomplete="PF('DlgAlterarSenha').hide();" />
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

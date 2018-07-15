@@ -1,0 +1,40 @@
+package br.com.sistemacomercial.enums;
+
+
+public enum TipoCreditoDebito {
+
+    C("Crédito"),
+    D("Debito");
+    private String value;
+
+    private TipoCreditoDebito(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static TipoCreditoDebito getTipoCreditoDebito(Integer value) {
+        switch (value) {
+            case 0:
+                return C;
+            case 1:
+                return D;
+            default:
+                return null;
+        }
+    }
+
+    public static String getTipoCreditoDebito(TipoCreditoDebito tipoCreditoDebito) {
+        switch (tipoCreditoDebito) {
+            case C:
+                return "C";
+            case D:
+                return "D";
+            default:
+                return null;
+        }
+    }
+}

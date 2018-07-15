@@ -1,0 +1,56 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroUsuarioBean.editando ? 'Edição do usuário' : 'Novo usuário'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="usuario" value="#{cadastroUsuarioBean.objeto}" />
+			<f:viewAction action="#{cadastroUsuarioBean.inicializar}" />
+		</f:metadata>
+
+		<h:form id="form">
+			<h1>#{cadastroUsuarioBean.editando ? 'Edição do usuário' : 'Novo
+				usuário'}</h1>
+
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:toolbar style="margin-top: 20px">
+				<p:toolbarGroup>
+					<p:button value="Novo" outcome="/usuario/CadastroUsuario" />
+					<p:commandButton value="Salvar" id="botaoSalvar"
+						action="#{cadastroUsuarioBean.salvar}" update=":form" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:button value="Pesquisa" outcome="/usuario/PesquisaUsuario" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:panelGrid columns="2" id="painel"
+				style="width: 100%; margin-top: 20px" columnClasses="rotulo, campo">
+
+				<p:outputLabel value="Login" for="login" />
+				<p:inputText id="login" size="40" maxlength="40"
+					value="#{cadastroUsuarioBean.objeto.login}" required="true" />
+				<p:outputLabel value="Senha" for="pwd1" />
+				<p:password id="pwd1" value="#{cadastroUsuarioBean.objeto.senha}"
+					match="pwd2" label="Password 1" required="true" />
+				<p:outputLabel value="Confirmação" for="pwd2" />
+				<p:password id="pwd2" value="#{cadastroUsuarioBean.objeto.senha}"
+					label="Password 2" required="true" />
+			</p:panelGrid>
+			
+			<div align="center" style="margin-top: 20px">
+				<p:pickList id="pickList" value="#{cadastroUsuarioBean.model}"  converter="pickListConverterUsuario"
+					var="fil" itemValue="#{fil}" itemLabel="#{fil.descricaoFilialEmpresa}" >
+					
+						<p:ajax event="transfer" process="@this" />
+				</p:pickList>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

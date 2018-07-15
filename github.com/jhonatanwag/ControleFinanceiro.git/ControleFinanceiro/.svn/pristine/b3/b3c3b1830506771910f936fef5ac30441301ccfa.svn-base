@@ -1,0 +1,88 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.enums.SituacaoVenda;
+import br.com.sistemacomercial.enums.TipoMovimentacao;
+import br.com.sistemacomercial.enums.TipoVenda;
+import br.com.sistemacomercial.model.Estoque;
+import br.com.sistemacomercial.model.ItemVenda;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.repository.Estoques;
+import br.com.sistemacomercial.repository.Titulos;
+import br.com.sistemacomercial.repository.Vendas;
+import br.com.sistemacomercial.security.TerminalLogado;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class VendaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Vendas vendas;
+	@Inject
+	private Titulos titulos;
+	@Inject
+	@TerminalLogado
+	private Terminal terminal;
+	@Inject
+	private Caixas caixas;
+	@Inject
+	private CadastroProdutoService produtoService;
+	@Inject
+	private Estoques estoques;
+
+	@Transactional
+	public Venda salvar(Venda venda) {
+		if (venda.isNovo()) {
+			Date dataVenda = new Date();
+			venda.setDataVenda(dataVenda);
+			venda.setTerminal(terminal);
+			venda = vendas.salvar(venda);
+			if (!venda.getTipoVenda().equals(TipoVenda.O)) {
+				produtoService.baixarEstoque(venda.getItensVenda());
+				titulos.geraTituloVenda(venda);
+				caixas.criaMovimentoCaixa(terminal, venda);
+
+				if (venda.getCliente() != null) {
+					venda.getCliente().setDataUltimaVenda(dataVenda);
+				}
+				for (ItemVenda itemVenda : venda.getItensVenda()) {
+					Estoque es = estoques.estoquePorProduto(itemVenda.getProduto()).get(0);
+					estoques.criaMovimentoEstoque(es, terminal, itemVenda, TipoMovimentacao.SAIDA);
+				}
+		    
+			}else if (venda.getTipoVenda().equals(TipoVenda.O)){//Orçamento faço somente a movimetação no caixa
+				caixas.criaMovimentoCaixa(terminal, venda);
+			}
+
+		}
+
+		return vendas.salvar(venda);
+	}
+
+	@Transactional
+	public void estornarVenda(Venda venda) {
+		Venda vendaEstornar = vendas.porId(venda.getId());
+		vendaEstornar.setSituacaoVenda(SituacaoVenda.E);
+		vendas.salvar(vendaEstornar);
+		for (ItemVenda item : vendaEstornar.getItensVenda()) {
+			Estoque es = estoques.estoquePorProduto(item.getProduto()).get(0);
+			estoques.criaMovimentoEstoque(es, terminal, item, TipoMovimentacao.ENTRADA);
+		}
+		titulos.cancelarTituloVenda(vendaEstornar);
+		caixas.estornoMovimentoCaixa(terminal, vendaEstornar);
+
+	}
+
+	@Transactional
+	public void excluirVenda(Venda venda) {
+		vendas.remover(venda.getId());
+	}
+
+}

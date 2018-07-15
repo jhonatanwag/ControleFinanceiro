@@ -1,0 +1,141 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.enums.SituacaoDocumento;
+import br.com.sistemacomercial.enums.TipoTitulo;
+import br.com.sistemacomercial.enums.TipoVenda;
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.ParcelaTitulo;
+import br.com.sistemacomercial.model.Titulo;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.filter.TituloFilter;
+import br.com.sistemacomercial.service.NegocioException;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class Titulos extends RepositoryAbstrato<Titulo> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Titulos() {
+		super(Titulo.class);
+	}
+
+	@Override
+	public Titulo salvar(Titulo objeto) {
+		return super.salvar(objeto);
+	}
+
+	/**
+	 * 
+	 * @param venda
+	 * @author Danilo D. de Paula
+	 * 
+	 *         Gera o título da venda somente para os tipos (avista, crédiario e
+	 *         a prazo), os tipos Orçamentos e Transferência não geramos título!
+	 */
+	@Transactional
+	public void geraTituloVenda(Venda venda) {
+		try {
+			// Se Orçamento ou Transferencia não faço titulo
+			if (!venda.getTipoVenda().equals(TipoVenda.O) || !venda.getTipoVenda().equals(TipoVenda.T)) {
+				Titulo titulo = new Titulo();
+				titulo.setTipoTitulo(TipoTitulo.RECEBER);
+				venda.setTitulo(titulo);
+				//Avista
+				if (venda.getTipoVenda().equals(TipoVenda.A)) {
+					ParcelaTitulo parcelaTitulo = new ParcelaTitulo(titulo);
+
+					parcelaTitulo.setSituacaoTitulo(SituacaoDocumento.NORMAL);
+					parcelaTitulo.setValorDesconto(BigDecimal.ZERO);
+					parcelaTitulo.setValorJuro(BigDecimal.ZERO);
+					parcelaTitulo.setValorTitulo(venda.getTotalLiquidoVenda());
+					// A vista já faço o recebimento
+					parcelaTitulo.setNumeroParcela(1);
+					parcelaTitulo.setValorRecebido(venda.getTotalLiquidoVenda());
+					Date dataVencPgto = new Date();
+					parcelaTitulo.setDataVencimento(dataVencPgto);
+					parcelaTitulo.setDataPagamento(dataVencPgto);			
+				
+				//Á prazo
+				} else if (venda.getTipoVenda().equals(TipoVenda.P)) {
+                    //Arrumar aqui para baixo
+					ParcelaTitulo parcelaTitulo = new ParcelaTitulo(titulo);
+
+					parcelaTitulo.setSituacaoTitulo(SituacaoDocumento.NORMAL);
+					parcelaTitulo.setValorDesconto(BigDecimal.ZERO);
+					parcelaTitulo.setValorJuro(BigDecimal.ZERO);
+					parcelaTitulo.setValorTitulo(venda.getTotalLiquidoVenda());
+
+					parcelaTitulo.setNumeroParcela(1);		
+					parcelaTitulo.setValorRecebido(BigDecimal.ZERO);					
+					parcelaTitulo.setDataVencimento(new Date());
+					
+					titulo.getParcelasTitulos().add(parcelaTitulo);
+			    //Crediário
+				}else if(venda.getTipoVenda().equals(TipoVenda.C)){
+					
+				}
+
+			}
+
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação do caixa");
+		}
+	}
+
+	@Transactional
+	public void cancelarTituloVenda(Venda venda) {
+		try {
+			for (ParcelaTitulo parcelaTitulo : venda.getTitulo().getParcelasTitulos()) {
+				parcelaTitulo.setSituacaoTitulo(SituacaoDocumento.CANCELADO);
+			}
+
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao cancelar o título da venda!");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Titulo> filtrados(TituloFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Titulo.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (filtro.getTipoTitulo() != null) {
+			criteria.add(Restrictions.eq("tipoTitulo", filtro.getTipoTitulo()));
+		}
+
+		if (filtro.getCliente() != null) {
+			criteria.add(Restrictions.eq("tipoTitulo", filtro.getTipoTitulo()));
+		}
+
+		return criteria.addOrder(Order.asc("id")).list();
+	}
+
+	public List<ParcelaTitulo> parcelasReceberPorCliente(Cliente cliente) {
+		try {
+			return manager.createQuery(
+					"SELECT a FROM ParcelaTitulo a INNER JOIN a.titulo b INNER JOIN b.venda c "
+							+ "WHERE a.titulo.id = b.id and b.id = c.titulo.id and a.situacaoTitulo = 0 and b.tipoTitulo = 1 and a.valorRecebido = 0 and c.cliente.id = :cliente_id ORDER BY a.dataVencimento",
+					ParcelaTitulo.class).setParameter("cliente_id", cliente.getId()).getResultList();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+}

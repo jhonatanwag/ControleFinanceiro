@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF8" />
+	<title>Login</title>
+	<h:outputScript name="js/login.js" library="sentinel-layout" />
+	<h:outputStylesheet name="css/font-icon-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="css/sentinel-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="css/core-layout.css"
+		library="sentinel-layout" />
+</h:head>
+
+<h:body class="fontRegular login-back white-back">
+
+	<f:metadata>
+		<f:viewParam name="dummy" />
+		<f:event listener="#{loginBean.preRender}" type="preRenderView" />
+	</f:metadata>
+
+	<div class="Container">
+		<h:form if="frm" prependId="false">
+
+			<div
+				class="Container80 MaxWid500 Fnone MarAuto TexAlCenter PaddingTopPercent10">
+				<a href="" id="login-logo"> <h:graphicImage
+						name="images/LOGO.svg" styleClass="Fleft"
+						library="sentinel-layout" /> <span
+					class="Fs30 FontTitilliumSemiBoldItalic Fleft"><span class="hardblue">AUTENTICAÇÃO</span></span>
+				</a>
+				<div class="EmptyBox10"></div>
+			</div>
+
+			<!-- LOGIN BOX COVER START -->
+			<div class="Container80 MaxWid500 white-back Fnone MarAuto BordRad10"
+				id="login-box">
+				<div class="Container">
+
+					<div
+						class="Container90 Fnone MarAuto TexAlCenter TabContent OvHidden"
+						id="TAB1">
+						<div class="EmptyBox50"></div>
+						<p:inputText value="#{loginBean.usuario}" placeholder="Usúario"
+							id="j_username" styleClass="Container80 Fnone MarAuto Fs18" />
+						<div class="EmptyBox10"></div>
+						<p:password placeholder="Senha" id="j_password"
+							styleClass="Container80 Fnone MarAuto Fs18" feedback="false" />
+						<div class="EmptyBox20"></div>
+
+						<div class="EmptyBox30"></div>
+						<p:commandButton value="ENTRAR" styleClass="Fs16"
+							action="#{loginBean.login}" ajax="false"></p:commandButton>
+						<div class="EmptyBox50"></div>
+					</div>
+
+
+				</div>
+			</div>
+		</h:form>
+	</div>
+	<!-- LOGIN BOX COVER END -->
+
+</h:body>
+</html>

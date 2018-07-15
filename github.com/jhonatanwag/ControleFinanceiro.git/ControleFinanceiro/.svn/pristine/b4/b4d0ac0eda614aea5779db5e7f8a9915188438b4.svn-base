@@ -1,0 +1,282 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">Recebimento por cliente</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<f:viewAction action="#{recebimentoBean.inicializar}" />
+		</f:metadata>
+
+		<div class="ContainerIndent ui-fluid">
+			<div class="ContainerIndent">
+				<h:form id="formRecebimento">
+
+
+					<p:panel>
+						<p:messages autoUpdate="true" closable="true" />
+
+						<p:toolbar style="margin-top: 10px">
+							<p:toolbarGroup align="right">
+								<p:commandButton value="Confirmar Recebimento" id="botaoSalvar"
+									styleClass="botaoConfirmar" icon="icon-ok"
+									oncomplete="PF('DlgConfirmarRecebimento').show();"
+									process="dataTableItem, botaoSalvar"
+									action="#{recebimentoBean.preRecebimento}"
+									update="formDlgConfirmarRecebimento" />
+							</p:toolbarGroup>
+						</p:toolbar>
+						<div class="Separator"></div>
+
+						<p:panelGrid columns="8" style="margin-top: 10px; width: 100%">
+							<p:outputLabel value="Cód. Cliente" for="codCli" />
+							<p:inputText id="codCli" size="6" maxlength="6"
+								onkeyup="onlyNumbers(this)" style="text-align: right"
+								value="#{recebimentoBean.pessoaSelecionada.id}">
+								<p:ajax event="change" process="@this"
+									listener="#{recebimentoBean.pessoaPorId()}"
+									update="codCli, cliente, ultimoPagamento, ultimoValor,  painelPrincipal" />
+							</p:inputText>
+
+							<p:commandButton icon="ui-icon-search" process="@this"
+								update="@none" action="#{pesquisaPessoaBean.abrirDialogo}">
+								<p:ajax event="dialogReturn"
+									listener="#{recebimentoBean.pessoaSelecao}"
+									update="codCli, cliente, ultimoPagamento, ultimoValor, painelPrincipal"
+									process="@this" />
+								<p:resetInput target="cliente, codCli" />
+							</p:commandButton>
+
+							<p:inputText id="cliente" size="70" maxlength="100"
+								disabled="true"
+								value="#{recebimentoBean.pessoaSelecionada.nome}" />
+
+							<p:outputLabel value="Dat. Ult. Pgto." for="ultimoPagamento" />
+							<p:inputText id="ultimoPagamento" disabled="true"
+								value="#{recebimentoBean.dataUltimaPagamento}" size="15"
+								style="text-align: center;">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</p:inputText>
+
+							<p:outputLabel value="Val. Ult. Receb." for="ultimoValor" />
+							<p:inputText id="ultimoValor" disabled="true"
+								style="text-align: right"
+								value="#{recebimentoBean.valorUltimoPagamento}" size="15">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+						</p:panelGrid>
+
+					</p:panel>
+
+
+					<div align="right">
+						<p:panelGrid columns="2" styleClass="ui-panelgrid-blank"
+							style="margin-top: 10px; border:0px none; background-color:transparent;">
+							<p:outputLabel value="Receb. Por Valor" for="recebimentoValor" />
+							<p:inputText id="recebimentoValor"
+								value="#{recebimentoBean.recebimentoPorValor}" size="15"
+								styleClass="moeda" style="text-align: right" />
+
+						</p:panelGrid>
+					</div>
+
+					<p:panelGrid columns="3" id="painelPrincipal"
+						columnClasses="ui-grid-col-3,ui-grid-col-15,ui-grid-row-3"
+						layout="grid" styleClass="ui-panelgrid-blank"
+						style="border:0px none; background-color:transparent; margin-top: 10px">
+
+						<p:dataTable id="dataTablePorValor"
+							value="#{recebimentoBean.parcelaDataVencimentos}" var="item"
+							scrollable="true" scrollHeight="150" reflow="true"
+							style="margin-top: 10px;">
+
+							<f:facet name="header">
+                    Por vencimento
+                     </f:facet>
+
+							<p:column selectionMode="multiple" style="text-align:center" />
+
+							<p:column id="dataVencimentos" headerText="Vencimentos"
+								style="text-align: right">
+								<h:outputText value="#{item.dataVencimeto}" />
+							</p:column>
+
+							<p:column id="valorTotal" headerText="Valor Total">
+								<h:outputText value="#{item.valorTotal}" />
+							</p:column>
+
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column colspan="2" style="text-align:right"
+										footerText="Totals:" />
+									<p:column footerText="#2$" />
+								</p:row>
+							</p:columnGroup>
+						</p:dataTable>
+
+
+						<p:dataTable id="dataTableItem" resizableColumns="true"
+							value="#{recebimentoBean.parcelaTitulos}" var="item"
+							reflow="true"
+							selection="#{recebimentoBean.parcelaTitulosSelecionadas}"
+							rowKey="#{item.id}" scrollable="true" scrollHeight="150"
+							style="margin-top: 10px">
+
+							<f:facet name="header">
+                    Por Cupom/Doc.
+                     </f:facet>
+
+							<p:ajax event="toggleSelect"
+								listener="#{recebimentoBean.preSelecao}"
+								update=":formRecebimento:painelTotalGeral" />
+
+							<p:ajax event="rowSelectCheckbox"
+								listener="#{recebimentoBean.preSelecao}"
+								update=":formRecebimento:painelTotalGeral" />
+
+							<p:ajax event="rowUnselectCheckbox"
+								listener="#{recebimentoBean.preSelecao}"
+								update=":formRecebimento:painelTotalGeral" />
+
+							<p:ajax event="rowSelect"
+								listener="#{recebimentoBean.preSelecao}"
+								update=":formRecebimento:painelTotalGeral" />
+
+							<p:ajax event="rowUnselect"
+								listener="#{recebimentoBean.preSelecao}"
+								update=":formRecebimento:painelTotalGeral" />
+
+
+
+							<p:column selectionMode="multiple" style="text-align:center;">
+							</p:column>
+
+							<p:column id="item" headerText="Código"
+								style="text-align: right;">
+								<h:outputText value="#{item.id}" />
+							</p:column>
+
+							<p:column id="dcto" headerText="Cupom/Dcto."
+								style="text-align: left;">
+								<h:outputText value="#{item.numeroDocumento}" />
+							</p:column>
+
+							<p:column id="valor" headerText="Valor"
+								style="text-align: right;">
+								<h:outputText value="#{item.valorTitulo}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</p:column>
+
+							<p:column id="juros" headerText="Juros"
+								style="text-align: right;">
+								<h:outputText value="#{item.valorJuro}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</p:column>
+
+							<p:column id="parcela" headerText="Parcela"
+								style="text-align: right;">
+								<h:outputText value="#{item.numeroParcela}" />
+							</p:column>
+
+							<p:column id="vencimento" headerText="Venc"
+								style="text-align: right;">
+								<h:outputText value="#{item.dataVencimento}"
+									style="#{item.parcelaVencida ? 'color: red' : ''}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</p:column>
+
+							<p:column id="diasRestantes" headerText="Dias Rest."
+								style="text-align: right;">
+								<h:outputText value="#{item.diasParaVencimento}"
+									style="#{item.parcelaVencida ? 'color: red' : ''}" />
+							</p:column>
+
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column footerText="" />
+									<p:column footerText="" />
+									<p:column style="text-align:right" footerText="Totais:" />
+
+									<p:column style="text-align: right;">
+										<f:facet name="footer">
+											<h:outputText value="#{recebimentoBean.totalTitulos}">
+												<f:convertNumber type="currency" />
+											</h:outputText>
+										</f:facet>
+									</p:column>
+									<p:column footerText="" />
+									<p:column footerText="" />
+									<p:column footerText="" />
+									<p:column footerText="" />
+								</p:row>
+							</p:columnGroup>
+						</p:dataTable>
+
+						<p:panelGrid columns="1" columnClasses="ui-grid-col-1,ui-grid-col-2,ui-grid-row-2"
+						layout="grid" styleClass="ui-panelgrid-blank"
+						style="border:0px none; background-color:transparent; margin-top: 10px">
+							<p:commandButton value="Espelho"
+								style="width: 120px; margin-top: 10px" update="formDlgEspelho"
+								action="#{recebimentoBean.espelhoVenda}"
+								oncomplete="PF('DlgEspelho').show();"
+								process="@this, dataTableItem"></p:commandButton>
+							<p:commandButton value="Renegociação"
+								style="width: 120px; margin-top: 10px"
+								oncomplete="PF('DlgRenegociacao').show();" process="@this"></p:commandButton>
+							<p:commandButton value="Últimos pgto."
+								oncomplete="PF('DlgUltimosPgtos').show();" process="@this"
+								style="width: 120px; margin-top: 10px">
+							</p:commandButton>
+						</p:panelGrid>
+					</p:panelGrid>
+
+					<div align="right">
+						<p:panelGrid id="painelTotalGeral" columns="2"
+							styleClass="painelCinza" style="width: 300px; margin-top: 10px">
+							<p:outputLabel value="[S]Subtotal" for="subTotal" />
+							<p:inputText id="subTotal"
+								value="#{recebimentoBean.valorSubTotal}" size="15"
+								disabled="true" styleClass="moeda" style="text-align: right">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+							<p:outputLabel value="[+]Juros" for="juros" />
+							<p:inputText id="juros"
+								value="#{recebimentoBean.valorTotalJuros}" size="15"
+								styleClass="moeda" style="text-align: right">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+							<p:outputLabel value="[-]Descontos" for="desconto" />
+							<p:inputText id="desconto"
+								value="#{recebimentoBean.valorTotalDescontos}" size="15"
+								styleClass="moeda" style="text-align: right">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+							<p:outputLabel value="[=]Total" for="total" />
+							<p:inputText id="total"
+								value="#{recebimentoBean.valorTotalSelecionado}" size="15"
+								disabled="true" styleClass="moeda" style="text-align: right">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+						</p:panelGrid>
+					</div>
+
+				</h:form>
+
+				<ui:include
+					src="/WEB-INF/template/recebimento/DlgConfirmarRecebimento.xhtml" />
+				<ui:include src="/WEB-INF/template/recebimento/DlgEspelho.xhtml" />
+				<ui:include
+					src="/WEB-INF/template/recebimento/DlgRenegociacao.xhtml" />
+				<ui:include
+					src="/WEB-INF/template/recebimento/DlgUltimosPgtos.xhtml" />
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

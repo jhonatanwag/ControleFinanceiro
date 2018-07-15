@@ -1,0 +1,33 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import javax.persistence.PersistenceException;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.Arquivo;
+import br.com.sistemacomercial.service.NegocioException;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class Arquivos extends RepositoryAbstrato<Arquivo> implements Serializable {
+
+	public Arquivos() {
+		super(Arquivo.class);
+	}
+	
+	private static final long serialVersionUID = 1L;
+	
+    @Override
+	public Arquivo salvar(Arquivo arquivo) {
+		return super.salvar(arquivo);
+	}
+
+	@Transactional
+	public void geraArquivoProduto(Produto produto) {
+		try {
+			Arquivo arquivo = new Arquivo();
+			produto.setArquivo(arquivo);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar o arquivo do caixa");
+		}
+	}
+
+}

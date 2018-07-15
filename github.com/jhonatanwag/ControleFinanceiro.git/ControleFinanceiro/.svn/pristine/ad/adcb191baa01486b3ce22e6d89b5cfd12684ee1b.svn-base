@@ -1,0 +1,91 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Grupo;
+import br.com.sistemacomercial.model.SubGrupo;
+import br.com.sistemacomercial.service.CadastroGrupoService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroGrupoBean extends BeanAbstrato<Grupo>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroGrupoService cadastroGrupoService;
+	private SubGrupo subGrupoSelecionado;
+	private Boolean editandoSubGrupo = false;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Grupo());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroGrupoService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Grupo salvo com sucesso!");
+	}
+
+	@Override
+	public void setObjeto(Grupo objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public SubGrupo getSubGrupoSelecionado() {
+		return subGrupoSelecionado;
+	}
+
+	public void setSubGrupoSelecionado(SubGrupo subGrupoSelecionado) {
+		this.subGrupoSelecionado = subGrupoSelecionado;
+	}
+
+	/* Subgrupo - inicio */
+	public void novoSubGrupo() {
+		setSubGrupoSelecionado(new SubGrupo());
+		getSubGrupoSelecionado().setGrupo(getObjeto());
+		this.editandoSubGrupo = false;
+	}
+
+	public void alterarSubGrupo() {
+		this.editandoSubGrupo = true;
+		if (getObjeto() != null) {
+		}
+	}
+
+	public void confirmarSubGrupo() {
+		if (!this.editandoSubGrupo) {
+			getSubGrupoSelecionado().setGrupo(getObjeto());
+			getObjeto().getSubGrupos().add(getSubGrupoSelecionado());
+		}
+	}
+
+	public void excluirSubGrupo() {
+		cadastroGrupoService.excluirSubGrupo(getSubGrupoSelecionado());
+		getObjeto().getSubGrupos().remove(getSubGrupoSelecionado());
+	}
+
+	/* Subgrupo - fim */
+
+}

@@ -1,0 +1,101 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+//import org.hibernate.validator.constraints.NotEmpty;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name="funcao")
+public class Funcao implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "funcao_id")
+	private Long id;
+	@Column(length = 80, nullable=false, unique=true)
+	private String descricao;
+	@Column(length = 80)
+	private String atividade;
+	@Version
+	private Long versao;
+
+	public Funcao() {
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getAtividade() {
+		return atividade;
+	}
+
+	public void setAtividade(String atividade) {
+		this.atividade = atividade;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Funcao other = (Funcao) obj;
+		if (this.id != other.id
+				&& (this.id == null || !this.id.equals(other.id))) {
+			return false;
+		}
+		if ((this.descricao == null) ? (other.descricao != null)
+				: !this.descricao.equals(other.descricao)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 53 * hash + (this.id != null ? this.id.hashCode() : 0);
+		hash = 53 * hash
+				+ (this.descricao != null ? this.descricao.hashCode() : 0);
+		return hash;
+	}
+}

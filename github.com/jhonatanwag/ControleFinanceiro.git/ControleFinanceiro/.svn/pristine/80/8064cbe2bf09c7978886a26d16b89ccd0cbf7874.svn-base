@@ -1,0 +1,311 @@
+# ==============================================================================
+# Menus
+# ==============================================================================
+label.menu.principal=Início
+
+label.menu.cadastros=Cadastros
+
+label.menu.cadastros.fiscal = Fiscal
+label.menu.cadastros.fiscal.modelo = Modelo Doc. Fiscal
+
+label.menu.cadastros.pessoas=Pessoas
+label.menu.cadastros.pessoas.pessoa=Pessoa
+label.menu.cadastros.pessoas.etinia=Etnia
+label.menu.cadastros.pessoas.agenda=Agenda
+label.menu.cadastros.pessoas.tipocortecabelo=Tipo de Corte de Cabelo
+
+label.menu.cadastros.localizacoes=Localizações
+label.menu.cadastros.localizacoes.pais=País
+label.menu.cadastros.localizacoes.estado=Estado
+label.menu.cadastros.localizacoes.cidade=Cidade
+label.menu.cadastros.localizacoes.logradouro=Tipos Logradouros
+
+label.menu.cadastros.convenios=Convênios
+label.menu.cadastros.convenios.convenio=Convênio
+
+label.menu.cadastros.produtos=Produtos
+label.menu.cadastros.produtos.produto=Produto
+label.menu.cadastros.produtos.deposito=Depósito
+label.menu.cadastros.produtos.gruposubgrupo=Grupo/SubGrupo
+label.menu.cadastros.produtos.marca=Marcas
+label.menu.cadastros.produtos.cor=Cor
+label.menu.cadastros.produtos.unimedida=Unidade Medida
+label.menu.cadastros.produtos.ean=Código EAN13
+label.menu.cadastros.produtos.ean.tamanho=Código EAN deve conter 13 dígitos
+
+label.menu.cadastros.diversos=Diversos
+label.menu.cadastros.diversos.estadocivil=Estado civil
+
+label.menu.cadastros.fiscalcontabil=Fiscal/Contábil 
+label.menu.cadastros.fiscalcontabil.modelo.documento.fiscais=Modelo de documentos fiscais 
+
+label.menu.cadastros.empresas=Empresas
+label.menu.cadastros.empresas.empresa=Empresa
+label.menu.cadastros.empresafilial=Empresa/Filial
+
+label.menu.movimentacoes.entrada=Entrada
+label.menu.movimentacoes.entrada.entradaDocumentos=Entrada de Documentos
+
+label.menu.movimentacoes.estoque=Estoque
+label.menu.movimentacoes.estoque.inventario=Inventários
+
+label.menu.movimentacoes=Movimentações 
+label.menu.movimentacoes.agenda=Agenda 
+
+label.menu.financeiro=Financeiro
+label.menu.financeiro.cadastro=Cadastro
+label.menu.financeiro.cadastro.contaCorrente=Conta Corrente
+label.menu.financeiro.cadastro.talaoCheque=Talão de Cheque
+label.menu.financeiro.cadastro.tipoDespesa=Tipo Despesa
+label.menu.financeiro.banco=Banco
+label.menu.financeiro.recebimento=Recebimento
+label.menu.financeiro.gerenciadorCheque=Gerenciador de Cheques
+label.menu.financeiro.gerenciadorCartao=Gerenciador de Cartões
+label.menu.financeiro.relatorios=Relatórios
+label.menu.financeiro.relatorios.contasReceber=Contas a Receber
+
+
+label.menu.caixa=Caixa
+label.menu.caixa.gerenciadorcaixa=Gerenciador de caixa
+label.menu.caixa.fluxoCaixa = Laçamento em fluxo de caixa
+
+label.menu.venda=Venda
+label.menu.venda.venda=Venda
+label.menu.venda.venda.gourmet=Venda Gourmet
+label.menu.venda.estorno.venda=Estornar Venda(s)
+label.menu.venda.gerenciador=Gerenciador de Venda(s)
+
+label.menu.relatorios=Relatórios 
+label.menu.relatorios.cadastro=Cadastros 
+label.menu.relatorios.movimento=Movimentos 
+label.menu.relatorios.financeiro=Fianceiros 
+label.menu.relatorios.contabil=Contabéis 
+label.menu.relatorios.fiscal=Fiscais 
+label.menu.relatorios.gerencial=Gerenciais 
+
+label.menu.utilitarios=Utilitarios 
+label.menu.utilitarios.fiscal=Utilitários 
+label.menu.utilitarios.funcao=Função 
+label.menu.utilitarios.terminal=Terminal
+label.menu.utilitarios.objetos=Objetos do Sistema  
+
+
+label.menu.ajuda=Ajuda Help 
+
+
+# ==============================================================================
+# Mensagem nome da aplicação
+# ==============================================================================
+app.title=Projeto exemplo: Primefaces e EJB3 no Openshift
+
+# ==============================================================================
+# Mensagens confirma(sim/Não)
+# ==============================================================================
+confirma.sim=Sim 
+confirma.nao=Não 
+
+# ==============================================================================
+# Mensagens Labes
+# ==============================================================================
+label.filtros=Filtros 
+label.pesquisar=Pesquisar 
+label.opcoes=Opções 
+label.listagem=Listagem 
+label.incluir=Incluir 
+label.editar=Editar 
+label.excluir=Excluir
+
+# ==============================================================================
+# Mensagens Botões
+# ==============================================================================
+button.atualizar=Atualizar 
+button.salvar=Salvar 
+button.cancelar=Cancelar 
+button.excluir=Excluir 
+button.alterar=Alterar 
+button.novo=Novo 
+button.pesquisar=Pesquisar
+
+# ==============================================================================
+# Mensagens Validar Dados
+# ==============================================================================
+
+excluir.confirma=Confirma a exclusão? 
+msg.erro.campo.obrigatorio=Campo deve ser Informado! 
+msg.erro.integridade.referencial=Este registro foi alterado por outro usuário desde que você começou a editá-lo! Se você salvar o registro, substituirá as alterações feitas pelo outro usuário. Copiar as alterações para a área de transferência permite observar os valores de outros usuário inserido e, em seguida, colar suas alterações de volta caso você decida fazer as alterações! 
+msg.erro.integridade.violada=Não foi possível excluir este registro o mesmo é referenciado por outro registro. 
+msg.erro.inclusao=Erro ao incluir o registro. 
+msg.erro.exclusao=Erro ao excluir o registro. 
+msg.erro.listagem=Erro ao listar o(s) registro(s). 
+msg.nenhum.registro.encontrado=Nenhum registro encontrado para os filtros informados. 
+
+msg.erro.usuario.obrigatorio=Usuário deve ser informado. 
+msg.erro.usuario.senha.obrigatorio=Senha deve ser informada. 
+
+
+
+# ==============================================================================
+# Mensagens LABEL padrão
+# ==============================================================================
+label.id=Código 
+label.data.cadastro=Data do cadastro 
+label.descricao=Descrição 
+label.situacao=Situação 
+label.datainicio=Data início 
+label.datafim=Data Fim 
+label.preco=Preço
+
+# ==============================================================================
+# Mensagens cadastro d PAIS
+# ==============================================================================
+label.pais.nome=Nome Pais 
+label.pais.codigo.ibge=Código IBGE 
+label.banco.codigo.compensacao=Código Compesação 
+label.banco.nome=Nome Banco 
+
+# ==============================================================================
+# Mensagens cadastro de ESTADO
+# ==============================================================================
+label.estado.pais=Nome do país 
+label.estado.nome=Nome do estado 
+label.estado.sigla=UF 
+label.estado.codigo.ibge=Código IBGE 
+
+# ==============================================================================
+# Mensagens cadastro de CIDADE
+# ==============================================================================
+label.cidade.nome=Nome da Cidade 
+label.cidade.codigo.ibge=Código IBGE 
+# ==============================================================================
+# Mensagens cadastro de Tipo Logradouro
+# ==============================================================================
+label.tipologradouro.descricao=Descrição 
+label.tipologradouro.abreviacao=Abreviação 
+
+
+# ==============================================================================
+# Mensagens cadastro de Terminal
+# ==============================================================================
+label.terminal.descricao=Nome do Computador 
+label.terminal.endereco.ip=Endereço IP 
+label.terminal.faz.backup=Faz backup 
+label.terminal.atualiza.preco=Atualiza preço 
+label.terminal.faz.estorno=Faz estorno 
+label.terminal.caixa=Caixa 
+label.terminal.recebe=Recebe 
+
+
+# ==============================================================================
+# Mensagens cadastro de Etnia
+# ==============================================================================
+label.etnia.nome=Nome 
+label.etnia.descricao=Descrição 
+
+# ==============================================================================
+# Mensagens cadastro de Empresa
+# ==============================================================================
+label.empresa.nomefantasia=Nome Fanstasia 
+label.empresa.razaosocial=Razão Social 
+
+# ==============================================================================
+# Mensagens cadastro de Unidade de Medida
+# ==============================================================================
+label.unidade.medida.sigla=Sigla 
+label.unidade.medida.descricao=Descrição 
+label.unidade.medida.situacao=Situação 
+
+
+# ==============================================================================
+# Mensagens cadastro de Marca
+# ==============================================================================
+label.marca.descricao=Descrição 
+label.marca.situacao=Situação 
+
+# ==============================================================================
+# Mensagens cadastro de Cor
+# ==============================================================================
+label.cor.descricao=Descrição 
+label.cor.situacao=Situação 
+# ==============================================================================
+# Mensagens cadastro de cfop
+# ==============================================================================
+label.cfop.descricao=Descrição 
+label.cfop.situacao=Situação 
+
+# ==============================================================================
+# Mensagens cadastro de Convenio
+# ==============================================================================
+label.convenio.descricao=Descrição 
+label.convenio.situacao=Situação 
+label.convenio.datacadastro=Data Cadastro 
+
+# ==============================================================================
+# Mensagens cadastro de Deposito
+# ==============================================================================
+label.deposito.descricao=Descrição 
+label.deposito.situacao=Situação 
+
+# ==============================================================================
+# Mensagens cadastro de Modelo de documentos fiscais
+# ==============================================================================
+label.modelodocumentofiscais.codigo.modelo=Código Modelo 
+label.modelodocumentofiscais.descricao=Descrição 
+
+# ==============================================================================
+# Mensagens cadastro de tipo de despesa
+# ==============================================================================
+label.tipodespesa.descricao=Nome do Computador 
+label.tipodespesa.entradasaida=Entrada/Saída
+label.tipodespesa.debitocredito=Crédito/Debito
+label.tipodespesa.movimentacaixa=Movimenta Caixa 
+
+# ==============================================================================
+# Mensagens Caixa
+# ==============================================================================
+label.caixa.dataabertura=Data da abertura
+label.caixa.datafechamento=Data do fechamento
+label.caixa.terminalabertura=Terminal abertura
+label.caixa.terminalfechamento=Terminal fechamento
+
+
+# ==============================================================================
+# Mensagens GERAIS
+# ==============================================================================
+
+session.expire=Aviso tempo limite da sessão!
+move.cursor=Mova o mouse para continuar trabalhando!
+session.expire.1=Sua sessão íra a expirar em:
+session.expire. = segundos
+
+
+msg.erro.validacao.documento.federal.duplicado=Cpf/Cnpj já Cadastrado.
+msg.erro.validacao.documento.federal.invalido=Cpf/Cnpj inválido
+
+label.yaw=YaW Tecnologia 
+label.logo.yaw=Logo da YaW 
+label.detalhes.projeto=<strong>Projeto livre</strong>, demonstração das tecnologias <em>Primefaces (JSF  )</em> e <em>EJB 3</em> na plataforma de <strong>cloud computing</strong> da Red Hat, o <em>Open Shift</em>.
+label.saiba.mais=saiba mais 
+
+menu.lista=<i class="icon-list"></i> Lista 
+menu.incluir=<i class="icon-pencil"></i> Incluir 
+menu.sobre=<i class="icon-book"></i> Sobre 
+
+page.title.lista.mercadoria=Lista de mercadorias 
+page.title.incluir.mercadoria=Incluir mercadoria 
+page.title.editar.mercadoria=Editar mercadoria 
+page.title.sobre=Sobre o projeto 
+page.title.app=App Demo PrimeFaces e EJB 3 no Openshift 
+
+
+msg.erro.salvar.mercadoria=Não foi possível salvar a mercadoria. 
+msg.erro.listar.mercadoria=Não foi possível carregar a lista de mercadorias. 
+msg.erro.remover.mercadoria=Não foi possível remover a mercadoria. 
+
+
+sobre.build=<strong>Implementation-Build:</strong> 350683fd9ad 4 46 ebffb9cb5f565481a4f4991
+sobre.title=<strong>Implementation-Title:</strong> Demo PrimeFaces (JSF  ) c/ EJB 3 no Openshift
+sobre.site=<strong>Implementation-Site:</strong> http://www.yaw.com.br
+sobre.built=<strong>Built-by:</strong> YaW Tecnologia
+
+dialog.emexecucao.titulo=Em execução 
+dialog.emexecucao.aguarde=Aguarde... 

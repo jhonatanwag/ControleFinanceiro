@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog header="Movimento do caixa(Em tela)" widgetVar="DlgMovCaixa"
+		modal="true" dynamic="true" resizable="true" appendTo="@(boby)">
+		<h:form id="formDlgMovCaixa">
+			<p:dataTable value="#{caixaBean.caixaSelecionado.caixaMovimentacaos}"
+				var="item" emptyMessage="Nenhum movimento no caixa encontrado."
+				rows="10" paginator="true" paginatorAlwaysVisible="false"
+				paginatorPosition="bottom">
+				<p:column id="dataLanc" headerText="dat. Lanc"
+					style="text-align: center; width: 15%"
+					sortBy="#{item.dataLancamento}">
+					<h:outputText value="#{item.dataLancamento}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+					</h:outputText>
+				</p:column>
+				<p:column id="valorLanc" headerText="Val. Lanc"
+					style="text-align: right; width: 5%"
+					sortBy="#{item.valorLancamento}">
+					<h:outputText value="#{item.valorLancamento}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column id="venda" headerText="Cód. Vend."
+					style="text-align: right; width: 5%" sortBy="#{item.venda.id}">
+					<h:outputText value=" #{item.venda.id}" />
+				</p:column>
+				<p:column id="historico" headerText="Hist."
+					style="text-align: left;">
+					<h:outputText value=" #{item.historico}" />
+				</p:column>
+
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column colspan="1" style="text-align:right"
+							footerText="Totais:" />
+
+						<p:column>
+							<f:facet name="footer">
+								<h:outputText value="#{caixaBean.totalMovimentoCaixa}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</f:facet>
+						</p:column>
+						<p:column footerText="" />
+						<p:column footerText="" />
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton value="Fechar" immediate="true"
+					oncomplete="PF('DlgMovCaixa').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+</ui:composition>

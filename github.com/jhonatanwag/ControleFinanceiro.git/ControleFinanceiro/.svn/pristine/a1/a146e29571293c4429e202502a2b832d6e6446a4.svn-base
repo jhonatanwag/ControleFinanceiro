@@ -1,0 +1,28 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.ModeloDocumentoFiscal;
+import br.com.sistemacomercial.repository.ModeloDocumentoFiscais;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroModeloDctoFiscalService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private ModeloDocumentoFiscais modelos;
+
+	@Transactional
+	public ModeloDocumentoFiscal salvar(ModeloDocumentoFiscal modelo) {
+		ModeloDocumentoFiscal modeloExiste = modelos.porDescricaoUnico(modelo.getDescricao(), modelo.getId());
+		
+		if (modeloExiste != null && !modeloExiste.equals(modelo)) {
+			throw new NegocioException("Já existe um modelo com a mesma descrição já cadastrado.");
+		}
+		return modelos.salvar(modelo);
+	}
+
+}

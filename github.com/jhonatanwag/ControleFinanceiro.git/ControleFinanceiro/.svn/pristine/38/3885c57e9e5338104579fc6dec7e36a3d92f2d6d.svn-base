@@ -1,0 +1,31 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.Terminais;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroTerminalService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Terminais terminais;
+
+	@Transactional
+	public Terminal salvar(Terminal terminal) {
+		Terminal terminalExiste = terminais.porUsuarioSoUnico(terminal.getUsuarioSO(), terminal.getId());
+		if (terminalExiste != null && !terminalExiste.equals(terminal)) {
+			throw new NegocioException("Já existe um terminal com mesmo usuário do sistema operacional cadastrado.");
+		}
+		terminalExiste = terminais.porIpUnico(terminal.getIp(), terminal.getId());
+		if (terminalExiste != null && !terminalExiste.equals(terminal)) {
+			throw new NegocioException("Já existe um terminal com mesmo endereço ip cadastrado.");
+		}
+		return terminais.salvar(terminal);
+	}
+
+}

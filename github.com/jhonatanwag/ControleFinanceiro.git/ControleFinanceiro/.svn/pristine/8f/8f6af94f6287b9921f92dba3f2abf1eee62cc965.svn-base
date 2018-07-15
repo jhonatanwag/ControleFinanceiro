@@ -1,0 +1,40 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.TipoDespesa;
+import br.com.sistemacomercial.repository.TipoDespesas;
+import br.com.sistemacomercial.repository.filter.TipoDespesaFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaTipoDespesaBean extends PesquisaBeanAbstrato<TipoDespesa, TipoDespesaFilter>
+		implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TipoDespesas tipoDespesas;
+
+	public PesquisaTipoDespesaBean() {
+		setFiltro(new TipoDespesaFilter());
+	}
+
+	@Override
+	public void excluir() {
+		tipoDespesas.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("TipoDespesa " + getObjetoSelecionado().getDescricao() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(tipoDespesas.filtrados(getFiltro()));
+	}
+
+}

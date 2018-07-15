@@ -1,0 +1,157 @@
+package br.com.sistemacomercial.security;
+
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Produces;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import br.com.sistemacomercial.model.Caixa;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.UsuarioFilial;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.repository.Empresas;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.Terminais;
+
+@Named
+@RequestScoped
+public class Seguranca {
+
+	@Inject
+	private ExternalContext externalContext;
+	@Inject
+	private Terminais terminais;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private Empresas empresas;
+
+
+	public String getNomeUsuario() {
+		String nome = null;
+
+		UsuarioSistema usuarioLogado = getUsuarioLogado();
+
+		if (usuarioLogado != null) {
+			nome = usuarioLogado.getUsuario().getLogin();
+		}
+
+		return nome;
+	}
+
+	public String getEnderecoIp() {
+		String enderecoIp = getEnderecoIpLocal();
+		return enderecoIp;
+	}
+
+	@Produces
+	@UsuarioLogado
+	public UsuarioSistema getUsuarioLogado() {
+		UsuarioSistema usuario = null;
+
+		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) FacesContext
+				.getCurrentInstance().getExternalContext().getUserPrincipal();
+
+		if (auth != null && auth.getPrincipal() != null) {
+			usuario = (UsuarioSistema) auth.getPrincipal();
+		}
+
+		return usuario;
+	}
+
+	@Produces
+	@FuncionarioLogado
+	public Funcionario getFuncionarioLogado() {
+		UsuarioSistema usuario = null;
+
+		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) FacesContext
+				.getCurrentInstance().getExternalContext().getUserPrincipal();
+
+		if (auth != null && auth.getPrincipal() != null) {
+			usuario = (UsuarioSistema) auth.getPrincipal();
+		}
+
+		return usuario.getUsuario().getFuncionario();
+	}
+
+	@Produces
+	@FilialLogada
+	public Filial getFilialLogada() {
+		boolean filialEncontrada = false;
+		UsuarioSistema usuario = null;
+
+		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) FacesContext
+				.getCurrentInstance().getExternalContext().getUserPrincipal();
+
+		if (auth != null && auth.getPrincipal() != null) {
+			usuario = (UsuarioSistema) auth.getPrincipal();
+		}
+		if(usuario != null){
+			for(UsuarioFilial usuarioFilial : usuario.getUsuario().getUsuarioFiliais()){
+				if(usuarioFilial.getPadrao()){					
+					return usuarioFilial.getFilial();
+				}
+			}
+			if(!filialEncontrada){
+				Filial filial = empresas.porIdFilial(44L);
+				if (filial == null) {
+					filial = empresas.porIdFilial(255L);
+				}
+				return filial;
+			}
+			
+		}
+		return null;
+	}
+
+	@Produces
+	@TerminalLogado
+	public Terminal getTerminalLogado() {
+		Terminal t = terminais.porId(181L);
+		if (t == null) {
+			t = terminais.porId(41L);
+		}
+		return t;
+	}
+	
+
+
+	/**
+	 * 
+	 * @return o endereço do computador local
+	 */
+	@Produces
+	@EnderecoIpLocal
+	public String getEnderecoIpLocal() {
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
+				.getRequest();
+		String ip = null;
+		ip = request.getHeader("x-forwarded-for");
+		if (ip == null) {
+			ip = request.getHeader("X_FORWARDED_FOR");
+			if (ip == null) {
+				ip = request.getRemoteAddr();
+			}
+		}
+		return ip;
+		// String remoteAddr = Faces.getRemoteAddr();
+		// return remoteAddr;
+
+	}
+
+	public boolean isEmitirPedidoPermitido() {
+		return externalContext.isUserInRole("ADMINISTRADORES") || externalContext.isUserInRole("VENDEDORES");
+	}
+
+	public boolean isCancelarPedidoPermitido() {
+		return externalContext.isUserInRole("ADMINISTRADORES") || externalContext.isUserInRole("VENDEDORES");
+	}
+
+}

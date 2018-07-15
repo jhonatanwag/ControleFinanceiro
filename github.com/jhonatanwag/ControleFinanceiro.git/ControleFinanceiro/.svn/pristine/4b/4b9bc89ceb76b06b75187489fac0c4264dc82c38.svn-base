@@ -1,0 +1,258 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.SelectEvent;
+
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Grupo;
+import br.com.sistemacomercial.model.ItemVenda;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.Grupos;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.repository.filter.GrupoFilter;
+import br.com.sistemacomercial.security.FilialLogada;
+import br.com.sistemacomercial.security.TerminalLogado;
+import br.com.sistemacomercial.service.VendaService;
+import br.com.sistemacomercial.util.jpa.Transactional;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class VendaBean extends BeanAbstrato<Venda> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private Produtos produtos;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private VendaService vendaService;
+	@Inject
+	private Grupos grupos;
+	private Pessoa pessoaSelecionada;
+	private Produto produtoSelecionado = new Produto();
+	private Venda vendaSelecionada;
+	private ItemVenda itemVendaSelecionado;
+	private Integer quantidade = 1;
+	private List<Funcionario> funcionarios;
+	private List<Grupo> grupo;
+	private String codigoProdutoDigitado = null;
+	@Inject
+	@TerminalLogado
+	private Terminal terminalLogado;
+	@Inject
+	@FilialLogada
+	private Filial filialLogada;
+
+	public VendaBean() {
+		super();
+		// limpar();
+	}
+
+	@Override
+	public void inicializar() {
+		if (FacesUtil.isNotPostback()) {
+			if (this.getObjeto() == null) {
+				limpar();
+			}
+			produtoSelecionado = null;
+			funcionarios = pessoas.listaFuncionarios();
+			grupo = grupos.filtrados(new GrupoFilter());
+			// getObjeto().adicionarItemVazio();
+		}
+	}
+		
+	public Terminal getTerminalLogado() {
+		return terminalLogado;
+	}
+
+	@Override
+	public void setObjeto(Venda objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Transactional
+	public void confirmarFechamento() {
+		getObjeto().setFilial(filialLogada);
+		getObjeto().setTerminal(terminalLogado);
+		getObjeto().atualizarTotais();
+		vendaService.salvar(getObjeto());
+		FacesUtil.addInfoMessage("Venda salva com sucesso!");
+		limpar();
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Venda());
+		setPessoaSelecionada(new Pessoa());
+		codigoProdutoDigitado = null;
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	/* Item venda Inicio */
+
+	public Integer getQuantidade() {
+		return quantidade;
+	}
+
+	public String getCodigoProdutoDigitado() {
+		return codigoProdutoDigitado;
+	}
+
+	public void setCodigoProdutoDigitado(String codigoProdutoDigitado) {
+		this.codigoProdutoDigitado = codigoProdutoDigitado;
+	}
+
+	public ItemVenda getItemVendaSelecionado() {
+		return itemVendaSelecionado;
+	}
+
+	public void setItemVendaSelecionado(ItemVenda itemVendaSelecionado) {
+		this.itemVendaSelecionado = itemVendaSelecionado;
+	}
+
+	public List<Grupo> getGrupo() {
+		return grupo;
+	}
+
+	public void setQuantidade(Integer quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public void excluirItemVenda() {
+		 getObjeto().getItensVenda().remove(getItemVendaSelecionado());		 
+	}
+	/* Item venda Fim */
+
+	/* Pessoa Inicio */
+	public Pessoa getPessoaSelecionada() {
+		return pessoaSelecionada;
+	}
+
+	public void setPessoaSelecionada(Pessoa pessoaSelecionada) {
+		this.pessoaSelecionada = pessoaSelecionada;
+	}
+
+	public void pessoaPorId() {
+		Pessoa pessoa = pessoas.porId((getPessoaSelecionada().getId() == null ? -1 : getPessoaSelecionada().getId()));
+		if (pessoa != null) {
+			setPessoaSelecionada(pessoa);
+			getObjeto().setCliente(pessoa.getClientePessoa());
+		} else {
+			setPessoaSelecionada(new Pessoa());
+			getObjeto().setCliente(null);
+			FacesUtil.addErrorMessage("Cliente não encontrada para o código informado!");
+		}
+	}
+
+	public void pessoaSelecao(SelectEvent event) {
+		Pessoa pessoa = (Pessoa) event.getObject();
+		this.pessoaSelecionada = pessoa;
+		getObjeto().setCliente(pessoa.getClientePessoa());
+	}
+
+	/* Pessoa Fim */
+
+	/* Produto inicio */
+	public Produto getProdutoSelecionado() {
+		return produtoSelecionado;
+	}
+
+	public void setProdutoSelecionado(Produto produtoSelecionado) {
+		this.produtoSelecionado = produtoSelecionado;
+	}
+
+	public void produtoSelecao(SelectEvent event) {
+		Produto produto = (Produto) event.getObject();
+		this.produtoSelecionado = produto;
+		if (this.produtoSelecionado != null) {
+			pesquisaProduto(this.produtoSelecionado);
+		}
+	}
+
+	public void pesquisaProduto(Produto prod) {
+		produtoSelecionado = null;
+		if (prod == null) {
+			if (this.codigoProdutoDigitado != null && this.codigoProdutoDigitado.trim().length() > 0) {
+				this.produtoSelecionado = produtos.porEAN(codigoProdutoDigitado, -1L);
+				if (this.produtoSelecionado == null) {
+					this.produtoSelecionado = produtos.porId(Long.valueOf(codigoProdutoDigitado));
+				}
+			}
+		} else {
+			produtoSelecionado = prod;
+		}
+
+		if (produtoSelecionado != null) {			//
+			ItemVenda item = getObjeto().produtoExistente(this.produtoSelecionado);
+			if (item == null) {
+				item = new ItemVenda(getObjeto(), produtoSelecionado);
+				getObjeto().getItensVenda().add(item);
+			} else {
+				//Se já existir o produto na venda eu inclemento
+				BigDecimal incr = item.getQuantidade().add(new BigDecimal("1"));
+				item.setQuantidade(incr);				
+			}
+			item.setEan13(produtoSelecionado.getEan13());
+			item.setDescricao(produtoSelecionado.getDescricaoReduzida());
+			item.atualizarValores();
+		} else {
+			FacesUtil.addErrorMessage("Código do produto não encontrado!");
+		}
+		this.codigoProdutoDigitado = null;	
+	}
+	
+	public void finalizarVenda() {
+		// getObjeto().removerItemVazio();
+	}
+
+	/* Produto Fim */
+
+	public Venda getVendaSelecionada() {
+		return vendaSelecionada;
+	}
+
+	public void setVendaSelecionada(Venda vendaSelecionada) {
+		this.vendaSelecionada = vendaSelecionada;
+	}
+
+	public List<Funcionario> getFuncionarios() {
+		return funcionarios;
+	}
+
+	@Override
+	public void salvar() {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public boolean isItensVazio(){
+		if (getObjeto() != null) {
+			if (getObjeto().getItensVenda().size() > 0){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+}

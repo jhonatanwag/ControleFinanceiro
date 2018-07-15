@@ -1,0 +1,236 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+@Entity
+@Table(name = "item_venda")
+public class ItemVenda implements Serializable, Comparable<ItemVenda> {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue()
+	@Column(name = "venda_item_id")
+	private Long id;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne
+	@JoinColumn(name = "venda_id", nullable = false)
+	private Venda venda;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "produto_id")
+	private Produto produto;
+	@Column(name = "ean13", length = 14)
+	private String ean13;
+	@Column(length = 233, name = "descricao")
+	private String descricao;
+	@Column(name = "indice_depto")
+	private String indiceDepartamento;
+	private String aliquota;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "unid_medida_id")
+	private UnidadeMedida unidadeMedida;
+	private String tipoQuantidade;
+	@OneToMany(mappedBy = "itemVenda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<ItemVendaOpcional> itemVendaOpcionals = new ArrayList<>();
+	@Column(nullable = false)
+	private BigDecimal quantidade = BigDecimal.ONE;
+	@Column(name = "val_unitario", nullable = false)
+	private BigDecimal valorUnitario = BigDecimal.ZERO;
+	@Column(name = "tip_acres_desc", length = 1)
+	private String tipoAcrescimoDesconto;
+	private BigDecimal valorAcrescimo = BigDecimal.ZERO;
+	private BigDecimal valorDesconto = BigDecimal.ZERO;
+	@Column(name="perc_desconto")
+	private BigDecimal percentualDesconto = BigDecimal.ZERO;
+	private BigDecimal valorLiquido = BigDecimal.ZERO;
+	/**
+	 * Indica se o valor total do item será truncado "T" ou arredondado "A"
+	 */
+	@Column(name = "tipo_calculo", length = 1)
+	private String tipoCalculo;
+	@Column(name = "ncm", length = 8)
+	private String ncm;
+	private String cfop;
+	@Column(name = "inf_adicionais")
+	private String informacoesAdicionais;
+	private String CST_ICMS;
+
+	public ItemVenda() {
+		super();
+	}
+
+	public ItemVenda(Venda venda, Produto produto) {
+		super();
+		this.venda = venda;
+		this.produto = produto;
+		this.unidadeMedida = produto.getUnidadeMedida();
+		this.valorUnitario = produto.getPrecoAtual();
+	}
+	
+	public ItemVenda(Long id, Venda venda, Produto produto) {
+		super();
+		this.id = id;
+		this.venda = venda;
+		this.produto = produto;
+		this.unidadeMedida = produto.getUnidadeMedida();
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public String getEan13() {
+		return ean13;
+	}
+
+	public void setEan13(String ean13) {
+		this.ean13 = ean13;
+	}
+
+	public Venda getVenda() {
+		return venda;
+	}
+
+	public void setVenda(Venda venda) {
+		this.venda = venda;
+	}
+
+	public Produto getProduto() {
+		return produto;
+	}
+
+	public void setProduto(Produto produto) {
+		this.produto = produto;
+	}
+
+	public BigDecimal getQuantidade() {
+		return quantidade;
+	}
+
+	public void setQuantidade(BigDecimal quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public BigDecimal getValorBruto() {
+		return (this.quantidade.multiply(this.valorUnitario));
+	}
+
+	public BigDecimal getValorLiquido() {
+		return this.valorLiquido;
+	}
+
+	public BigDecimal getValorAcrescimo() {
+		return valorAcrescimo;
+	}
+
+	public void setValorAcrescimo(BigDecimal valorAcrescimo) {
+		this.valorAcrescimo = valorAcrescimo;
+	}
+
+	public BigDecimal getValorDesconto() {
+		return valorDesconto;
+	}
+
+	public void setValorDesconto(BigDecimal valorDesconto) {
+		this.valorDesconto = valorDesconto;
+	}
+
+	public BigDecimal getValorUnitario() {
+		return valorUnitario;
+	}
+
+	public void setValorUnitario(BigDecimal valorUnitario) {
+		this.valorUnitario = valorUnitario;
+	}
+
+	public UnidadeMedida getUnidadeMedida() {
+		return unidadeMedida;
+	}
+
+	public void setUnidadeMedida(UnidadeMedida unidadeMedida) {
+		this.unidadeMedida = unidadeMedida;
+	}
+
+	public List<ItemVendaOpcional> getItemVendaOpcionals() {
+		return itemVendaOpcionals;
+	}
+
+	public void setItemVendaOpcionals(List<ItemVendaOpcional> itemVendaOpcionals) {
+		this.itemVendaOpcionals = itemVendaOpcionals;
+	}
+
+	public void atualizarValores() {
+		this.valorLiquido = getValorBruto().subtract(getValorDesconto()).add(getValorAcrescimo());
+	}
+
+	@Override
+	public int compareTo(ItemVenda o) {
+		return this.getId().compareTo(o.getId());
+	}
+
+	// origemProduto
+	// itemListaServico
+	// codigoISS
+	// naturezaOperacaoISS
+	// indicadorIncentivoISS
+	// codigoIBGE
+	// CSOSN
+	// baseCalculoValorRetido
+	// ICMS_ValorRetido
+	// modoBaseCalculo
+	// percentualReducaoBaseCalculo
+	// ICMS_ST_ModoBaseCalculo
+	// ICMS_ST_PercentualMargemAdicionado
+	// ICMS_ST_PercentualReducaoBaseCalculo
+	// ICMS_ST_ValorReducaoBaseCalculo
+	// ICMS_ST_Aliquota
+	// ICMS_ST_Valor
+	// valorDesoneracaoICMS
+	// motivoDesoneracaoICMS
+	// aliquotaCalculoCredito
+	// creditoICMSSimples
+	// impostosIncidentes
+	// CST_PIS
+	// PIS_BaseCalculo
+	// PIS_Aliquota
+	// PIS_Valor
+	// PIS_QuantidadeVendida
+	// PIS_ValorAliquotaReais
+	// CST_COFINS
+	// COFINS_BaseCalculo
+	// COFINS_Aliquota
+	// COFINS_Valor
+	// COFINS_QuantidadeVendida
+	// COFINS_ValorAliquotaReais
+
+}

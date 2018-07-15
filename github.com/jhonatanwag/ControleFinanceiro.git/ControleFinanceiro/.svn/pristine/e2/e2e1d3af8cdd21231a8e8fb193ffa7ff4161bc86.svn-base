@@ -1,0 +1,17 @@
+package br.com.sistemacomercial.exception;
+
+public class DB1EdigException extends RuntimeException {
+	private static final long serialVersionUID = 5393030346444740088L;
+
+	public DB1EdigException(String paramMessage, Throwable paramThrow) {
+		super(paramMessage, paramThrow);
+	}
+
+	public DB1EdigException(String paramMessage) {
+		super(paramMessage);
+	}
+
+	public DB1EdigException(Throwable throwable) {
+		super(throwable);
+	}
+}

@@ -1,0 +1,91 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Agencia;
+import br.com.sistemacomercial.model.Banco;
+import br.com.sistemacomercial.repository.filter.BancoFilter;
+
+public class Bancos extends RepositoryAbstrato<Banco> implements Serializable {
+
+	public Bancos() {
+		super(Banco.class);
+	}
+	
+	private static final long serialVersionUID = 1L;
+	
+    @Override
+	public Banco salvar(Banco banco) {
+		return super.salvar(banco);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Banco> filtrados(BancoFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Banco.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getNomeBanco())) {
+			criteria.add(Restrictions.ilike("nomeBanco", filtro.getNomeBanco(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("nomeBanco")).list();
+	}
+
+
+	public Agencia porIdAgencia(Long id) {
+		return manager.find(Agencia.class, id);
+	}
+
+	public List<Agencia> AgenciasDoBanco(Banco banco) {
+		return manager.createQuery("from Agencia where banco.id = :bancoId", Agencia.class)
+				.setParameter("bancoId", banco.getId()).getResultList();
+	}
+	
+	public List<Agencia> TodasAgencias() {
+		return manager.createQuery("from Agencia", Agencia.class).getResultList();
+	}
+
+	public Banco porNomeUnico(String descricao) {
+		try {
+			return manager.createQuery("from Banco where upper(nomeBanco) = :descricao", Banco.class)
+					.setParameter("descricao", descricao.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+	
+	public Banco porCodCompensacaoUnico(String codigoBanco) {
+		try {
+			return manager.createQuery("from Banco where upper(codigoCompensacao) = :codigoBanco", Banco.class)
+					.setParameter("codigoBanco", codigoBanco.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+
+	public List<Banco> porNome(String descricao) {
+		return this.manager.createQuery("from Banco where upper(nomeBanco) like :descricao", Banco.class)
+				.setParameter("descricao", descricao.toUpperCase() + "%").getResultList();
+	}
+
+	public boolean validaExclusaoAgencia(Agencia agencia) {
+		return true;
+	}
+	
+	
+
+}

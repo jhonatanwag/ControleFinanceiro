@@ -1,0 +1,531 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import br.com.sistemacomercial.enums.CaixaStatus;
+import br.com.sistemacomercial.enums.TipoVenda;
+import br.com.sistemacomercial.util.DataUtils;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name = "caixa")
+public class Caixa implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	@NotNull(message = "O filial deve ser infomado.")
+	@ManyToOne
+	@JoinColumn(name = "filial_id")
+	private Filial filial;
+	@Column(nullable = true)
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date dataAbertura;
+	@Column(nullable = true)
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date dataFechamento;
+	// Abertura
+	@Column(nullable = false)
+	private BigDecimal valorDinheiro;
+	@Column(nullable = false)
+	private BigDecimal valorChequeVista;
+	@Column(nullable = false)
+	private BigDecimal valorChequePre;
+	@Column(nullable = false)
+	private BigDecimal valorCartao;
+	// Fechamento
+	@Column(nullable = false)
+	private BigDecimal valorFechDinheiro;
+	@Column(nullable = false)
+	private BigDecimal valorFechChequeVista;
+	@Column(nullable = false)
+	private BigDecimal valorFechChequePre;
+	@Column(nullable = false)
+	private BigDecimal valorFechCartao;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteDinheiro;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteChequeVista;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteChequePre;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteCartao;
+	@Column(nullable = false)
+	private BigDecimal valorVendaPrazo;
+	@Column(nullable = false)
+	private BigDecimal valorVendaVista;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "funcionario_abert_id")
+	private Funcionario funcionarioAbertura;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "terminal_abert_id")
+	private Terminal terminalAbertura;
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "funcionario_fecha_id")
+	private Funcionario funcionarioFechamento;
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "terminal_fecha_id")
+	private Terminal terminalFechamento;
+	@Column(length = 1)
+	@Enumerated(EnumType.STRING)
+	private CaixaStatus caixaStatus = CaixaStatus.A;
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "caixa", fetch = FetchType.LAZY)
+	private List<CaixaMovimentacao> caixaMovimentacaos = new ArrayList<CaixaMovimentacao>();
+	// Movimentacao
+	@Transient
+	private BigDecimal valorRecebVendaVistaDinheiro = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebVendaVistaCheVista = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebVendaVistaChePre = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebVendaVistaCartao = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebPrazoDinheiro = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebPrazoCheVista = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebPrazoChePre = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorRecebPrazoCartao = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorLancFluDinheiro = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorLancFluCheVista = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorLancFluChePre = BigDecimal.ZERO;
+	@Transient
+	private BigDecimal valorLancFluCartao = BigDecimal.ZERO;
+
+	public Caixa() {
+	}
+
+	public Caixa(Caixa caixaAnterior, Funcionario funcionarioAbertura, Terminal terminal, Filial filial) {
+		caixaAnterior.carregaTotaisRecebimentos();
+		this.caixaStatus = CaixaStatus.A;
+		this.funcionarioAbertura = funcionarioAbertura;
+		this.terminalAbertura = terminal;
+		this.filial = filial;
+		this.dataAbertura = new Date();
+		// fechamento
+		this.valorFechDinheiro = BigDecimal.ZERO;
+		this.valorFechChequeVista = BigDecimal.ZERO;
+		this.valorFechChequePre = BigDecimal.ZERO;
+		this.valorFechCartao = BigDecimal.ZERO;
+		//
+		this.valorVendaVista = BigDecimal.ZERO;
+		this.valorVendaPrazo = BigDecimal.ZERO;
+		// Valor para o novo caixa aberto
+		this.valorDinheiro = caixaAnterior.valorTransporteDinheiro;
+		this.valorChequeVista = caixaAnterior.valorTransporteChequeVista;
+		this.valorChequePre = caixaAnterior.valorTransporteChequePre;
+		this.valorCartao = caixaAnterior.valorTransporteCartao;
+
+		this.valorTransporteDinheiro = BigDecimal.ZERO;
+		this.valorTransporteChequeVista = BigDecimal.ZERO;
+		this.valorTransporteChequePre = BigDecimal.ZERO;
+		this.valorTransporteCartao = BigDecimal.ZERO;
+
+	}
+
+	public BigDecimal getValorTransporteChequePre() {
+		return valorTransporteChequePre;
+	}
+
+	public void setValorTransporteChequePre(BigDecimal valorTransporteChequePre) {
+		this.valorTransporteChequePre = valorTransporteChequePre;
+	}
+
+	public BigDecimal getValorTransporteCartao() {
+		return valorTransporteCartao;
+	}
+
+	public void setValorTransporteCartao(BigDecimal valorTransporteCartao) {
+		this.valorTransporteCartao = valorTransporteCartao;
+	}
+
+	public BigDecimal getValorTransporteChequeVista() {
+		return valorTransporteChequeVista;
+	}
+
+	public void setValorTransporteChequeVista(BigDecimal valorTransporteChequeVista) {
+		this.valorTransporteChequeVista = valorTransporteChequeVista;
+	}
+
+	public BigDecimal getValorTransporteDinheiro() {
+		return valorTransporteDinheiro;
+	}
+
+	public void setValorTransporteDinheiro(BigDecimal valorTransporteDinheiro) {
+		this.valorTransporteDinheiro = valorTransporteDinheiro;
+	}
+
+	public Date getDataFechamento() {
+		return dataFechamento;
+	}
+
+	public void setDataFechamento(Date dataFechamento) {
+		this.dataFechamento = dataFechamento;
+	}
+
+	public Date getDataAbertura() {
+		return dataAbertura;
+	}
+
+	public Terminal getTerminalAbertura() {
+		return terminalAbertura;
+	}
+
+	public void setTerminalAbertura(Terminal terminalAbertura) {
+		this.terminalAbertura = terminalAbertura;
+	}
+
+	public Terminal getTerminalFechamento() {
+		return terminalFechamento;
+	}
+
+	public void setTerminalFechamento(Terminal terminalFechamento) {
+		this.terminalFechamento = terminalFechamento;
+	}
+
+	public void setDataAbertura(Date dataAbertura) {
+		this.dataAbertura = dataAbertura;
+	}
+
+	public Funcionario getFuncionarioAbertura() {
+		return funcionarioAbertura;
+	}
+
+	public void setFuncionarioAbertura(Funcionario funcionarioAbertura) {
+		this.funcionarioAbertura = funcionarioAbertura;
+	}
+
+	public Funcionario getFuncionarioFechamento() {
+		return funcionarioFechamento;
+	}
+
+	public void setFuncionarioFechamento(Funcionario funcionarioFechamento) {
+		this.funcionarioFechamento = funcionarioFechamento;
+	}
+
+	public String getDescricaoCompletaCaixa() {
+		return "Caixa: " + this.id + " - Data Hora Abertura: "
+				+ DataUtils.converteDataEmString(this.dataAbertura, "dd/MM/yyyy hh:mm:ss");
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public BigDecimal getValorCartao() {
+		return valorCartao;
+	}
+
+	public void setValorCartao(BigDecimal valorCartao) {
+		this.valorCartao = valorCartao;
+	}
+
+	public BigDecimal getValorChequePre() {
+		return valorChequePre;
+	}
+
+	public void setValorChequePre(BigDecimal valorChequePre) {
+		this.valorChequePre = valorChequePre;
+	}
+
+	public BigDecimal getValorChequeVista() {
+		return valorChequeVista;
+	}
+
+	public void setValorChequeVista(BigDecimal valorChequeVista) {
+		this.valorChequeVista = valorChequeVista;
+	}
+
+	public BigDecimal getValorDinheiro() {
+		return valorDinheiro;
+	}
+
+	public void setValorDinheiro(BigDecimal valorDinheiro) {
+		this.valorDinheiro = valorDinheiro;
+	}
+
+	public BigDecimal getValorVendaPrazo() {
+		return valorVendaPrazo;
+	}
+
+	public void setValorVendaPrazo(BigDecimal valorVendaPrazo) {
+		this.valorVendaPrazo = valorVendaPrazo;
+	}
+
+	public BigDecimal getValorVendaVista() {
+		return valorVendaVista;
+	}
+
+	public void setValorVendaVista(BigDecimal valorVendaVista) {
+		this.valorVendaVista = valorVendaVista;
+	}
+
+	public BigDecimal getValorFechCartao() {
+		return valorFechCartao;
+	}
+
+	public void setValorFechCartao(BigDecimal valorFechCartao) {
+		this.valorFechCartao = valorFechCartao;
+	}
+
+	public BigDecimal getValorFechChequePre() {
+		return valorFechChequePre;
+	}
+
+	public void setValorFechChequePre(BigDecimal valorFechChequePre) {
+		this.valorFechChequePre = valorFechChequePre;
+	}
+
+	public BigDecimal getValorFechChequeVista() {
+		return valorFechChequeVista;
+	}
+
+	public void setValorFechChequeVista(BigDecimal valorFechChequeVista) {
+		this.valorFechChequeVista = valorFechChequeVista;
+	}
+
+	public BigDecimal getValorFechDinheiro() {
+		return valorFechDinheiro;
+	}
+
+	public void setValorFechDinheiro(BigDecimal valorFechDinheiro) {
+		this.valorFechDinheiro = valorFechDinheiro;
+	}
+
+	public Filial getFilial() {
+		return filial;
+	}
+
+	public void setFilial(Filial filial) {
+		this.filial = filial;
+	}
+
+	public CaixaStatus getCaixaStatus() {
+		return caixaStatus;
+	}
+
+	public void setCaixaStatus(CaixaStatus caixaStatus) {
+		this.caixaStatus = caixaStatus;
+	}
+
+	public List<CaixaMovimentacao> getCaixaMovimentacaos() {
+		return caixaMovimentacaos;
+	}
+
+	public void setCaixaMovimentacaos(List<CaixaMovimentacao> caixaMovimentacaos) {
+		this.caixaMovimentacaos = caixaMovimentacaos;
+	}
+
+	public BigDecimal getValorRecebVendaVistaCartao() {
+		return valorRecebVendaVistaCartao;
+	}
+
+	public BigDecimal getValorRecebVendaVistaChePre() {
+		return valorRecebVendaVistaChePre;
+	}
+
+	public BigDecimal getValorRecebVendaVistaCheVista() {
+		return valorRecebVendaVistaCheVista;
+	}
+
+	public BigDecimal getValorRecebVendaVistaDinheiro() {
+		return valorRecebVendaVistaDinheiro;
+	}
+
+	public BigDecimal getValorRecebPrazoCartao() {
+		return valorRecebPrazoCartao;
+	}
+
+	public BigDecimal getValorRecebPrazoChePre() {
+		return valorRecebPrazoChePre;
+	}
+
+	public BigDecimal getValorRecebPrazoCheVista() {
+		return valorRecebPrazoCheVista;
+	}
+
+	public BigDecimal getValorRecebPrazoDinheiro() {
+		return valorRecebPrazoDinheiro;
+	}
+
+	public BigDecimal getValorLancFluCartao() {
+		return valorLancFluCartao;
+	}
+
+	public void setValorLancFluCartao(BigDecimal valorLancFluCartao) {
+		this.valorLancFluCartao = valorLancFluCartao;
+	}
+
+	public BigDecimal getValorLancFluChePre() {
+		return valorLancFluChePre;
+	}
+
+	public void setValorLancFluChePre(BigDecimal valorLancFluChePre) {
+		this.valorLancFluChePre = valorLancFluChePre;
+	}
+
+	public BigDecimal getValorLancFluCheVista() {
+		return valorLancFluCheVista;
+	}
+
+	public void setValorLancFluCheVista(BigDecimal valorLancFluCheVista) {
+		this.valorLancFluCheVista = valorLancFluCheVista;
+	}
+
+	public BigDecimal getValorLancFluDinheiro() {
+		return valorLancFluDinheiro;
+	}
+
+	public void setValorLancFluDinheiro(BigDecimal valorLancFluDinheiro) {
+		this.valorLancFluDinheiro = valorLancFluDinheiro;
+	}
+
+	private void totalizadoresCaixaMovimentacao() {
+		valorRecebVendaVistaDinheiro = BigDecimal.ZERO;
+		valorRecebVendaVistaCheVista = BigDecimal.ZERO;
+		valorRecebVendaVistaChePre = BigDecimal.ZERO;
+		valorRecebVendaVistaCartao = BigDecimal.ZERO;
+		valorRecebPrazoDinheiro = BigDecimal.ZERO;
+		valorRecebPrazoCheVista = BigDecimal.ZERO;
+		valorRecebPrazoChePre = BigDecimal.ZERO;
+		valorRecebPrazoCartao = BigDecimal.ZERO;
+
+		// melhorar aqui vincular somente a parcela titulo e pegar pelo titulo o
+		// tipo de venda, matricula etc.
+		if (!getCaixaMovimentacaos().isEmpty()) {
+			for (CaixaMovimentacao caixaMovimentacao : getCaixaMovimentacaos()) {
+				if (caixaMovimentacao.getVenda() != null) {
+					if (caixaMovimentacao.getVenda().getTitulo() != null) {
+						if (caixaMovimentacao.getCompoeMovimentacaoFinanceira() == true && caixaMovimentacao.getVenda().getTitulo().getVenda().getTipoVenda().equals(TipoVenda.A)) {
+							this.valorRecebVendaVistaDinheiro = this.valorRecebVendaVistaDinheiro
+									.add(caixaMovimentacao.getValorDinheiro());
+							this.valorRecebVendaVistaCheVista = this.valorRecebVendaVistaCheVista
+									.add(caixaMovimentacao.getValorChequeVista());
+							this.valorRecebVendaVistaChePre = this.valorRecebVendaVistaChePre
+									.add(caixaMovimentacao.getValorChequePre());
+							this.valorRecebVendaVistaCartao = this.valorRecebVendaVistaCartao
+									.add(caixaMovimentacao.getValorCartao());
+						}
+					} else if (caixaMovimentacao.getCompoeMovimentacaoFinanceira() == true && caixaMovimentacao.getVenda().getTitulo().getVenda().getTipoVenda().equals(TipoVenda.P)) {
+						this.valorRecebPrazoDinheiro = this.valorRecebPrazoDinheiro
+								.add(caixaMovimentacao.getValorDinheiro());
+						this.valorRecebPrazoCheVista = this.valorRecebPrazoCheVista
+								.add(caixaMovimentacao.getValorChequeVista());
+						this.valorRecebPrazoChePre = this.valorRecebPrazoChePre
+								.add(caixaMovimentacao.getValorChequePre());
+						this.valorRecebPrazoCartao = this.valorRecebPrazoCartao.add(caixaMovimentacao.getValorCartao());
+					}
+				} else if (caixaMovimentacao.getCompoeMovimentacaoFinanceira() == true && caixaMovimentacao.getRecebimento() != null) {
+					if (!caixaMovimentacao.getRecebimento().getParcelaTitulos().isEmpty()) {
+						this.valorRecebPrazoDinheiro = this.valorRecebPrazoDinheiro
+								.add(caixaMovimentacao.getValorDinheiro());
+						this.valorRecebPrazoCheVista = this.valorRecebPrazoCheVista
+								.add(caixaMovimentacao.getValorChequeVista());
+						this.valorRecebPrazoChePre = this.valorRecebPrazoChePre
+								.add(caixaMovimentacao.getValorChequePre());
+						this.valorRecebPrazoCartao = this.valorRecebPrazoCartao.add(caixaMovimentacao.getValorCartao());
+					}
+				} else if (caixaMovimentacao.getCompoeMovimentacaoFinanceira() == true && caixaMovimentacao.getLancFluxoCaixa() != null) {
+					this.valorLancFluDinheiro = this.valorLancFluDinheiro.add(caixaMovimentacao.getValorDinheiro());
+					this.valorLancFluCheVista = this.valorLancFluCheVista.add(caixaMovimentacao.getValorChequeVista());
+					this.valorLancFluChePre = this.valorLancFluChePre.add(caixaMovimentacao.getValorChequePre());
+					this.valorLancFluCartao = this.valorLancFluCartao.add(caixaMovimentacao.getValorCartao());
+				}
+			}
+		}
+		// if (caixaMovimentacao.getRecebimentoPorValor() != null) {
+		// this.valorRecebPrazoDinheiro = this.valorRecebPrazoDinheiro +
+		// caixaMovimentacao.getValorDinheiro();
+		// this.valorRecebPrazoCheVista = this.valorRecebPrazoCheVista +
+		// caixaMovimentacao.getValorChequeVista();
+		// this.valorRecebPrazoChePre = this.valorRecebPrazoChePre +
+		// caixaMovimentacao.getValorChequePre();
+		// this.valorRecebPrazoCartao = this.valorRecebPrazoCartao +
+		// caixaMovimentacao.getValorCartao();
+		// }
+
+	}
+
+	/*
+	 * private void somaLancFluxoCaixa() { valorLancFluDinheiro =
+	 * BigDecimal.ZERO; valorLancFluCheVista = BigDecimal.ZERO;
+	 * valorLancFluChePre = BigDecimal.ZERO; valorLancFluCartao =
+	 * BigDecimal.ZERO; for (CaixaMovimentacao caixaMovimentacao :
+	 * getCaixaMovimentacaos()) { if (caixaMovimentacao.getTipoDespesa() !=
+	 * null) { this.valorLancFluDinheiro = this.valorLancFluDinheiro +
+	 * caixaMovimentacao.getValorDinheiro(); this.valorLancFluCheVista =
+	 * this.valorLancFluCheVista + caixaMovimentacao.getValorChequeVista();
+	 * this.valorLancFluChePre = this.valorLancFluChePre +
+	 * caixaMovimentacao.getValorChequePre(); this.valorLancFluCartao =
+	 * this.valorLancFluCartao + caixaMovimentacao.getValorCartao(); }
+	 * 
+	 * 
+	 * } }
+	 */
+
+	public void carregaTotaisRecebimentos() {
+		if (this.caixaMovimentacaos != null) {
+			totalizadoresCaixaMovimentacao();
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Caixa other = (Caixa) obj;
+		if (!Objects.equals(this.id, other.id)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		hash = 97 * hash + Objects.hashCode(this.id);
+		return hash;
+	}
+}

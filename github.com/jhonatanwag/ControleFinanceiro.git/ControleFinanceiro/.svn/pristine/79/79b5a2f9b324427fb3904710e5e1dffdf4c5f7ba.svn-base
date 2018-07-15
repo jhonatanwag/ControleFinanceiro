@@ -1,0 +1,139 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name = "cliente")
+public class Cliente implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(generator = "foreignCliente")
+	@GenericGenerator(name = "foreignCliente", strategy = "foreign", parameters = {
+			@Parameter(name = "property", value = "pessoa") })
+	@Column(name = "cliente_id")
+	private Long id;
+	@OneToOne(targetEntity = Pessoa.class, optional = false)
+	@PrimaryKeyJoinColumn
+	@Cascade(CascadeType.ALL)
+	private Pessoa pessoa;
+	@Column(name = "val_ult_pgto", nullable = true)
+	private BigDecimal valorRecebido = BigDecimal.ZERO;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data_ult_pgto", nullable = true)
+	private Date dataUltimoPagamento;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data_ult_venda", nullable = true)
+	private Date dataUltimaVenda;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "cliente", orphanRemoval = true)
+	private List<ClienteCredito> clienteCreditos = new ArrayList<>();
+
+	public Cliente() {
+		this.pessoa = new Pessoa();
+		this.pessoa.setCliente(true);
+	}
+
+	public Cliente(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
+
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public Date getDataUltimaVenda() {
+		return dataUltimaVenda;
+	}
+
+	public void setDataUltimaVenda(Date dataUltimaVenda) {
+		this.dataUltimaVenda = dataUltimaVenda;
+	}
+
+	public Date getDataUltimoPagamento() {
+		return dataUltimoPagamento;
+	}
+
+	public void setDataUltimoPagamento(Date dataUltimoPagamento) {
+		this.dataUltimoPagamento = dataUltimoPagamento;
+	}
+
+	public BigDecimal getValorRecebido() {
+		return valorRecebido;
+	}
+
+	public void setValorRecebido(BigDecimal valorRecebido) {
+		this.valorRecebido = valorRecebido;
+	}
+
+	public List<ClienteCredito> getClienteCreditos() {
+		return clienteCreditos;
+	}
+
+	public void setClienteCreditos(List<ClienteCredito> clienteCreditos) {
+		this.clienteCreditos = clienteCreditos;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Cliente other = (Cliente) obj;
+		if (this.pessoa != other.pessoa && (this.pessoa == null || !this.pessoa.equals(other.pessoa))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 79 * hash + (this.pessoa != null ? this.pessoa.hashCode() : 0);
+		return hash;
+	}
+}

@@ -1,0 +1,74 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroObjetoSistemaBean.editando ? 'Edição do grupo' : 'Novo grupo'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="objetoSistema"
+				value="#{cadastroObjetoSistemaBean.objeto}" />
+			<f:viewAction action="#{cadastroObjetoSistemaBean.inicializar}" />
+		</f:metadata>
+
+		<h:form id="form">
+			<h1>#{cadastroObjetoSistemaBean.editando ? 'Edição do objeto do
+				sistema' : 'Novo objeto do sistema'}</h1>
+
+			<p:messages id="messagesPessoa" autoUpdate="false" closable="true" />
+
+			<p:toolbar style="margin-top: 20px">
+				<p:toolbarGroup>
+					<p:button value="Novo"
+						outcome="/objetoSistema/CadastroObjetoSistema" />
+					<p:commandButton value="Salvar" id="botaoSalvar" process="@form"
+						action="#{cadastroObjetoSistemaBean.salvar}" update="@form" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:button value="Pesquisa"
+						outcome="/objetoSistema/PesquisaObjetoSistema" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:panelGrid columns="2" id="painel"
+				style="width: 100%; margin-top: 20px" columnClasses="rotulo, campo">
+
+
+				<p:outputLabel value="Código:" for="codigo" />
+				<p:inputText id="codigo"
+					value="#{cadastroObjetoSistemaBean.objeto.id}" required="false"
+					size="10" maxlength="10" readonly="true" />
+
+                 <p:outputLabel value="Data do cadastro" for="dataCadastro" />
+					<p:inputText id="dataCadastro"
+						value="#{cadastroObjetoSistemaBean.objeto.dataCadastro}" disabled="true"
+						class="campo25">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+					</p:inputText>
+
+
+				<p:outputLabel value="Descrição" for="descricao" />
+				<p:inputText id="descricao" size="100" maxlength="100"
+					value="#{cadastroObjetoSistemaBean.objeto.descricao}"
+					required="true" />
+
+				<p:outputLabel value="Url" for="url" />
+				<p:inputText id="url" size="100" maxlength="400"
+					value="#{cadastroObjetoSistemaBean.objeto.url}"
+					required="true" />
+
+			</p:panelGrid>
+			<div align="center" style="margin-top: 20px">
+				<p:pickList id="pickList" value="#{cadastroObjetoSistemaBean.model}"
+					var="opcao" itemValue="#{opcao}" itemLabel="#{opcao}">
+					<o:converter converterId="omnifaces.ListConverter"
+						list="#{cadastroObjetoSistemaBean.model.target}" />
+				</p:pickList>
+			</div>
+		</h:form>
+
+	</ui:define>
+</ui:composition>

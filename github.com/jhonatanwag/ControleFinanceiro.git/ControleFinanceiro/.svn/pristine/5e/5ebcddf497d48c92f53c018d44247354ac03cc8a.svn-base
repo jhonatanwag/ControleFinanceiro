@@ -1,0 +1,51 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Danilo
+ * CRT - Código de Regime Tributário
+ * O CRT, instituído pelo Ajuste SINIEF 7/05, identifica o regime tributário ao qual o contribuinte está submetido
+ */
+
+public enum CRT {
+
+//	1 - Simples Nacional
+//	O código 1 será utilizado pelo contribuinte optante pelo Simples Nacional.
+//	2 - Simples Nacional - excesso de sublimite da receita bruta
+//	O Estado do Rio de Janeiro não fixou sublimite, logo o código CRT 2 não deve ser utilizado 
+//	por estabelecimento de ME/EPP optante pelo Simples Nacional localizado neste Estado.
+//	3 - Regime Normal
+//	O código 3 será utilizado pelo contribuinte que não estiver na situação 1 ou 2. Como a situação 2 não é aplicável ao Estado do Rio de Janeiro, o CRT 3 deverá ser preenchido
+	
+    SIMPLES_NACIONAL("Simples Nacional - O código 1 será utilizado pelo contribuinte optante pelo Simples Nacional."),
+    SIMPLES_NACIONAL_RECEITA_BRUTA("Simples Nacional - excesso de sublimite da receita bruta,  Estado do Rio de Janeiro não fixou sublimite, logo o código CRT 2 não deve ser utilizado, por estabelecimento de ME/EPP optante pelo Simples Nacional localizado neste Estado."),
+    REGIME_NORMAL("O código 3 será utilizado pelo contribuinte que não estiver na situação 1 ou 2. Como a situação 2 não é aplicável ao Estado do Rio de Janeiro, o CRT 3 deverá ser preenchido");  
+    private String value;
+
+    private CRT(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static CRT getTipoEndereco(Integer value) {
+        switch (value) {          
+            case 1:
+                return SIMPLES_NACIONAL;
+            case 2:
+                return SIMPLES_NACIONAL_RECEITA_BRUTA;
+            case 3:
+                return REGIME_NORMAL;         
+             default:
+                return SIMPLES_NACIONAL;
+        }
+    }
+}

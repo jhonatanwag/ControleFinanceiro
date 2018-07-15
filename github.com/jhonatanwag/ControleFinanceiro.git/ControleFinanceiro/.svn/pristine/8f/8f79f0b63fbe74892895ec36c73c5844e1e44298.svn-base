@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.LancFluxoCaixa;
+import br.com.sistemacomercial.repository.LancFluxoCaixas;
+import br.com.sistemacomercial.repository.filter.LancFluxoCaixaFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaLancFluxoCaixaBean extends PesquisaBeanAbstrato<LancFluxoCaixa, LancFluxoCaixaFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private LancFluxoCaixas lancFluxoCaixas;
+
+	public PesquisaLancFluxoCaixaBean() {
+		setFiltro(new LancFluxoCaixaFilter());
+	}
+
+	@Override
+	public void excluir() {
+		lancFluxoCaixas.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Lançamento em fluxo de caixa excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(lancFluxoCaixas.filtrados(getFiltro()));
+	}
+
+}

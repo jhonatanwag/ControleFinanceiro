@@ -1,0 +1,76 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+
+import javax.faces.bean.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.UploadedFile;
+
+import br.com.sistemacomercial.model.Arquivo;
+import br.com.sistemacomercial.repository.Arquivos;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@RequestScoped
+// @ApplicationScoped
+public class ArquivoBean implements Serializable {
+	//http://stackoverflow.com/questions/19817248/primefaces-uploadfile-how-can-i-save-the-uploaded-image-file-to-some-directory
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private Arquivos arquivos;
+
+	public void upload(FileUploadEvent event) {
+		UploadedFile uf = event.getFile();
+		// Tools t = new Tools();
+		// String nomeArq = t.agora() + "-" +
+		// t.trataAcentoString(uf.getFileName());
+		// this.avaliacao.setAnexo_resp(nomeArq);
+		String nomeArq = uf.getFileName();
+		String path = "";
+		// aqui verifico se é linux ou windows
+		if (System.getProperties().get("os.name").toString().trim().equalsIgnoreCase("Linux")) {
+			path = "/home/workspace/gca/WebContent/resources/files/";
+		} else {
+			path = "c://files//";
+			// path =
+			// FacesUtil.getServletContext().getRealPath("/WEB-INF/imagens/");
+		}
+
+		File f = new File(path + nomeArq);
+		OutputStream os = null;
+		InputStream is = null;
+		try {
+			is = uf.getInputstream();
+			byte[] b = new byte[is.available()];
+			os = new FileOutputStream(f);
+			while (is.read(b) > 0) {
+				os.write(b);
+			}
+			arquivos.salvar(new Arquivo("jpg", nomeArq, f.getAbsolutePath()));
+			// aqui você pode colcar a gravação do path no BD
+
+			// Tools.msgAlert("Alerta", "O arquivo foi enviado corretamente,
+			// clique em enviar para concluir a operação.");
+			FacesUtil.addInfoMessage("Imagens enviadas com sucesso!");
+		} catch (IOException ex) {
+			FacesUtil.addErrorMessage("Erro ao enviar as imagens!" + ex);
+		} finally {
+			try {
+				os.flush();
+				os.close();
+				is.close();
+			} catch (IOException ex) {
+				FacesUtil.addInfoMessage("Erro ao enviar as imagens!" + ex);
+			}
+		}
+	}
+
+}

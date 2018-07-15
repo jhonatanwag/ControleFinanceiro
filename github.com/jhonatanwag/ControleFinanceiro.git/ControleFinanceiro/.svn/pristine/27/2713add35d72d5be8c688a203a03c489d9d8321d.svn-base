@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Usuario;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.filter.UsuarioFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaUsuarioBean extends PesquisaBeanAbstrato<Usuario, UsuarioFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Pessoas usuarios;
+
+	public PesquisaUsuarioBean() {
+		setFiltro(new UsuarioFilter());
+	}
+
+	@Override
+	public void excluir() {
+		usuarios.remover(getObjetoSelecionado());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Usuario " + getObjetoSelecionado().getLogin() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(usuarios.filtrados(getFiltro()));
+	}
+
+}

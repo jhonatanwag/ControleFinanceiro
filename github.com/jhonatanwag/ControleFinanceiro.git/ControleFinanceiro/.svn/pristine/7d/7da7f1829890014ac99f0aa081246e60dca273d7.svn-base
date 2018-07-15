@@ -1,0 +1,287 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.Column;
+
+import br.com.sistemacomercial.enums.CaixaStatus;
+import br.com.sistemacomercial.model.Caixa;
+import br.com.sistemacomercial.model.CaixaMovimentacao;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.repository.filter.CaixaFilter;
+import br.com.sistemacomercial.security.EnderecoIpLocal;
+import br.com.sistemacomercial.security.FilialLogada;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.security.TerminalLogado;
+import br.com.sistemacomercial.service.CaixaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CaixaBean extends BeanAbstrato<Caixa> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private Caixas caixas;
+	@Inject
+	private CaixaService caixaService;
+	@Inject
+	@TerminalLogado
+	private Terminal terminalLogado;
+	@Inject
+	@FilialLogada
+	private Filial filialLogada;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+	private boolean isCaixaAbertoTerminal = false;
+	@Inject
+	@EnderecoIpLocal
+	private String enderecoIpLocal;
+
+	private Caixa caixaSelecionado;
+	private List<Caixa> filtrados = new ArrayList<>();
+	private CaixaFilter filtro;
+	//O valores abaixos serao jogados para o novo caixa!
+	private BigDecimal valorTransporteDinheiro;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteChequeVista;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteChequePre;
+	@Column(nullable = false)
+	private BigDecimal valorTransporteCartao;
+
+	public CaixaBean() {
+		limpar();
+		filtro = new CaixaFilter();
+	}
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		caixaAbertoTerminal();
+	}
+
+	private void caixaAbertoTerminal() {
+	  this.isCaixaAbertoTerminal =	caixaService.existeCaixaAberto(terminalLogado);	
+	  System.out.println(enderecoIpLocal);
+	}
+
+	@Override
+	public void setObjeto(Caixa objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Caixa());
+		setCaixaSelecionado(null);
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(caixaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Caixa salvo com sucesso!");
+	}
+
+	public BigDecimal getTotalMovimentoCaixa() {
+		BigDecimal totalMovimentoCaixa = BigDecimal.ZERO;
+		if (caixaSelecionado != null) {
+			if (!caixaSelecionado.getCaixaMovimentacaos().isEmpty()) {
+				for (CaixaMovimentacao caixa : caixaSelecionado.getCaixaMovimentacaos()) {
+					totalMovimentoCaixa = totalMovimentoCaixa.add(caixa.getValorLancamento());
+				}
+
+			}
+		}
+		return totalMovimentoCaixa;
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public void pesquisar() {
+		setFiltrados(caixas.filtrados(getFiltro()));
+	}
+
+	public Caixa getCaixaSelecionado() {
+		return caixaSelecionado;
+	}
+
+	public void setCaixaSelecionado(Caixa caixaSelecionado) {
+		this.caixaSelecionado = caixaSelecionado;
+	}
+
+	public CaixaFilter getFiltro() {
+		return filtro;
+	}
+
+	public void setFiltro(CaixaFilter filtro) {
+		this.filtro = filtro;
+	}
+
+	public List<Caixa> getFiltrados() {
+		return filtrados;
+	}
+
+	public void setFiltrados(List<Caixa> filtrados) {
+		this.filtrados = filtrados;
+	}
+
+	public boolean isCaixaAbertoTerminal() {
+		return isCaixaAbertoTerminal;
+	}
+	
+	
+
+	public void criarNovoCaixa() {
+		limpar();
+		Filial filial = filialLogada;
+		Terminal terminal = terminalLogado;
+		Funcionario funcionario = funcionarioLogado;
+		getObjeto().setValorDinheiro(BigDecimal.ZERO);
+		getObjeto().setValorCartao(BigDecimal.ZERO);
+		getObjeto().setValorChequePre(BigDecimal.ZERO);
+		getObjeto().setValorVendaPrazo(BigDecimal.ZERO);
+		getObjeto().setValorVendaVista(BigDecimal.ZERO);
+		getObjeto().setValorChequeVista(BigDecimal.ZERO);
+		getObjeto().setValorFechCartao(BigDecimal.ZERO);
+		getObjeto().setValorFechChequePre(BigDecimal.ZERO);
+		getObjeto().setValorFechChequeVista(BigDecimal.ZERO);
+		getObjeto().setValorFechDinheiro(BigDecimal.ZERO);
+		getObjeto().setValorTransporteCartao(BigDecimal.ZERO);
+		getObjeto().setValorTransporteChequePre(BigDecimal.ZERO);
+		getObjeto().setValorTransporteChequeVista(BigDecimal.ZERO);
+		getObjeto().setValorTransporteDinheiro(BigDecimal.ZERO);
+		getObjeto().setDataAbertura(new Date());
+		getObjeto().setTerminalAbertura(terminal);
+		getObjeto().setFilial(filial);
+		getObjeto().setFuncionarioAbertura(funcionario);
+		
+		//setValorTransporteCartao(BigDecimal.ZERO);
+		//setValorTransporteChequePre(BigDecimal.ZERO);
+		//setValorTransporteChequeVista(BigDecimal.ZERO);
+		//setValorTransporteDinheiro(BigDecimal.ZERO);
+
+	}
+
+	public void confirmarNovoCaixa() {
+		getObjeto().setValorDinheiro(getValorTransporteDinheiro());
+		getObjeto().setValorChequePre(getValorTransporteChequePre());
+		getObjeto().setValorChequeVista(getValorTransporteChequeVista());
+		getObjeto().setValorCartao(getValorTransporteCartao());
+		salvar();
+	}
+	
+	public void preFechamentoCaixa(){
+		setObjeto(getCaixaSelecionado());
+		getObjeto().setValorFechCartao(BigDecimal.ZERO);
+		getObjeto().setValorFechChequePre(BigDecimal.ZERO);
+		getObjeto().setValorFechChequeVista(BigDecimal.ZERO);
+		getObjeto().setValorFechDinheiro(BigDecimal.ZERO);
+		//Valores para o novo caixa
+		setValorTransporteCartao(BigDecimal.ZERO);
+		setValorTransporteChequePre(BigDecimal.ZERO);
+		setValorTransporteChequeVista(BigDecimal.ZERO);
+		setValorTransporteDinheiro(BigDecimal.ZERO);
+	}
+
+	
+	public void confirmarFechCaixa() {		
+		//Fechamento inicio
+		getObjeto().setCaixaStatus(CaixaStatus.F);
+		getObjeto().setDataFechamento(new Date());
+		getObjeto().setTerminalFechamento(terminalLogado);		
+		
+		setValorTransporteDinheiro(getObjeto().getValorTransporteDinheiro());
+		setValorTransporteChequePre(getObjeto().getValorTransporteChequePre());
+		setValorTransporteChequeVista(getObjeto().getValorTransporteChequeVista());
+		setValorTransporteCartao(getObjeto().getValorTransporteCartao());
+		
+		salvar();	
+		//fechamento fim
+		
+		//Novo caixa inicio
+		criarNovoCaixa();
+		getObjeto().setValorDinheiro(getValorTransporteDinheiro());
+		getObjeto().setValorChequePre(getValorTransporteChequePre());
+		getObjeto().setValorChequeVista(getValorTransporteChequeVista());
+		getObjeto().setValorDinheiro(getValorTransporteDinheiro());
+		confirmarNovoCaixa();
+		//Novo caixa fim
+		limpar();
+	}
+	
+	public void excluir() {
+		Caixa caixa = caixas.porId(getCaixaSelecionado().getId());
+		if(caixa.getCaixaMovimentacaos().size() == 0){
+			caixas.remover(getCaixaSelecionado().getId());			
+			pesquisar();
+			limpar();
+			FacesUtil.addInfoMessage("Caixa excluído com sucesso.");	
+		}else{
+			FacesUtil.addErrorMessage("Caixa não pode ser excluído pois houve movimentação!");	
+		}		
+	}
+
+	public void carregaMovimentoCaixa() {
+		if (getCaixaSelecionado() != null) {
+			if (getCaixaSelecionado().getId() != null) {
+				caixaSelecionado = caixas.porId(getCaixaSelecionado().getId());
+			}
+
+		}
+	}
+
+	public BigDecimal getValorTransporteDinheiro() {
+		return valorTransporteDinheiro;
+	}
+
+	public void setValorTransporteDinheiro(BigDecimal valorTransporteDinheiro) {
+		this.valorTransporteDinheiro = valorTransporteDinheiro;
+	}
+
+	public BigDecimal getValorTransporteChequeVista() {
+		return valorTransporteChequeVista;
+	}
+
+	public void setValorTransporteChequeVista(BigDecimal valorTransporteChequeVista) {
+		this.valorTransporteChequeVista = valorTransporteChequeVista;
+	}
+
+	public BigDecimal getValorTransporteChequePre() {
+		return valorTransporteChequePre;
+	}
+
+	public void setValorTransporteChequePre(BigDecimal valorTransporteChequePre) {
+		this.valorTransporteChequePre = valorTransporteChequePre;
+	}
+
+	public BigDecimal getValorTransporteCartao() {
+		return valorTransporteCartao;
+	}
+
+	public void setValorTransporteCartao(BigDecimal valorTransporteCartao) {
+		this.valorTransporteCartao = valorTransporteCartao;
+	}
+	
+	
+
+}

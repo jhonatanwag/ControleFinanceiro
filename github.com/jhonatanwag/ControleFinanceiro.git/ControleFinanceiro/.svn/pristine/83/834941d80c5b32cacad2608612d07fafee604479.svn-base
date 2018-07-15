@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Filial" widgetVar="DlgFilial" modal="true" dynamic="true"
+		responsive="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<p:panel>
+			<h:form id="formDialogFilial">
+				<p:messages id="messagesEmail" closable="true" autoUpdate="true" />
+				<p:panelGrid id="painelFilial" columns="2"
+					columnClasses="rotulo, campo" style="margin-top: 20px">
+
+					<p:outputLabel value="Responsável:" for="pes" />
+					<p:selectOneMenu id="pes" required="true" filter="true"
+						filterMatchMode="startsWith"
+						value="#{cadastroEmpresaBean.pessoaSelecionada.cliente}">
+						<f:selectItem itemLabel="--Selecione--" />
+						<f:selectItems var="tp" itemLabel="#{tp.nome}"
+							itemValue="#{tp.cliente}"
+							value="#{cadastroEmpresaBean.todasPessoas}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Razão Social" for="razao" />
+					<p:inputText id="razao" class="uppercase campo90"
+						converter="#{upperToCaseConverter}" maxlength="100"
+						value="#{cadastroEmpresaBean.filialSelecionada.razaoSocial}"
+						required="true" />
+
+					<p:outputLabel value="Nome fantasia" for="fantasia" />
+					<p:inputText id="fantasia" class="uppercase campo90"
+						converter="#{upperToCaseConverter}" maxlength="100"
+						value="#{cadastroEmpresaBean.filialSelecionada.nomeFantasia}"
+						required="true" />
+
+					<p:outputLabel value="CNPJ" for="cnpj" />
+					<p:inputText id="cnpj" class="uppercase campo90"
+						converter="#{upperToCaseConverter}" maxlength="100"
+						mask="99.999.999/9999-99"
+						value="#{cadastroEmpresaBean.filialSelecionada.cnpj}"
+						required="true" />
+
+					<p:outputLabel value="Inscrição Estadual" for="inscricaoEstadual" />
+					<p:inputText id="inscricaoEstadual" class="uppercase campo90"
+						converter="#{upperToCaseConverter}" maxlength="100"
+						value="#{cadastroEmpresaBean.filialSelecionada.inscricaoEstadual}"
+						required="true" />
+
+					<p:outputLabel value="Fecha caixa por terminal" for="fechaCaixa" />
+					<p:selectBooleanCheckbox id="fechaCaixa" required="true"
+						value="#{cadastroEmpresaBean.filialSelecionada.fechaCaixaTerminal}"
+						disabled="false" />
+
+					<p:outputLabel value="Sede" for="sede" />
+					<p:selectBooleanCheckbox id="sede" required="true"
+						value="#{cadastroEmpresaBean.filialSelecionada.sede}"
+						disabled="false" />
+				</p:panelGrid>
+
+				<h:panelGrid rendered="true" columns="3" cellpadding="5"
+					style="margin: 0 auto;">
+					<p:commandButton id="bntConfirmar" value="Confirmar"
+						actionListener="#{cadastroEmpresaBean.confirmarFilial}"
+						update=":formDialogFilial, :form:tabView:tabelaFilial"
+						oncomplete="if (!args.validationFailed) PF('DlgFilial').hide();" />
+
+					<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+						oncomplete="PF('DlgFilial').hide();">
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:panel>
+		<p:tabView id="tabView">
+			<ui:include src="/WEB-INF/template/pessoa/TabEndereco.xhtml" />
+			<ui:include src="/WEB-INF/template/pessoa/TabTelefone.xhtml" />
+			<ui:include src="/WEB-INF/template/pessoa/TabEmail.xhtml" />
+		</p:tabView>
+	</p:dialog>
+</ui:composition>

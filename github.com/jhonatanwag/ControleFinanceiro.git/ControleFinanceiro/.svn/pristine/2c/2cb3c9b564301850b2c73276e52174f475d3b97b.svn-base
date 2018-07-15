@@ -1,0 +1,306 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TabChangeEvent;
+
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Grupo;
+import br.com.sistemacomercial.model.ItemVenda;
+import br.com.sistemacomercial.model.ItemVendaOpcional;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.ProdutoOpcional;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.Grupos;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.service.VendaService;
+import br.com.sistemacomercial.util.jpa.Transactional;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class VendaBeanTouch extends BeanAbstrato<Venda> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private Produtos produtos;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private VendaService vendaService;
+	@Inject
+	private Grupos grupos;
+	private Pessoa pessoaSelecionada;
+	private Produto produtoSelecionado = new Produto();
+	private Venda vendaSelecionada;
+	private ItemVenda itemVendaSelecionada;
+	private List<ItemVenda> itemVendaSelecionados = new ArrayList<>();
+	private List<Produto> opcionaisSelecionados = new ArrayList<>();
+	private Integer quantidade = 1;
+	private List<Funcionario> funcionarios;
+	private List<Grupo> grupo;
+	private List<Produto> produtosTab;
+	private Boolean editandoOpcional = false;
+
+	@Override
+	public void inicializar() {
+		if (FacesUtil.isNotPostback()) {
+			if (this.getObjeto() == null) {
+				limpar();
+			}
+			funcionarios = pessoas.listaFuncionarios();
+			grupo = grupos.gruposVendaGourmet(true);
+		}
+	}
+
+	@Override
+	public void setObjeto(Venda objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Transactional
+	public void confirmarFechamento() {
+		vendaService.salvar(getObjeto());
+		limpar();
+		FacesUtil.addInfoMessage("Venda salva com sucesso!");
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Venda());
+		setPessoaSelecionada(new Pessoa());
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	/* Item venda Inicio */
+
+	public Integer getQuantidade() {
+		return quantidade;
+	}
+
+	public List<Grupo> getGrupo() {
+		return grupo;
+	}
+
+	public List<ItemVenda> getItemVendaSelecionados() {
+		return itemVendaSelecionados;
+	}
+		
+	public void setItemVendaSelecionados(List<ItemVenda> itemVendaSelecionados) {
+		this.itemVendaSelecionados = itemVendaSelecionados;
+	}
+		
+
+	public ItemVenda getItemVendaSelecionada() {
+		return itemVendaSelecionada;
+	}
+
+	public void setItemVendaSelecionada(ItemVenda itemVendaSelecionada) {
+		this.itemVendaSelecionada = itemVendaSelecionada;
+	}
+
+	public void setQuantidade(Integer quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public void excluirItemVenda() {
+		 getObjeto().getItensVenda().remove(itemVendaSelecionada);
+		 itemVendaSelecionada = null;
+	}
+
+	/* Item venda Fim */
+
+	public List<Produto> getOpcionaisSelecionados() {
+		return opcionaisSelecionados;
+	}
+
+	public void setOpcionaisSelecionados(List<Produto> opcionaisSelecionados) {
+		this.opcionaisSelecionados = opcionaisSelecionados;
+	}
+
+	/* Pessoa Inicio */
+	public Pessoa getPessoaSelecionada() {
+		return pessoaSelecionada;
+	}
+
+	public void setPessoaSelecionada(Pessoa pessoaSelecionada) {
+		this.pessoaSelecionada = pessoaSelecionada;
+	}
+
+	public void pessoaPorId() {
+		Pessoa pessoa = pessoas.porId((getPessoaSelecionada().getId() == null ? -1 : getPessoaSelecionada().getId()));
+		if (pessoa != null) {
+			setPessoaSelecionada(pessoa);
+			getObjeto().setCliente(pessoa.getClientePessoa());
+		} else {
+			setPessoaSelecionada(new Pessoa());
+			getObjeto().setCliente(null);
+			FacesUtil.addErrorMessage("Cliente não encontrada para o código informado!");
+		}
+	}
+
+	public void pessoaSelecao(SelectEvent event) {
+		Pessoa pessoa = (Pessoa) event.getObject();
+		this.pessoaSelecionada = pessoa;
+		getObjeto().setCliente(pessoa.getClientePessoa());
+	}
+
+	/* Pessoa Fim */
+
+	/* Produto inicio */
+	public Produto getProdutoSelecionado() {
+		return produtoSelecionado;
+	}
+
+	public void setProdutoSelecionado(Produto produtoSelecionado) {
+		this.produtoSelecionado = produtoSelecionado;
+	}
+
+	private void produtosPorGrupo(Grupo grupo) {
+		this.produtosTab = produtos.produtosPorGrupo(grupo);
+	}
+
+	public void produtoSelecao(SelectEvent event) {
+		Produto produto = (Produto) event.getObject();
+		this.produtoSelecionado = produto;
+		if (this.produtoSelecionado != null) {
+			getObjeto().getItensVenda().add(new ItemVenda(getObjeto(), produtoSelecionado));
+			// getObjeto().adicionarItemVazio();
+		}
+	}
+
+	public void produtoPorCodigo() {
+		if (this.produtoSelecionado != null) {
+			this.produtoSelecionado = produtos.porId(this.produtoSelecionado.getId());
+			getObjeto().getItensVenda().add(new ItemVenda(getObjeto(), produtoSelecionado));
+		}
+	}
+
+	public void onTabChange(TabChangeEvent event) {
+		System.out.println(event.getData());
+		Grupo grupoTabSelecionada = (Grupo) event.getData();
+		produtosPorGrupo(grupoTabSelecionada);
+	}
+
+	public List<Produto> getProdutosTab() {
+		return produtosTab;
+	}
+
+	public void incluirItemVenda() {
+		ItemVenda itemVenda = new ItemVenda();
+		itemVenda.setVenda(getObjeto());
+		itemVenda.setQuantidade(new BigDecimal(getQuantidade()));
+		produtoSelecionado = produtos.porId(produtoSelecionado.getId());
+		itemVenda.setValorUnitario(getProdutoSelecionado().getPrecoAtual());
+		itemVenda.setProduto(getProdutoSelecionado());
+		itemVenda.setUnidadeMedida(getProdutoSelecionado().getUnidadeMedida());
+		itemVenda.atualizarValores();
+		getObjeto().getItensVenda().add(itemVenda);
+		setProdutoSelecionado(null);
+	}
+	
+	
+	public void opcionais(){
+		if(this.produtoSelecionado != null){
+			this.produtoSelecionado.getProdutoOpcionais();
+			for(ProdutoOpcional prodOp: produtoSelecionado.getProdutoOpcionais()){
+				 prodOp.setSelecionado(false);
+			}
+		}
+	}
+	
+	public void incluirItemComOpcioanais() {
+		if(!editandoOpcional){
+			ItemVenda itemVenda = new ItemVenda();
+			itemVenda.setVenda(getObjeto());
+			itemVenda.setQuantidade(new BigDecimal(getQuantidade()));
+			itemVenda.setValorUnitario(getProdutoSelecionado().getPrecoAtual());
+			itemVenda.setProduto(getProdutoSelecionado());
+			itemVenda.setUnidadeMedida(getProdutoSelecionado().getUnidadeMedida());
+			
+			
+			for(ProdutoOpcional prodOpcional : produtoSelecionado.getProdutoOpcionais()){
+				if(prodOpcional.getSelecionado()){
+					ItemVendaOpcional opc = new ItemVendaOpcional();
+					opc.setItemVenda(itemVenda);
+					opc.setQuantidade(BigDecimal.ONE);
+					opc.setValorUnitario(prodOpcional.getPreco());
+					opc.setProduto(prodOpcional.getProdutoOpcional());
+					itemVenda.getItemVendaOpcionals().add(opc);
+				}
+			}		
+			
+			itemVenda.atualizarValores();
+			getObjeto().getItensVenda().add(itemVenda);
+			setProdutoSelecionado(null);
+		}else{
+			//int index = getObjeto().getItensVenda().indexOf(itemVendaSelecionada);
+			//getObjeto().getItensVenda().set(index, element)
+		}
+		
+	}
+	
+	public void cancelarOpcional(){
+		editandoOpcional = false;
+		setProdutoSelecionado(null);
+	}
+	
+	public void alterarOpcionais(){
+		editandoOpcional = true;
+		produtoSelecionado = itemVendaSelecionada.getProduto();
+		opcionais();
+		for(ItemVendaOpcional itemOpc : itemVendaSelecionada.getItemVendaOpcionals()){
+			for(ProdutoOpcional prodOpc : produtoSelecionado.getProdutoOpcionais()){						
+				if(itemOpc.getProduto().getId().equals(prodOpc.getProdutoOpcional().getId())){
+					prodOpc.setSelecionado(true);
+				}
+			}
+			
+		}
+	}
+	
+	
+
+	public void finalizarVenda() {
+
+	}
+	
+
+
+	/* Produto Fim */
+
+	public Venda getVendaSelecionada() {
+		return vendaSelecionada;
+	}
+
+	public void setVendaSelecionada(Venda vendaSelecionada) {
+		this.vendaSelecionada = vendaSelecionada;
+	}
+
+	public List<Funcionario> getFuncionarios() {
+		return funcionarios;
+	}
+
+	@Override
+	public void salvar() {
+		// TODO Auto-generated method stub
+
+	}
+
+}

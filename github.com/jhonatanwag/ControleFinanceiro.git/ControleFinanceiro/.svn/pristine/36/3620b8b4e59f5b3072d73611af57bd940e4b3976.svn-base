@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Página 2</title>
+	<h:outputStylesheet library="skin"
+		name="css/jquery.mobile-1.4.5.min.css" />
+	<h:outputScript library="skin" name="js/jquery.min.js" />
+	<h:outputScript library="skin" name="js/jquery.mobile-1.4.5.min.js" />
+</h:head>
+<h:body>
+	<div id="pagina1" data-role="page">
+		<div data-role="header">
+			<h1>Página 2.</h1>
+		</div>
+		<div role="main" class="ui-content">
+			<h:outputText
+				value="O Texto digitado foi: #{jqueryManagedBean.texto}" />
+		</div>
+	</div>
+</h:body>
+</html>

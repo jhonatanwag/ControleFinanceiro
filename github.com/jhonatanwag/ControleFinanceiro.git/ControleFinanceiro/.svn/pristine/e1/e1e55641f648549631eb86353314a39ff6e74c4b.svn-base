@@ -1,0 +1,63 @@
+package br.com.sistemacomercial.controle;
+
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Caixa;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.Usuario;
+import br.com.sistemacomercial.model.UsuarioFilial;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.repository.Empresas;
+import br.com.sistemacomercial.security.CaixaAtual;
+import br.com.sistemacomercial.security.EnderecoIpLocal;
+import br.com.sistemacomercial.security.FilialLogada;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.security.TerminalLogado;
+import br.com.sistemacomercial.security.UsuarioLogado;
+
+@Named
+@RequestScoped
+public class DashBoardBean {
+
+	@Inject
+	@TerminalLogado
+	private Terminal terminalLogado;	
+	@Inject
+	private Caixas caixas;
+	@Inject
+	@CaixaAtual
+	private Caixa caixaAtual;
+	
+	
+
+	public Terminal getTerminalLogado() {
+		return terminalLogado;
+	}
+	
+		
+	public Caixa getCaixaAtual() {
+		return caixaAtual;
+	}
+
+	@Produces
+	@CaixaAtual
+	public Caixa getCaixa() {
+
+		if (terminalLogado != null) {
+			Caixa t = caixas.caixaAbertoPorTerminal(getTerminalLogado());
+
+			return t;
+		}
+
+		return null;
+
+	}
+	
+	
+
+}

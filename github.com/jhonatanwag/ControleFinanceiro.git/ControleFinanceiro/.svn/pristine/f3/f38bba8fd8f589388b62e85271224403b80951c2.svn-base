@@ -1,0 +1,119 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.*;
+
+//import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name="empresa")
+public class Empresa implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue()
+	@Column(name = "empresa_id")
+	private Long id;
+	@Column(name = "nome_fantasia", length = 100, nullable = false)
+	private String nomeFantasia;
+	@Column(name = "razao_social", length = 100)
+	private String razaoSocial;
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY)
+	private List<Filial> filiais = new ArrayList<Filial>();
+	@Temporal(javax.persistence.TemporalType.DATE)
+	@Column(name = "data_backup")
+	private Date ultimoBackup;
+
+	public Empresa() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Date getUltimoBackup() {
+		return ultimoBackup;
+	}
+
+	public void setUltimoBackup(Date ultimoBackup) {
+		this.ultimoBackup = ultimoBackup;
+	}
+
+	public String getNomeFantasia() {
+		return nomeFantasia;
+	}
+
+	public void setNomeFantasia(String nomeFantasia) {
+		this.nomeFantasia = nomeFantasia;
+	}
+
+	public String getRazaoSocial() {
+		return razaoSocial;
+	}
+
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
+	}
+
+	public List<Filial> getFiliais() {
+		return filiais;
+	}
+
+	public void setFiliais(List<Filial> filiais) {
+		this.filiais = filiais;
+	}
+
+	// public Arquivo getArquivo() {
+	// return arquivo;
+	// }
+	//
+	// public void setArquivo(Arquivo arquivo) {
+	// this.arquivo = arquivo;
+	// }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Empresa other = (Empresa) obj;
+		if ((this.nomeFantasia == null) ? (other.nomeFantasia != null)
+				: !this.nomeFantasia.equals(other.nomeFantasia)) {
+			return false;
+		}
+		if ((this.razaoSocial == null) ? (other.razaoSocial != null) : !this.razaoSocial.equals(other.razaoSocial)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 43 * hash + (this.nomeFantasia != null ? this.nomeFantasia.hashCode() : 0);
+		hash = 43 * hash + (this.razaoSocial != null ? this.razaoSocial.hashCode() : 0);
+		return hash;
+	}
+}

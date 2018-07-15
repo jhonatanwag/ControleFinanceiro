@@ -1,0 +1,53 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog header="Novo Caixa" widgetVar="DlgNovoCaixa" modal="true"
+		dynamic="true" resizable="true" appendTo="@(boby)">
+		<h:form id="formDlgNovoCaixa" >
+			<p:panelGrid id="painelNovoCaia" columns="2">
+				<p:outputLabel value="Dinheiro" for="valEmDinheiro" />
+				<p:inputText id="valEmDinheiro" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.valorTransporteDinheiro}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cartão" for="valEmCartao" />
+				<p:inputText id="valEmCartao" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.valorTransporteCartao}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cheque à vista" for="valChqVista" />
+				<p:inputText id="valChqVista" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.valorTransporteChequeVista}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cheque pré-datado" for="valChqPre" />
+				<p:inputText id="valChqPre" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.valorTransporteChequePre}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton value="Confirmar" styleClass="botaoConfirmar"
+					actionListener="#{caixaBean.confirmarNovoCaixa}" update=":formDlgNovoCaixa"
+					oncomplete="PF('DlgNovoCaixa').hide();">
+				</p:commandButton>
+				<p:commandButton value="Cancelar" immediate="true"
+					oncomplete="PF('DlgNovoCaixa').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

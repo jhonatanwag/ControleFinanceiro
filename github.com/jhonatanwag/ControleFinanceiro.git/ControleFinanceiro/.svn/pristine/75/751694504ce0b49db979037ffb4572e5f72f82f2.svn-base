@@ -1,0 +1,417 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.enterprise.inject.Produces;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.SelectEvent;
+
+import br.com.sistemacomercial.model.ClienteCredito;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.ParcelaDataVencimento;
+import br.com.sistemacomercial.model.ParcelaTitulo;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.Recebimento;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.Recebimentos;
+import br.com.sistemacomercial.repository.Vendas;
+import br.com.sistemacomercial.repository.filter.RecebimentoFilter;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.security.TerminalLogado;
+import br.com.sistemacomercial.service.RecebimentoService;
+import br.com.sistemacomercial.util.jpa.Transactional;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class RecebimentoBean extends BeanAbstrato<Recebimento> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private RecebimentoService recebimentoService;
+	@Inject
+	private Recebimentos recebimentos;
+	@Inject
+	private Caixas caixas;
+	@Inject
+	private Vendas vendasService;
+	@Inject
+	@TerminalLogado
+	private Terminal terminalLogado;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+	private Pessoa pessoaSelecionada;
+	private List<ParcelaTitulo> parcelaTitulos = new ArrayList<>();
+	private List<ParcelaDataVencimento> parcelaDataVencimentos = new ArrayList<>();
+	private Date dataUltimaPagamento;
+	private BigDecimal valorUltimoPagamento;
+	private ParcelaTitulo parcelaTituloSelecionada;
+	private List<ParcelaTitulo> parcelaTitulosSelecionadas = new ArrayList<>();
+
+	private List<Venda> vendas = new ArrayList<>();
+	private List<Recebimento> ultimosRecebimentos;
+	private List<ClienteCredito> clienteCreditos = new ArrayList<>();;
+	private List<ClienteCredito> clienteCreditosSelecionados = new ArrayList<>();
+
+	private BigDecimal valorTotalSelecionado;
+	private BigDecimal valorSubTotal;
+	private BigDecimal recebimentoPorValor;
+	private BigDecimal valorTotalJuros;
+	private BigDecimal valorTotalDescontos;
+	/* Variaves confirma recebimento */
+	private BigDecimal valorEmDinheiro = BigDecimal.ZERO;
+	private BigDecimal valorEmCartao = BigDecimal.ZERO;
+	private BigDecimal valorEmCheque = BigDecimal.ZERO;
+
+	public RecebimentoBean() {
+		limpar();
+	}
+
+	@Override
+	@Produces
+	@RecebimentoEdicao
+	public Recebimento getObjeto() {
+		return super.getObjeto();
+	}
+
+	@Override
+	public void inicializar() {
+		if (FacesUtil.isNotPostback()) {
+		}
+	}
+
+	@Override
+	public void setObjeto(Recebimento objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Recebimento());
+		setPessoaSelecionada(new Pessoa());
+		parcelaTitulos = new ArrayList<>();
+		parcelaDataVencimentos = new ArrayList<>();
+		parcelaTitulosSelecionadas = new ArrayList<>();
+		clienteCreditos = new ArrayList<>();
+		clienteCreditosSelecionados = new ArrayList<>();
+		valorEmDinheiro = BigDecimal.ZERO;
+		valorEmCartao = BigDecimal.ZERO;
+		valorEmCheque = BigDecimal.ZERO;
+		valorSubTotal = BigDecimal.ZERO;
+		valorTotalJuros = BigDecimal.ZERO;
+		valorTotalDescontos = BigDecimal.ZERO;
+		valorTotalSelecionado = BigDecimal.ZERO;
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(recebimentoService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Recebimento salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public List<ParcelaTitulo> getParcelaTitulos() {
+		return parcelaTitulos;
+	}
+
+	public void setParcelaTitulos(List<ParcelaTitulo> parcelaTitulos) {
+		this.parcelaTitulos = parcelaTitulos;
+	}
+
+	public List<ParcelaDataVencimento> getParcelaDataVencimentos() {
+		return parcelaDataVencimentos;
+	}
+
+	public void setParcelaDataVencimentos(List<ParcelaDataVencimento> parcelaDataVencimentos) {
+		this.parcelaDataVencimentos = parcelaDataVencimentos;
+	}
+
+	public ParcelaTitulo getParcelaTituloSelecionada() {
+		return parcelaTituloSelecionada;
+	}
+
+	public void setParcelaTituloSelecionada(ParcelaTitulo parcelaTituloSelecionada) {
+		this.parcelaTituloSelecionada = parcelaTituloSelecionada;
+	}
+
+	public List<ParcelaTitulo> getParcelaTitulosSelecionadas() {
+		return parcelaTitulosSelecionadas;
+	}
+
+	public void setParcelaTitulosSelecionadas(List<ParcelaTitulo> parcelaTitulosSelecionadas) {
+		this.parcelaTitulosSelecionadas = parcelaTitulosSelecionadas;
+	}
+
+	public List<ClienteCredito> getClienteCreditosSelecionados() {
+		return clienteCreditosSelecionados;
+	}
+
+	public void setClienteCreditosSelecionados(List<ClienteCredito> clienteCreditosSelecionados) {
+		this.clienteCreditosSelecionados = clienteCreditosSelecionados;
+	}
+
+	public BigDecimal getValorSubTotal() {
+		return valorSubTotal;
+	}
+
+	public void setValorSubTotal(BigDecimal valorSubTotal) {
+		this.valorSubTotal = valorSubTotal;
+	}
+
+	public BigDecimal getValorTotalSelecionado() {
+		return valorTotalSelecionado;
+	}
+
+	public BigDecimal getValorEmDinheiro() {
+		return valorEmDinheiro;
+	}
+
+	public void setValorEmDinheiro(BigDecimal valorEmDinheiro) {
+		this.valorEmDinheiro = valorEmDinheiro;
+	}
+
+	public BigDecimal getValorEmCartao() {
+		return valorEmCartao;
+	}
+
+	public void setValorEmCartao(BigDecimal valorEmCartao) {
+		this.valorEmCartao = valorEmCartao;
+	}
+
+	public BigDecimal getValorEmCheque() {
+		return valorEmCheque;
+	}
+
+	public void setValorEmCheque(BigDecimal valorEmCheque) {
+		this.valorEmCheque = valorEmCheque;
+	}
+
+	public BigDecimal getRecebimentoPorValor() {
+		return recebimentoPorValor;
+	}
+
+	public void setRecebimentoPorValor(BigDecimal recebimentoPorValor) {
+		this.recebimentoPorValor = recebimentoPorValor;
+	}
+
+	public List<ClienteCredito> getClienteCreditos() {
+		return clienteCreditos;
+	}
+
+	public void setClienteCreditos(List<ClienteCredito> clienteCreditos) {
+		this.clienteCreditos = clienteCreditos;
+	}
+
+	public BigDecimal getValorTotalJuros() {
+		return valorTotalJuros;
+	}
+
+	public void setValorTotalJuros(BigDecimal valorTotalJuros) {
+		this.valorTotalJuros = valorTotalJuros;
+	}
+
+	public BigDecimal getValorTotalDescontos() {
+		return valorTotalDescontos;
+	}
+
+	public void setValorTotalDescontos(BigDecimal valorTotalDescontos) {
+		this.valorTotalDescontos = valorTotalDescontos;
+	}
+
+	public void espelhoVenda() {
+		vendas.clear();
+		for (ParcelaTitulo parcelaTitulo : parcelaTitulosSelecionadas) {
+			if (parcelaTitulo.getTitulo().getVenda() != null) {
+				Venda venda = vendasService.porId(parcelaTitulo.getTitulo().getVenda().getId());
+				vendas.add(venda);
+			}
+		}
+	}
+
+	public void preSelecao() {
+		valorSubTotal = BigDecimal.ZERO;
+		valorTotalJuros = BigDecimal.ZERO;
+		valorTotalDescontos = BigDecimal.ZERO;
+		valorTotalSelecionado = BigDecimal.ZERO;
+		for (ParcelaTitulo parcelaTitulo : parcelaTitulosSelecionadas) {
+			valorSubTotal = valorSubTotal.add(parcelaTitulo.getValorTitulo());
+			valorTotalJuros = valorTotalJuros.add(parcelaTitulo.getValorJuro());
+			valorTotalDescontos = valorTotalDescontos.add(parcelaTitulo.getValorDesconto());
+		}
+		valorTotalSelecionado = valorTotalSelecionado.add(valorSubTotal).add(valorTotalJuros)
+				.subtract(valorTotalDescontos);
+	}
+
+	public void preRecebimento() {
+		valorTotalSelecionado = BigDecimal.ZERO;
+		for (ParcelaTitulo parcelaTitulo : parcelaTitulosSelecionadas) {
+			valorTotalSelecionado = valorTotalSelecionado.add(parcelaTitulo.getValorTitulo());
+		}
+		valorEmDinheiro = valorSubTotal;
+		valorEmCartao = BigDecimal.ZERO;
+		valorEmCheque = BigDecimal.ZERO;
+	}
+
+	public void rateioValores() {
+		if (valorEmDinheiro.compareTo(valorTotalSelecionado) == 1) {
+			valorEmDinheiro = valorEmDinheiro;
+		}
+	}
+
+	public void ultimosRecebimento() {
+		RecebimentoFilter recebimentoFilter = new RecebimentoFilter(new Date(), new Date());
+		ultimosRecebimentos = recebimentos.filtrados(recebimentoFilter);
+	}
+
+	public List<Recebimento> getUltimosRecebimentos() {
+		return ultimosRecebimentos;
+	}
+
+	@Transactional
+	public void confirmarRecebimento() {
+		getObjeto().setCliente(getPessoaSelecionada().getClientePessoa());
+		getObjeto().setDataRecebimento(new Date());
+		getObjeto().setValorDinheiro(valorEmDinheiro);
+		getObjeto().setValorCheque(valorEmCheque);
+		getObjeto().setValorCartao(valorEmCartao);
+		for (ParcelaTitulo parcelaTitulo : parcelaTitulosSelecionadas) {
+			parcelaTitulo.setRecebimento(getObjeto());
+			parcelaTitulo.setDataPagamento(new Date());
+			parcelaTitulo.setValorRecebido(parcelaTitulo.getValorTitulo().add(parcelaTitulo.getValorJuro())
+					.subtract(parcelaTitulo.getValorDesconto()));
+		}
+		getObjeto().getParcelaTitulos().addAll(getParcelaTitulosSelecionadas());
+		getObjeto().getCliente().setDataUltimoPagamento(new Date());
+		setObjeto(recebimentoService.salvar(getObjeto()));
+		caixas.criaMovimentoCaixa(terminalLogado, getObjeto());
+		salvar();
+	}
+
+	public List<Venda> getVendas() {
+		return vendas;
+	}
+
+	public Date getDataUltimaPagamento() {
+		return dataUltimaPagamento;
+	}
+
+	public BigDecimal getValorUltimoPagamento() {
+		return valorUltimoPagamento;
+	}
+
+	/* Pessoa Inicio */
+	public Pessoa getPessoaSelecionada() {
+		return pessoaSelecionada;
+	}
+
+	public void setPessoaSelecionada(Pessoa pessoaSelecionada) {
+		this.pessoaSelecionada = pessoaSelecionada;
+	}
+
+	public void pessoaPorId() {
+		Pessoa pessoa = pessoas.porId((getPessoaSelecionada().getId() == null ? -1 : getPessoaSelecionada().getId()));
+		if (pessoa != null) {
+			setPessoaSelecionada(pessoa);
+			parcelasPorCliente();
+			clienteCreditos();
+		} else {
+			setPessoaSelecionada(new Pessoa());
+			FacesUtil.addErrorMessage("Cliente não encontrada para o código informado!");
+		}
+	}
+
+	public void pessoaSelecao(SelectEvent event) {
+		Pessoa pessoa = (Pessoa) event.getObject();
+		this.pessoaSelecionada = pessoa;
+		parcelasPorCliente();
+		clienteCreditos();
+	}
+
+	private void parcelasPorCliente() {
+		if (getPessoaSelecionada() != null) {
+			parcelaTitulos = recebimentoService.parcelasReceberPorCliente(getPessoaSelecionada().getClientePessoa());
+			dadosClientes();
+		}
+	}
+
+	public BigDecimal getTotalTitulos() {
+		BigDecimal totalTitulos = BigDecimal.ZERO;
+		if (parcelaTitulos != null) {
+			if (!parcelaTitulos.isEmpty()) {
+				for (ParcelaTitulo parcelaTitulo : parcelaTitulos) {
+					totalTitulos = totalTitulos.add(parcelaTitulo.getValorTitulo());
+				}
+
+			}
+		}
+		return totalTitulos;
+	}
+
+	private void clienteCreditos() {
+		if (getPessoaSelecionada() != null) {
+			// clienteCreditos =
+			// getPessoaSelecionada().getClientePessoa().getClienteCreditos();
+		}
+	}
+
+	/**
+	 * @author Danilo Soma de forma acumulada o valor dos titulos à receber por
+	 *         data de vencimento
+	 */
+	private void parcelasPorVencimento() {
+		parcelaDataVencimentos = new ArrayList<>();
+		Date dataAtual = null;
+		for (ParcelaTitulo parcelaTitulo : parcelaTitulos) {
+
+			if (parcelaDataVencimentos.size() != 0) {
+				if (dataAtual != parcelaTitulo.getDataVencimento()) {
+					parcelaDataVencimentos.add(new ParcelaDataVencimento(parcelaTitulo.getDataVencimento(),
+							parcelaTitulo.getValorTitulo()));
+				} else {
+					parcelaDataVencimentos.get(parcelaDataVencimentos.size())
+							.setValorTotal(parcelaTitulo.getValorTitulo().add(parcelaTitulo.getValorTitulo()));
+				}
+			} else {
+				parcelaDataVencimentos.add(
+						new ParcelaDataVencimento(parcelaTitulo.getDataVencimento(), parcelaTitulo.getValorTitulo()));
+				dataAtual = parcelaTitulo.getDataVencimento();
+			}
+
+		}
+	}
+
+	/* Pessoa Fim */
+
+	private void dadosClientes() {
+		if (getPessoaSelecionada() != null) {
+			this.dataUltimaPagamento = getPessoaSelecionada().getClientePessoa().getDataUltimoPagamento();
+			this.valorUltimoPagamento = getPessoaSelecionada().getClientePessoa().getValorRecebido();
+		}
+
+	}
+
+	public boolean isAutorizadoRecebimento() {
+		return terminalLogado.getRecebe();
+	}
+
+}

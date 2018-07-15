@@ -1,0 +1,287 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Formula;
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name = "produto")
+public class Produto implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "produto_id")
+	private Long id;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_cadastro", nullable = false)
+	private Date dataCadastro = new Date();
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "situacao_cadastro", nullable = false)
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+	@Column(name = "descricao", nullable = false, unique = true)
+	private String descricao;
+	@Column(name = "descr_reduzida", nullable = false, unique = true, length = 30)
+	private String descricaoReduzida;
+	@Column(name = "observacao", nullable = true)
+	private String observacao;
+	@Column(length = 13, unique = true)
+	private String ean13;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "marca_id")
+	private Marca marca;
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "un_medida_id")
+	private UnidadeMedida unidadeMedida;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "sub_grupo_id")
+	private SubGrupo subGrupo;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "produto", orphanRemoval = true)
+	private List<Estoque> produtoEstoques = new ArrayList<>();
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "produto", orphanRemoval = true)
+	private List<ProdutoPreco> produtoPrecos = new ArrayList<>();
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "produto", orphanRemoval = true)
+	private List<ProdutoOpcional> produtoOpcionais = new ArrayList<>();
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "produto", orphanRemoval = true)
+	private List<ProdutoSabor> produtoSabores = new ArrayList<>();
+	
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "produto", orphanRemoval = true)
+	private List<Estoque> estoques = new ArrayList<>();	
+	@OneToOne(targetEntity = Arquivo.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "arquivo_id")
+	private Arquivo arquivo;
+	@Formula(value = "concat(descricao, ean13)")
+	private String descricaoCodigoProduto;
+
+
+	public List<ProdutoSabor> getProdutoSabores() {
+		return produtoSabores;
+	}
+
+	public void setProdutoSabores(List<ProdutoSabor> produtoSabores) {
+		this.produtoSabores = produtoSabores;
+	}
+
+	@Version
+	private Long versao;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public String getDescricaoReduzida() {
+		return descricaoReduzida;
+	}
+
+	public void setDescricaoReduzida(String descricaoReduzida) {
+		this.descricaoReduzida = descricaoReduzida;
+	}
+
+	public String getObservacao() {
+		return observacao;
+	}
+
+	public void setObservacao(String observacao) {
+		this.observacao = observacao;
+	}
+
+	public UnidadeMedida getUnidadeMedida() {
+		return unidadeMedida;
+	}
+
+	public void setUnidadeMedida(UnidadeMedida unidadeMedida) {
+		this.unidadeMedida = unidadeMedida;
+	}
+
+	public Marca getMarca() {
+		return marca;
+	}
+
+	public void setMarca(Marca marca) {
+		this.marca = marca;
+	}
+
+	public SubGrupo getSubGrupo() {
+		return subGrupo;
+	}
+
+	public void setSubGrupo(SubGrupo subGrupo) {
+		this.subGrupo = subGrupo;
+	}
+
+	public List<ProdutoPreco> getProdutoPrecos() {
+		return produtoPrecos;
+	}
+
+	public void setProdutoPrecos(List<ProdutoPreco> produtoPrecos) {
+		this.produtoPrecos = produtoPrecos;
+	}
+	
+	public List<ProdutoOpcional> getProdutoOpcionais() {
+		return produtoOpcionais;
+	}
+
+	public void setProdutoOpcionais(List<ProdutoOpcional> produtoOpcionais) {
+		this.produtoOpcionais = produtoOpcionais;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+
+	public String getEan13() {
+		return ean13;
+	}
+
+	public void setEan13(String ean13) {
+		this.ean13 = ean13;
+	}
+
+	public Arquivo getArquivo() {
+		return arquivo;
+	}
+
+	public void setArquivo(Arquivo arquivo) {
+		this.arquivo = arquivo;
+	}
+
+	public String getDescricaoComPrecoAtual() {
+		return this.descricao + ": " + NumberFormat.getCurrencyInstance().format(this.getPrecoAtual());
+	}
+	
+	
+	
+	public List<Estoque> getProdutoEstoques() {
+		return produtoEstoques;
+	}
+
+	public void setProdutoEstoques(List<Estoque> produtoEstoques) {
+		this.produtoEstoques = produtoEstoques;
+	}
+
+	public String getDescricaoCodigoProduto() {
+		return descricaoCodigoProduto;
+	}
+
+	public void setDescricaoCodigoProduto(String descricaoCodigoProduto) {
+		this.descricaoCodigoProduto = descricaoCodigoProduto;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	public Boolean isOpcional() {
+		return this.produtoOpcionais.size() > 0;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Produto other = (Produto) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	/**
+	 * Percorre a tabela de preços e retorna o último preço cadastrado para o
+	 * produto
+	 * 
+	 * @author Danilo
+	 * @return o Último preço cadastro para o Produto
+	 */
+	public BigDecimal getPrecoAtual() {
+		for (ProdutoPreco produtoPreco : this.produtoPrecos) {
+			if (produtoPreco.getDataFim() == null) {
+				return produtoPreco.getPreco();
+			}
+		}
+		return new BigDecimal(0);
+	}
+
+}

@@ -1,0 +1,154 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.sistemacomercial.enums.CstIcms;
+import br.com.sistemacomercial.enums.CstIpi;
+
+@Entity
+@Table(name = "nf_entrada_item")
+public class NotaEntradaItem implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue()
+	@Column(name = "nf_entrada_item_id")
+	private Long id;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne
+	@JoinColumn(name = "nf_entrada_id", nullable = false)
+	private NotaEntrada notaEntrada;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "produto_id")
+	private Produto produto;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "unid_medida_id")
+	private UnidadeMedida unidadeMedida;
+	@Column(nullable = true, length = 8)
+	private String ncm;
+	@Column(nullable = false)
+	private BigDecimal quantidade = BigDecimal.ONE;
+	@Column(name = "val_unitario", nullable = false)
+	private BigDecimal valorUnitario = BigDecimal.ZERO;
+	@Column(name = "val_total", nullable = false)
+	private BigDecimal valorTotal = BigDecimal.ZERO;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "cst_icms")
+	private CstIcms cstIcms = CstIcms.OUTRAS;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "cst_ipi")
+	private CstIpi cstIpi = CstIpi.OUTRAS_ENTRADAS;
+	@Version
+	private Long versao;
+
+	public NotaEntradaItem() {
+		super();
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public NotaEntrada getNotaEntrada() {
+		return notaEntrada;
+	}
+
+	public void setNotaEntrada(NotaEntrada notaEntrada) {
+		this.notaEntrada = notaEntrada;
+	}
+
+	public Produto getProduto() {
+		return produto;
+	}
+
+	public void setProduto(Produto produto) {
+		this.produto = produto;
+	}
+
+	public UnidadeMedida getUnidadeMedida() {
+		return unidadeMedida;
+	}
+
+	public void setUnidadeMedida(UnidadeMedida unidadeMedida) {
+		this.unidadeMedida = unidadeMedida;
+	}
+
+	public BigDecimal getQuantidade() {
+		return quantidade;
+	}
+
+	public void setQuantidade(BigDecimal quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public BigDecimal getValorUnitario() {
+		return valorUnitario;
+	}
+
+	public void setValorUnitario(BigDecimal valorUnitario) {
+		this.valorUnitario = valorUnitario;
+	}
+
+	public BigDecimal getValorTotal() {
+		return valorTotal;
+	}
+
+	public void setValorTotal(BigDecimal valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
+	public String getNcm() {
+		return ncm;
+	}
+
+	public void setNcm(String ncm) {
+		this.ncm = ncm;
+	}
+
+	public CstIcms getCstIcms() {
+		return cstIcms;
+	}
+
+	public void setCstIcms(CstIcms cstIcms) {
+		this.cstIcms = cstIcms;
+	}
+
+	public CstIpi getCstIpi() {
+		return cstIpi;
+	}
+
+	public void setCstIpi(CstIpi cstIpi) {
+		this.cstIpi = cstIpi;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+	
+	
+
+}

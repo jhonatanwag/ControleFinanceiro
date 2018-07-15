@@ -1,0 +1,116 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{gerenciadorInventario.editando ? 'Edição do inventário' : 'Novo inventário'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="inventario"
+				value="#{gerenciadorInventario.inventario}" />
+			<f:viewAction action="#{gerenciadorInventario.inicializar}" />
+		</f:metadata>
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<h:form id="formInventario">
+
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">#{gerenciadorInventario.editando
+						? 'Edição do inventário' : 'Novo inventário'}</div>
+
+					<p:messages id="messageDadosPrincipais" autoUpdate="false"
+						closable="true" />
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:button value="Novo" outcome="/inventario/CadastroInventario" />
+						</p:toolbarGroup>
+						
+						<p:toolbarGroup>
+							<p:commandButton value="Salvar" id="botaoSalvar" disabled="#{gerenciadorInventario.inventario.cancelado || gerenciadorInventario.inventario.finalizado}"
+								action="#{gerenciadorInventario.salvar}"
+								update="formInventario" />
+						</p:toolbarGroup>
+						
+						<p:toolbarGroup align="right">
+							<p:button value="Pesquisa"
+								outcome="/inventario/GerenciadorInventario" />
+						</p:toolbarGroup>
+						
+						<p:toolbarGroup align="right">
+							
+								<p:commandButton value="Cancelar Inventário" id="botaoCancelarInventario" disabled="#{gerenciadorInventario.inventario.cancelado || gerenciadorInventario.inventario.finalizado}"
+								action="#{gerenciadorInventario.cancelar}"
+								update="formInventario" />
+						</p:toolbarGroup>
+						
+						<p:toolbarGroup  align="right">
+							<p:commandButton value="Encerrar Inventário" id="botaoEncerrar" disabled="#{gerenciadorInventario.inventario.cancelado || gerenciadorInventario.inventario.finalizado}"
+								action="#{gerenciadorInventario.encerrar}"
+								update="formInventario" />
+						</p:toolbarGroup>
+
+
+						
+					</p:toolbar>
+
+					
+
+					<p:dataTable id="itemInventario"
+						value="#{gerenciadorInventario.inventario.itemInventarios}"
+						var="item" style="margin-top: 20px"
+						emptyMessage="Nenhum item encontrado." rows="20" paginator="true"
+						paginatorAlwaysVisible="false" paginatorPosition="bottom">
+
+						<p:column headerText="Código" style="text-align: center;"
+							sortBy="#{item.id}">
+							<h:outputText value="#{item.id}" />
+						</p:column>
+
+						<p:column headerText="Produto" sortBy="#{item.produto.descricao}"
+							style="text-align: center;">
+							<h:outputText value="#{item.produto.descricao}" />
+						</p:column>
+
+						<p:column headerText="Un."
+							sortBy="#{item.produto.unidadeMedida.descricao}"
+							style="text-align: center;">
+							<h:outputText value="#{item.produto.unidadeMedida.descricao}">
+
+							</h:outputText>
+						</p:column>
+
+
+						<p:column headerText="Qtd. Estoque"
+							sortBy="#{item.quantidadeEstoque}" style="text-align: center;">
+							<h:outputText value="#{item.quantidadeEstoque}">
+
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Qtd. Apurada"
+							sortBy="#{item.quantidadeApurada}" style="text-align: center;">
+							<h:outputText value="#{item.quantidadeApurada}">
+
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Dif." sortBy="#{item.diferenca}"
+							style="text-align: center;">
+							<h:outputText value="#{item.diferenca}">
+
+							</h:outputText>
+						</p:column>
+
+					</p:dataTable>
+
+				</h:form>
+
+			</div>
+		</div>
+
+	</ui:define>
+</ui:composition>

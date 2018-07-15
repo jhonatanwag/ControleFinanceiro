@@ -1,0 +1,116 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de Cidades</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<div class="ContainerIndent">
+				<p:panel>
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa
+						de Cidades</div>
+					<div class="Separator"></div>
+
+					<div class="ui-fluid">
+						<p:panelGrid columns="4" columnClasses="col1,col2,col1,col2"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+
+							<p:inputText value="#{pesquisaCidadeBean.filtro.idDe}"
+								maxlength="6" />
+							<p:outputLabel value="até" />
+							<p:inputText value="#{pesquisaCidadeBean.filtro.idAte}"
+								maxlength="6" />
+
+
+							<p:outputLabel value="Data do cadastro" />
+
+							<p:calendar pattern="dd/MM/yyyy"
+								value="#{pesquisaCidadeBean.filtro.dataCadastroInicio}" />
+							<p:outputLabel value="até" />
+							<p:calendar pattern="dd/MM/yyyy"
+								value="#{pesquisaCidadeBean.filtro.dataCadastroFim}" />
+
+
+							<p:outputLabel value="Nome" />
+							<p:inputText value="#{pesquisaCidadeBean.filtro.nome}"
+								maxlength="100" />
+
+						</p:panelGrid>
+					</div>
+				</p:panel>
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:commandButton value="Pesquisar"
+							action="#{pesquisaCidadeBean.pesquisar}" update="@form" />
+						<p:button value="Limpar" outcome="PesquisaCidade.xhtml" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:button value="Novo" outcome="CadastroCidade.xhtml" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:dataTable id="cidadesTable"
+					value="#{pesquisaCidadeBean.objetosFiltrados}" var="cidade"
+					reflow="true" style="margin-top: 20px"
+					emptyMessage="Nenhuma cidade encontrada." rows="20"
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Código" sortBy="#{cidade.id}">
+						<h:outputText value="#{cidade.id}" />
+					</p:column>
+
+					<p:column headerText="Código Ibge" sortBy="#{cidade.codigoIBGE}">
+						<h:outputText value="#{cidade.codigoIBGE}" />
+					</p:column>
+
+					<p:column headerText="Descrição" sortBy="#{cidade.nome}">
+						<h:outputText value="#{cidade.nome}" />
+					</p:column>
+
+					<p:column headerText="Estado/País" sortBy="#{cidade.estado.nome}">
+						<h:outputText value="#{cidade.estado.nome}" />
+					</p:column>
+
+					<p:column headerText="Dat. Cadastro"
+						sortBy="#{cidade.dataCadastro}">
+						<h:outputText value="#{cidade.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy"
+								timeZone="America/Sao_Paulo" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Opções">
+						<p:button outcome="/cidade/CadastroCidade" icon="ui-icon-pencil"
+							title="Editar">
+							<f:param name="cidade" value="#{cidade.id}" />
+						</p:button>
+						<p:commandButton icon="ui-icon-trash" title="Excluir"
+							oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+							update=":frmPesquisa:confirmacaoExclusaoDialog">
+							<f:setPropertyActionListener
+								target="#{pesquisaCidadeBean.objetoSelecionado}"
+								value="#{cidade}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:confirmDialog header="Exclusão da cidade"
+					message="Tem certeza que deseja excluir a cidade #{pesquisaCidadeBean.objetoSelecionado.nome}?"
+					widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+					<p:button value="Não"
+						onclick="PF('confirmacaoExclusao').hide(); return false;" />
+					<p:commandButton value="Sim"
+						oncomplete="PF('confirmacaoExclusao').hide();"
+						action="#{pesquisaCidadeBean.excluir}" process="@this"
+						update=":frmPesquisa:cidadesTable" />
+				</p:confirmDialog>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,38 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import br.com.sistemacomercial.model.MotivoBloqueio;
+import br.com.sistemacomercial.repository.MotivoBloqueios;
+import br.com.sistemacomercial.repository.filter.MotivoBloqueioFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaMotivoBloqueioBean extends PesquisaBeanAbstrato<MotivoBloqueio, MotivoBloqueioFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private MotivoBloqueios motivoBloqueios;
+
+	public PesquisaMotivoBloqueioBean() {
+		setFiltro(new MotivoBloqueioFilter());
+	}
+	
+	@Override
+	public void excluir() {
+		motivoBloqueios.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Motivo bloqueio " + getObjetoSelecionado().getDescricao() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(motivoBloqueios.filtrados(getFiltro()));
+	}
+
+}

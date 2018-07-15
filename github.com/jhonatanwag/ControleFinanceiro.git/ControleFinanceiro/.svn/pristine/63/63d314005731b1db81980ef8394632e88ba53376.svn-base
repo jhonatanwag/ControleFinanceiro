@@ -1,0 +1,57 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.TipoCorteCabelo;
+import br.com.sistemacomercial.repository.filter.TipoCorteCabeloFilter;
+import br.com.sistemacomercial.repository.filter.TipoDespesaFilter;
+
+public class TipoCorteCabelos extends RepositoryAbstrato<TipoCorteCabelo> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public TipoCorteCabelos() {
+		super(TipoCorteCabelo.class);
+	}
+
+	@Override
+	public TipoCorteCabelo salvar(TipoCorteCabelo objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TipoCorteCabelo> filtrados(TipoCorteCabeloFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(TipoCorteCabelo.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+	public TipoCorteCabelo porDescricaoUnico(String descricao) {
+		try {
+			return manager.createQuery("from TipoCorteCabelo where upper(descricao) = :descricao", TipoCorteCabelo.class)
+					.setParameter("descricao", descricao.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+}

@@ -1,0 +1,94 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.SelectEvent;
+
+import br.com.sistemacomercial.model.LancFluxoCaixa;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.TipoDespesa;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.TipoDespesas;
+import br.com.sistemacomercial.repository.filter.TipoDespesaFilter;
+import br.com.sistemacomercial.service.LancFluxoCaixaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class LancFluxoCaixaBean extends BeanAbstrato<LancFluxoCaixa>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private LancFluxoCaixaService lancFluxoCaixaService;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private TipoDespesas tipoDespesas;
+	private List<TipoDespesa> todosTipoDespesas;
+	private Pessoa pessoaSelecionada;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		todosTipoDespesas = tipoDespesas.filtrados(new TipoDespesaFilter());
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new LancFluxoCaixa());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(lancFluxoCaixaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Lançamento em fluxo de caixa efetuado com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	/* Pessoa Inicio */
+	public Pessoa getPessoaSelecionada() {
+		return pessoaSelecionada;
+	}
+
+	public void setPessoaSelecionada(Pessoa pessoaSelecionada) {
+		this.pessoaSelecionada = pessoaSelecionada;
+	}
+
+	public void pessoaPorId() {
+		Pessoa pessoa = pessoas.porId((getPessoaSelecionada().getId() == null ? -1 : getPessoaSelecionada().getId()));
+		if (pessoa != null) {
+			setPessoaSelecionada(pessoa);
+			getObjeto().setPessoa(pessoa);
+		} else {
+			setPessoaSelecionada(new Pessoa());
+			getObjeto().setPessoa(null);
+			FacesUtil.addErrorMessage("Pessoa não encontrada para o código informado!");
+		}
+	}
+
+	public void pessoaSelecao(SelectEvent event) {
+		Pessoa pessoa = (Pessoa) event.getObject();
+		this.pessoaSelecionada = pessoa;
+		getObjeto().setPessoa(pessoa);
+	}
+
+	/* Pessoa Fim */
+	
+	public List<TipoDespesa> getTodosTipoDespesas(){
+		return todosTipoDespesas;
+	}
+
+}

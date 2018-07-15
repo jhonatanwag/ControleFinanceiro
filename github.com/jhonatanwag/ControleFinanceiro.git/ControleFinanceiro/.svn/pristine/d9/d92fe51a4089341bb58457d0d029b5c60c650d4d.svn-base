@@ -1,0 +1,42 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Empresa;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.model.ProdutoPreco;
+import br.com.sistemacomercial.repository.Empresas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroEmpresaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Empresas empresas;
+
+	@Transactional
+	public Empresa salvar(Empresa empresa) {
+		Empresa empresaExiste = empresas.porNomeFantasiaUnico(empresa.getNomeFantasia(), empresa.getId());
+
+		if (empresaExiste != null && !empresaExiste.equals(empresa)) {
+			throw new NegocioException("Já existe uma empresa com o mesmo nome fantasia cadastrado.");
+		}
+
+		empresaExiste = empresas.porRazaoSocialUnico(empresa.getNomeFantasia(), empresa.getId());
+		if (empresaExiste != null && !empresaExiste.equals(empresa)) {
+			throw new NegocioException("Já existe uma empresa com a mesma razão social cadastrada.");
+		}
+		return empresas.salvar(empresa);
+	}
+
+	public void excluirFilial(Filial filialSelecionada) {
+		if (!empresas.validaExclusaoFilial(filialSelecionada)) {
+			throw new NegocioException("Filial não pode ser excluído.");
+		}
+
+	}
+
+}

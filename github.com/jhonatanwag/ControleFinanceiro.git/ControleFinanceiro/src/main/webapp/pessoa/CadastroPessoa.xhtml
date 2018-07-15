@@ -1,0 +1,43 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroPessoaBean.editando ? 'Edição da pessoa' : 'Nova pessoa'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="pessoa" value="#{cadastroPessoaBean.objeto}" />
+			<f:viewAction action="#{cadastroPessoaBean.inicializar}" />
+		</f:metadata>
+		<div class="ContainerIndent">
+			<h:form id="formCadastroPessoa">
+				<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">#{cadastroPessoaBean.editando
+					? 'Edição de pessoa' : 'Nova pessoa'}</div>
+
+				<p:messages id="messageDadosPrincipais" autoUpdate="false"
+					closable="true" />
+
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:button value="Novo" outcome="/pessoa/CadastroPessoa" />
+						<p:commandButton value="Salvar" id="botaoSalvar"
+							action="#{cadastroPessoaBean.salvar}" update="formCadastroPessoa" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:button value="Pesquisa" outcome="/pessoa/PesquisaPessoa" />
+					</p:toolbarGroup>
+				</p:toolbar>
+				<br />
+				<ui:include src="/WEB-INF/template/pessoa/DadosPrincipais.xhtml" />
+
+			</h:form>
+
+			<ui:include src="/WEB-INF/template/pessoa/DlgEmail.xhtml" />
+			<ui:include src="/WEB-INF/template/pessoa/DlgTelefone.xhtml" />
+			<ui:include src="/WEB-INF/template/pessoa/DlgEndereco.xhtml" />
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Recebimento;
+import br.com.sistemacomercial.repository.filter.RecebimentoFilter;
+
+public class Recebimentos extends RepositoryAbstrato<Recebimento> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Recebimentos() {
+		super(Recebimento.class);
+	}
+
+	@Override
+	public Recebimento salvar(Recebimento objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Recebimento> filtrados(RecebimentoFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Recebimento.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		return criteria.addOrder(Order.asc("dataRecebimento")).list();
+	}
+
+}

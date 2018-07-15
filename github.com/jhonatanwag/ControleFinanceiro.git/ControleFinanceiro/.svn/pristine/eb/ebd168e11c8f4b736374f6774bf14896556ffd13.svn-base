@@ -1,0 +1,40 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.NotaEntrada;
+import br.com.sistemacomercial.repository.NotaEntradas;
+import br.com.sistemacomercial.repository.filter.NotaEntradaFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaNotaEntradaBean extends PesquisaBeanAbstrato<NotaEntrada, NotaEntradaFilter>
+		implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private NotaEntradas notasEntradas;
+
+	public PesquisaNotaEntradaBean() {
+		setFiltro(new NotaEntradaFilter());
+	}
+
+	@Override
+	public void excluir() {
+		notasEntradas.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("NotaEntrada " + getObjetoSelecionado().getId() + " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(notasEntradas.filtrados(getFiltro()));
+	}
+
+}

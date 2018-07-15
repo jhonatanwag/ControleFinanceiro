@@ -1,0 +1,80 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+import java.util.Date;
+
+public class ChequeFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private Date dataAberturaIni;
+	private Date dataAberturaFim;
+	private Date dataFechamentoIni;
+	private Date dataFechamentoFim;
+
+	public ChequeFilter() {
+		super();
+	}
+
+	public ChequeFilter(Long idDe, Long idAte, Date dataAberturaIni, Date dataAberturaFim, Date dataFechamentoIni,
+			Date dataFechamentoFim) {
+		super();
+		this.idDe = idDe;
+		this.idAte = idAte;
+		this.dataAberturaIni = dataAberturaIni;
+		this.dataAberturaFim = dataAberturaFim;
+		this.dataFechamentoIni = dataFechamentoIni;
+		this.dataFechamentoFim = dataFechamentoFim;
+	}
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public Date getDataAberturaIni() {
+		return dataAberturaIni;
+	}
+
+	public void setDataAberturaIni(Date dataAberturaIni) {
+		this.dataAberturaIni = dataAberturaIni;
+	}
+
+	public Date getDataAberturaFim() {
+		return dataAberturaFim;
+	}
+
+	public void setDataAberturaFim(Date dataAberturaFim) {
+		this.dataAberturaFim = dataAberturaFim;
+	}
+
+	public Date getDataFechamentoIni() {
+		return dataFechamentoIni;
+	}
+
+	public void setDataFechamentoIni(Date dataFechamentoIni) {
+		this.dataFechamentoIni = dataFechamentoIni;
+	}
+
+	public Date getDataFechamentoFim() {
+		return dataFechamentoFim;
+	}
+
+	public void setDataFechamentoFim(Date dataFechamentoFim) {
+		this.dataFechamentoFim = dataFechamentoFim;
+	}
+
+}

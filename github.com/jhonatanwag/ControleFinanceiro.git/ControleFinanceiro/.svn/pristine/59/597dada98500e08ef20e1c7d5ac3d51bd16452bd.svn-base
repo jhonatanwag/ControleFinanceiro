@@ -1,0 +1,89 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+@Entity
+@Table(name = "item_inventario")
+public class ItemInventario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue()
+	@Column(name = "inventario_item_id")
+	private Long id;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne
+	@JoinColumn(name = "inventario_id", nullable = false)
+	private Inventario inventario;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "produto_id")
+	private Produto produto;
+	@Column(name = "qtd_estoque", nullable = false)
+	private BigDecimal quantidadeEstoque = BigDecimal.ONE;
+	@Column(name = "qtd_apurada", nullable = false)
+	private BigDecimal quantidadeApurada = BigDecimal.ONE;
+	@Column(name = "dif", nullable = false)
+	private BigDecimal diferenca = BigDecimal.ONE;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Inventario getInventario() {
+		return inventario;
+	}
+
+	public void setInventario(Inventario inventario) {
+		this.inventario = inventario;
+	}
+
+	public Produto getProduto() {
+		return produto;
+	}
+
+	public void setProduto(Produto produto) {
+		this.produto = produto;
+	}
+
+	public BigDecimal getQuantidadeEstoque() {
+		return quantidadeEstoque;
+	}
+
+	public void setQuantidadeEstoque(BigDecimal quantidadeEstoque) {
+		this.quantidadeEstoque = quantidadeEstoque;
+	}
+
+	public BigDecimal getQuantidadeApurada() {
+		return quantidadeApurada;
+	}
+
+	public void setQuantidadeApurada(BigDecimal quantidadeApurada) {
+		this.quantidadeApurada = quantidadeApurada;
+	}
+
+	public BigDecimal getDiferenca() {
+		return diferenca;
+	}
+
+	public void setDiferenca(BigDecimal diferenca) {
+		this.diferenca = diferenca;
+	}
+
+}

@@ -1,0 +1,199 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name="estoque")
+public class Estoque implements Serializable, Comparable<Estoque> {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @JoinColumn(name = "filial_id")
+    private Filial filial;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "dep_id")
+	private Deposito deposito;
+    @Fetch(FetchMode.JOIN)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "produto_id")
+	private Produto produto;
+    @NotNull
+    @Column(name="saldo")
+    private BigDecimal saldo;
+    @NotNull
+    @Column(name="qtd_minimo")
+    private BigDecimal qtdMinimo;
+    @NotNull
+    @Column(name="qtd_maximo")
+    private BigDecimal qtdMaximo;
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Column(name="dat_ult_compra")
+    private Date dataUltimaCompra;
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Column(name="dat_ult_venda")
+    private Date dataUltimaVenda;
+    @Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "estoque", fetch = FetchType.LAZY)
+	private List<EstoqueMovimentacao> estoqueMovimentacoes = new ArrayList<EstoqueMovimentacao>();
+
+    public Estoque() {
+    }
+
+    public Estoque(Filial filial, Produto produto, BigDecimal saldo) {
+        this.filial = filial;
+        this.produto = produto;
+        this.saldo = saldo;
+    }
+
+    public Estoque(Filial filial, Produto produto, BigDecimal saldo, Date dataUltimaCompra) {
+        this.filial = filial;
+        this.produto = produto;
+        this.saldo = saldo;
+        this.dataUltimaCompra = dataUltimaCompra;
+    }
+
+    public Filial getFilial() {
+        return filial;
+    }
+
+    public void setFilial(Filial filial) {
+        this.filial = filial;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Produto getProduto() {
+        return produto;
+    }
+        
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+    
+    
+  
+    public Deposito getDeposito() {
+		return deposito;
+	}
+
+	public void setDeposito(Deposito deposito) {
+		this.deposito = deposito;
+	}
+
+	public BigDecimal getSaldo() {
+		return saldo;
+	}
+
+	public void setSaldo(BigDecimal saldo) {
+		this.saldo = saldo;
+	}
+
+	public Date getDataUltimaCompra() {
+        return dataUltimaCompra;
+    }
+
+    public void setDataUltimaCompra(Date dataUltimaCompra) {
+        this.dataUltimaCompra = dataUltimaCompra;
+    }
+
+    public Date getDataUltimaVenda() {
+        return dataUltimaVenda;
+    }
+
+    public void setDataUltimaVenda(Date dataUltimaVenda) {
+        this.dataUltimaVenda = dataUltimaVenda;
+    }
+    
+    
+    public BigDecimal getQtdMinimo() {
+		return qtdMinimo;
+	}
+
+	public void setQtdMinimo(BigDecimal qtdMinimo) {
+		this.qtdMinimo = qtdMinimo;
+	}
+
+	public BigDecimal getQtdMaximo() {
+		return qtdMaximo;
+	}
+
+	public void setQtdMaximo(BigDecimal qtdMaximo) {
+		this.qtdMaximo = qtdMaximo;
+	}
+
+	public List<EstoqueMovimentacao> getEstoqueMovimentacoes() {
+		return estoqueMovimentacoes;
+	}
+
+	public void setEstoqueMovimentacoes(List<EstoqueMovimentacao> estoqueMovimentacoes) {
+		this.estoqueMovimentacoes = estoqueMovimentacoes;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((filial == null) ? 0 : filial.hashCode());
+		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Estoque other = (Estoque) obj;
+		if (filial == null) {
+			if (other.filial != null)
+				return false;
+		} else if (!filial.equals(other.filial))
+			return false;
+		if (produto == null) {
+			if (other.produto != null)
+				return false;
+		} else if (!produto.equals(other.produto))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int compareTo(Estoque arg0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
+	
+}

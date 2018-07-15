@@ -1,0 +1,52 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.PersistenceException;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import br.com.sistemacomercial.model.Cheque;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.filter.ChequeFilter;
+import br.com.sistemacomercial.service.NegocioException;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class Cheques extends RepositoryAbstrato<Cheque> implements Serializable {
+
+	public Cheques() {
+		super(Cheque.class);
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public Cheque salvar(Cheque objeto) {
+		return super.salvar(objeto);
+	}
+
+	
+	@Transactional
+	public void chequesVenda(Cheque terminal, Venda venda) {
+		try {
+		
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação do caixa venda");
+		}
+	}
+
+		
+	@SuppressWarnings("unchecked")
+	public List<Cheque> filtrados(ChequeFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Cheque.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+		
+		return criteria.addOrder(Order.asc("id")).list();
+	}
+
+}

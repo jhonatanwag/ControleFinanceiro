@@ -1,0 +1,142 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name = "produto_opcional", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_prod_opcional", columnNames = { "prod_opcional_id", "produto_id" }) })
+public class ProdutoOpcional implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "prod_opcional_id")
+	private Long id;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "produto_id")
+	private Produto produto;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "opcional_id", nullable=false)
+	private Produto produtoOpcional;
+	@Column(name = "preco", nullable = false)
+	private BigDecimal preco;
+	private Date dataFim;
+	@Version
+	private Long versao;
+	@Transient
+	private Boolean selecionado;
+
+	public ProdutoOpcional() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Produto getProduto() {
+		return produto;
+	}
+
+	public void setProduto(Produto produto) {
+		this.produto = produto;
+	}
+
+	public Produto getProdutoOpcional() {
+		return produtoOpcional;
+	}
+
+	public void setProdutoOpcional(Produto produtoOpcional) {
+		this.produtoOpcional = produtoOpcional;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+
+	public BigDecimal getPreco() {
+		return preco;
+	}
+
+	public void setPreco(BigDecimal preco) {
+		this.preco = preco;
+	}
+
+	public Date getDataFim() {
+		return dataFim;
+	}
+
+	public void setDataFim(Date dataFim) {
+		this.dataFim = dataFim;
+	}
+
+	public Boolean getSelecionado() {
+		return selecionado;
+	}
+
+	public void setSelecionado(Boolean selecionado) {
+		this.selecionado = selecionado;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
+		result = prime * result + ((produtoOpcional == null) ? 0 : produtoOpcional.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProdutoOpcional other = (ProdutoOpcional) obj;
+		if (produto == null) {
+			if (other.produto != null)
+				return false;
+		} else if (!produto.equals(other.produto))
+			return false;
+		if (produtoOpcional == null) {
+			if (other.produtoOpcional != null)
+				return false;
+		} else if (!produtoOpcional.equals(other.produtoOpcional))
+			return false;
+		return true;
+	}
+
+}

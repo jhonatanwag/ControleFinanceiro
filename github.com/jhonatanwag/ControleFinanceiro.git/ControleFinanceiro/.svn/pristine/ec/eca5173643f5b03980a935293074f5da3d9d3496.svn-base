@@ -1,0 +1,36 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+/**
+ * 
+ * @author Danilo
+ */
+public enum QtdDigitosTelefone {
+
+	OITO_DIGITOS("Oito d�gitos"), 
+	NOVE_DIGITOS("Nove d�gitos");
+	private String value;
+
+	private QtdDigitosTelefone(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return this.value;
+	}
+
+	public static QtdDigitosTelefone getQtdDigitosTelefone(Integer value) {
+		switch (value) {
+		case 0:
+			return OITO_DIGITOS;
+		case 1:
+			return NOVE_DIGITOS;
+		default:
+			return OITO_DIGITOS;
+		}
+	}
+}

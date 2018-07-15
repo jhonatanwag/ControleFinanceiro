@@ -1,0 +1,178 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.sistemacomercial.enums.TipoMovimentacao;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+public class EstoqueMovimentacao implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "filial_id")
+    private Filial filial;
+    @ManyToOne(targetEntity = Estoque.class, fetch = FetchType.LAZY, optional = false)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "estoque_id")
+	private Estoque estoque;
+    @Column(nullable = false)
+    private BigDecimal qtdMovimento;
+    @Cascade(CascadeType.ALL)
+    @OneToOne
+    private NotaEntradaItem notaEntradaItem;
+    @Cascade(CascadeType.ALL)
+    @OneToOne
+    private ItemVenda itemVenda;   
+    @OneToOne(optional = true)
+	@JoinColumn(name = "terminal_id")
+	private Terminal terminal;
+    private ItemInventario inventarioItem;
+    @Column(nullable = false)
+    private TipoMovimentacao tipoMovimentacao;
+    @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    private Date dataMovimentacao;
+    @Column(name="des_movimentacao")
+    private String desMovimentacao;
+
+    public EstoqueMovimentacao() {
+    }
+
+    public EstoqueMovimentacao(Terminal terminal, NotaEntradaItem notaEntradaItem, TipoMovimentacao tipoMovimentacao) {
+        this.notaEntradaItem = notaEntradaItem;
+        this.tipoMovimentacao = tipoMovimentacao;
+        this.terminal = terminal;
+        //this.produto = notaEntradaItem.getProduto();
+        //this.saldo = notaEntradaItem.getQuantidade();
+        this.filial = notaEntradaItem.getNotaEntrada().getFilial();
+        this.dataMovimentacao = new Date();
+    }
+    
+    public EstoqueMovimentacao(Terminal terminal, ItemVenda itemVenda, TipoMovimentacao tipoMovimentacao) {
+    	this.terminal = terminal;
+    	this.itemVenda = itemVenda;
+        this.tipoMovimentacao = tipoMovimentacao;
+        //this.produto = itemVenda.getProduto();
+      //  this.saldo = itemVenda.getQuantidade();
+        this.filial = itemVenda.getVenda().getFilial();
+        this.dataMovimentacao = new Date();
+    }
+    
+    public Filial getFilial() {
+        return filial;
+    }
+
+    public void setFilial(Filial filial) {
+        this.filial = filial;
+    }
+    
+    
+    public ItemVenda getItemVenda() {
+        return itemVenda;
+    }
+
+    public void setItemVenda(ItemVenda itemVenda) {
+        this.itemVenda = itemVenda;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+   
+    public Estoque getEstoque() {
+		return estoque;
+	}
+
+	public void setEstoque(Estoque estoque) {
+		this.estoque = estoque;
+	}
+	
+
+    public BigDecimal getQtdMovimento() {
+		return qtdMovimento;
+	}
+
+	public void setQtdMovimento(BigDecimal qtdMovimento) {
+		this.qtdMovimento = qtdMovimento;
+	}
+
+	public NotaEntradaItem getNotaEntradaItem() {
+        return notaEntradaItem;
+    }
+
+    public TipoMovimentacao getTipoMovimentacao() {
+        return tipoMovimentacao;
+    }
+        
+
+    public void setTipoMovimentacao(TipoMovimentacao tipoMovimentacao) {
+		this.tipoMovimentacao = tipoMovimentacao;
+	}
+
+	public Date getDataMovimentacao() {
+        return dataMovimentacao;
+    }
+
+	public ItemInventario getInventarioItem() {
+		return inventarioItem;
+	}
+
+	public void setInventarioItem(ItemInventario inventarioItem) {
+		this.inventarioItem = inventarioItem;
+	}
+
+	public Terminal getTerminal() {
+		return terminal;
+	}
+
+	public void setTerminal(Terminal terminal) {
+		this.terminal = terminal;
+	}
+
+	public String getDesMovimentacao() {
+		return desMovimentacao;
+	}
+
+	public void setDesMovimentacao(String desMovimentacao) {
+		this.desMovimentacao = desMovimentacao;
+	}
+
+	public void setDataMovimentacao(Date dataMovimentacao) {
+		this.dataMovimentacao = dataMovimentacao;
+	}
+	
+	
+		
+   
+}

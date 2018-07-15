@@ -1,0 +1,70 @@
+package br.com.controlefinanceiro.repository;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.controlefinanceiro.model.Cidade;
+import br.com.controlefinanceiro.model.Estado;
+import br.com.controlefinanceiro.repository.filter.CidadeFilter;
+
+public class Cidades extends RepositoryAbstrato<Cidade> implements Serializable {
+	
+	public Cidades() {
+		super(Cidade.class);
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public Cidade salvar(Cidade objeto) {
+		return super.salvar(objeto);
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<Cidade> filtrados(CidadeFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Cidade.class);
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+		if (filtro.getCodigoIbgeDe() != null && filtro.getCodigoIbgeAte() != null) {
+			criteria.add(Restrictions.between("codigoIbge", filtro.getCodigoIbgeDe(), filtro.getCodigoIbgeAte()));
+		}
+		if (StringUtils.isNotBlank(filtro.getNome())) {
+			criteria.add(Restrictions.ilike("nome", filtro.getNome(), MatchMode.ANYWHERE));
+		}
+		if (filtro.getDataCadastroInicio() != null && filtro.getDataCadastroFim() != null) {
+			criteria.add(
+					Restrictions.between("dataCadastro", filtro.getDataCadastroInicio(), filtro.getDataCadastroFim()));
+		}
+		return criteria.addOrder(Order.asc("nome")).list();
+	}
+
+
+	public Cidade porNomeEstadoUnico(String nome, Estado estado, Long id) {
+		try {
+			return manager
+					.createQuery("from Cidade where upper(nome) = :nome and estado.id = :estado_id and id <> :id",
+							Cidade.class)
+					.setParameter("nome", nome.toUpperCase()).setParameter("estado_id", estado.getId())
+					.setParameter("id", (id == null ? -1 : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<Cidade> porNome(String nome) {
+		return this.manager.createQuery("from Cidade where upper(nome) like :nome", Cidade.class)
+				.setParameter("nome", nome.toUpperCase() + "%").getResultList();
+	}
+
+}

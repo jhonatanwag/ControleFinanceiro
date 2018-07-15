@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.repository.UnidadeMedidas;
+
+@FacesConverter(forClass = UnidadeMedida.class)
+public class UnidadeMedidaConverter implements Converter {
+
+	@Inject
+	private UnidadeMedidas unidadeMedidas;
+
+//	public UnidadeMedidaConverter() {
+//		unidadeMedidas = CDIServiceLocator.getBean(UnidadeMedidas.class);
+//	}
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		UnidadeMedida retorno = null;
+
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = unidadeMedidas.porId(id);
+		}
+
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value != null) {
+			UnidadeMedida unid = (UnidadeMedida) value;
+			return unid.getId() == null ? null : unid.getId().toString();
+		}
+
+		return "";
+	}
+
+}

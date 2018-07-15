@@ -1,0 +1,61 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroTipoLogradouroBean.editando ? 'Edição de tipo de logradouro' : 'Novo tipo de logradouro'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="tipoLogradouro"
+				value="#{cadastroTipoLogradouroBean.objeto}" />
+			<f:viewAction action="#{cadastroTipoLogradouroBean.inicializar}" />
+		</f:metadata>
+
+		<h:form>
+			<div class="ContainerIndent">
+				<p:panel>
+					<h1>
+						<div class="FontBold Fs18 hardblue">#{cadastroTipoLogradouroBean.editando
+							? 'Edição de tipo de logradouro' : 'Novo tipo de logradouro'}</div>
+					</h1>
+
+					<p:messages autoUpdate="true" closable="true" />
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:button value="Novo"
+								outcome="/tipoLogradouro/CadastroTipoLogradouro" />
+							<p:commandButton value="Salvar" id="botaoSalvar"
+								action="#{cadastroTipoLogradouroBean.salvar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Pesquisa"
+								outcome="/tipoLogradouro/PesquisaTipoLogradouro" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:panelGrid columns="2" id="painel"
+						style="width: 100%; margin-top: 20px"
+						columnClasses="rotulo, campo">
+
+						<p:outputLabel value="Abreviação" for="abrev" />
+						<p:inputText id="abrev" size="10" maxlength="10"
+							value="#{cadastroTipoLogradouroBean.objeto.abreviacao}"
+							converter="#{upperToCaseConverter}" class="uppercase"
+							required="true" />
+
+						<p:outputLabel value="Descrição" for="descricao" />
+						<p:inputText id="descricao" converter="#{upperToCaseConverter}"
+							class="uppercase campo90" maxlength="80"
+							value="#{cadastroTipoLogradouroBean.objeto.descricao}"
+							required="true" />
+
+					</p:panelGrid>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

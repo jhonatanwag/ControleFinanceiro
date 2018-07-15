@@ -1,0 +1,67 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.ModeloDocumentoFiscal;
+import br.com.sistemacomercial.repository.filter.ModeloDocumentoFiscalFilter;
+
+public class ModeloDocumentoFiscais extends RepositoryAbstrato<ModeloDocumentoFiscal> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public ModeloDocumentoFiscais() {
+		super(ModeloDocumentoFiscal.class);
+	}
+
+	@Override
+	public ModeloDocumentoFiscal salvar(ModeloDocumentoFiscal objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ModeloDocumentoFiscal> filtrados(ModeloDocumentoFiscalFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(ModeloDocumentoFiscal.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+
+	public ModeloDocumentoFiscal porDescricaoUnico(String descricao, Long id) {
+		try {
+			return manager
+					.createQuery("from ModeloDocumentoFiscal where upper(descricao) = :descricao and id <> :id",
+							ModeloDocumentoFiscal.class)
+					.setParameter("descricao", descricao.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<ModeloDocumentoFiscal> porNome(String descricao) {
+		return this.manager
+				.createQuery("from ModeloDocumentoFiscal where upper(descricao) like :descricao",
+						ModeloDocumentoFiscal.class)
+				.setParameter("descricao", descricao.toUpperCase() + "%").getResultList();
+	}
+
+}

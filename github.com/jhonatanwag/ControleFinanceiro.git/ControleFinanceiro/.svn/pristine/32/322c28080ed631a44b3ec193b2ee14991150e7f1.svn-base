@@ -1,0 +1,93 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de estado civis</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<div class="ContainerIndent">
+				<p:panel>
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa
+						de Estado Civis</div>
+					<div class="Separator"></div>
+					<div class="ui-fluid">
+						<p:panelGrid columns="4" columnClasses="col1,col2,col1,col2"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+
+							<p:inputText size="10"
+								value="#{pesquisaEstadoCivilBean.filtro.idDe}" maxlength="6" />
+							<p:outputLabel value="até" />
+							<p:inputText size="10"
+								value="#{pesquisaEstadoCivilBean.filtro.idAte}" maxlength="6" />
+
+
+							<p:outputLabel value="Nome" />
+							<p:inputText value="#{pesquisaEstadoCivilBean.filtro.descricao}"
+								size="100" maxlength="100" />
+
+						</p:panelGrid>
+					</div>
+				</p:panel>
+
+
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:commandButton value="Pesquisar"
+							action="#{pesquisaEstadoCivilBean.pesquisar}" update="@form" />
+						<p:button value="Limpar" outcome="PesquisaEstadoCivil.xhtml" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:button value="Novo" outcome="CadastroEstadoCivil.xhtml" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:dataTable id="estadoCivilTable"
+					value="#{pesquisaEstadoCivilBean.objetosFiltrados}" reflow="true"
+					var="estadoCivil" style="margin-top: 20px"
+					emptyMessage="Nenhum estado civil encontrado." rows="20"
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Código" sortBy="#{estadoCivil.id}">
+						<h:outputText value="#{estadoCivil.id}" />
+					</p:column>
+
+					<p:column headerText="Descrição" sortBy="#{estadoCivil.descricao}">
+						<h:outputText value="#{estadoCivil.descricao}" />
+					</p:column>
+
+					<p:column headerText="Opções">
+						<p:button outcome="/estadoCivil/CadastroEstadoCivil"
+							icon="ui-icon-pencil" title="Editar">
+							<f:param name="estadoCivil" value="#{estadoCivil.id}" />
+						</p:button>
+						<p:commandButton icon="ui-icon-trash" title="Excluir"
+							oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+							update=":frmPesquisa:confirmacaoExclusaoDialog">
+							<f:setPropertyActionListener
+								target="#{pesquisaEstadoCivilBean.objetoSelecionado}"
+								value="#{estadoCivil}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:confirmDialog header="Exclusão do estado civil"
+					message="Tem certeza que deseja excluir o estado civil #{pesquisaEstadoCivilBean.objetoSelecionado.descricao}?"
+					widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+					<p:button value="Não"
+						onclick="PF('confirmacaoExclusao').hide(); return false;" />
+					<p:commandButton value="Sim"
+						oncomplete="PF('confirmacaoExclusao').hide();"
+						action="#{pesquisaEstadoCivilBean.excluir}" process="@this"
+						update=":frmPesquisa:estadoCivilTable" />
+				</p:confirmDialog>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

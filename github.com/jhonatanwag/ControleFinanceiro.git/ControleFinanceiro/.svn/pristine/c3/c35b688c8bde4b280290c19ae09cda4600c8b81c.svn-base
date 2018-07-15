@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Reimprimir Venda/Orçamento"
+		widgetVar="DlgReimprimirVenda" modal="true" dynamic="true"
+		resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogReimprimirVenda">
+			<p:messages id="messagesReimprimirVenda" closable="true"
+				autoUpdate="true" />
+			<div align="center">
+				<p:panelGrid columns="2"
+					columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+					layout="grid" styleClass="ui-panelgrid-blank"
+					style="border:0px none; background-color:transparent;">
+					<p:selectOneRadio id="console">
+						<f:selectItem itemLabel="Á Vista" itemValue="Xbox One" />
+						<f:selectItem itemLabel="Prazo" itemValue="Xbox One" />
+						<f:selectItem itemLabel="Orçamento" itemValue="PS4" />
+						<f:selectItem itemLabel="Transferência" itemValue="Wii U"
+							itemDisabled="true" />
+					</p:selectOneRadio>
+				</p:panelGrid>
+			</div>
+
+			<p:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Imprimir"
+					icon="icon-print"
+					oncomplete="if (!args.validationFailed) PF('DlgReimprimirVenda').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					icon="icon-cancel" oncomplete="PF('DlgReimprimirVenda').hide();" />
+			</p:panelGrid>
+
+
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

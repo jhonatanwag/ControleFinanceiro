@@ -1,0 +1,103 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import br.com.sistemacomercial.enums.EntradaSaida;
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+import br.com.sistemacomercial.enums.TipoCreditoDebito;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name = "tipo_despesa")
+public class TipoDespesa implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "tipo_desp_id")
+	private Long id;
+	@Column(name = "descricao", nullable = false)
+	private String descricao;
+	@Column(length = 1, name = "entrada_saida", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private EntradaSaida entradaSaida;
+	@Column(nullable = false)
+	private Boolean caixa;
+	@Column(nullable = false, name = "inf_pessoa")
+	private Boolean informaPessoa;
+	@Column(length = 1, nullable = false, name = "tip_cred_deb")
+	@Enumerated(EnumType.STRING)
+	private TipoCreditoDebito tipoCreditoDebito;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "situacao_cadastro")
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+
+	public TipoCreditoDebito getTipoCreditoDebito() {
+		return tipoCreditoDebito;
+	}
+
+	public void setTipoCreditoDebito(TipoCreditoDebito tipoCreditoDebito) {
+		this.tipoCreditoDebito = tipoCreditoDebito;
+	}
+
+	public Boolean getCaixa() {
+		return caixa;
+	}
+
+	public void setCaixa(Boolean caixa) {
+		this.caixa = caixa;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public EntradaSaida getEntradaSaida() {
+		return entradaSaida;
+	}
+
+	public void setEntradaSaida(EntradaSaida entradaSaida) {
+		this.entradaSaida = entradaSaida;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+
+	public Boolean getInformaPessoa() {
+		return informaPessoa;
+	}
+
+	public void setInformaPessoa(Boolean informaPessoa) {
+		this.informaPessoa = informaPessoa;
+	}
+
+}

@@ -1,0 +1,102 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.enums.SituacaoInventario;
+import br.com.sistemacomercial.model.Inventario;
+import br.com.sistemacomercial.repository.filter.InventarioFilter;
+import br.com.sistemacomercial.security.UsuarioLogado;
+import br.com.sistemacomercial.security.UsuarioSistema;
+import br.com.sistemacomercial.service.InventarioService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class GerenciadorInventario extends PesquisaBeanAbstrato<Inventario, InventarioFilter> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private InventarioService inventarioService;
+	@Inject
+	@UsuarioLogado
+	private UsuarioSistema usuarioSistema;
+	private Inventario inventario;
+
+	public GerenciadorInventario() {
+		setFiltro(new InventarioFilter());
+
+	}
+	
+	public void inicializar(){
+		if (this.getInventario() == null) {
+			limpar();
+		}
+	}
+
+	private void limpar() {
+		
+		setInventario(new Inventario());
+		
+	}
+
+	public void salvar() {
+		getInventario().setDataAbertura(new Date());
+		getInventario().setSituacaoInventario(SituacaoInventario.CRIADO);
+		getInventario().setFuncionarioAbertura(usuarioSistema.getUsuario().getFuncionario());
+		setInventario(inventarioService.salvar(getInventario()));		
+		limpar();
+		FacesUtil.addInfoMessage("Inventário salvo com sucesso!");
+	}
+	
+	
+	public void cancelar() {
+		getInventario().setDataFechamento(new Date());
+		getInventario().setSituacaoInventario(SituacaoInventario.CANCELADO);
+		getInventario().setFuncionarioEncerramento(usuarioSistema.getUsuario().getFuncionario());
+		setInventario(inventarioService.salvar(getInventario()));		
+		limpar();
+		FacesUtil.addInfoMessage("Inventário Cancelado com sucesso!");
+	}
+	
+	public void encerrar() {
+		getInventario().setDataFechamento(new Date());
+		getInventario().setSituacaoInventario(SituacaoInventario.FINALIZADO);
+		getInventario().setFuncionarioEncerramento(usuarioSistema.getUsuario().getFuncionario());
+		setInventario(inventarioService.salvar(getInventario()));		
+		limpar();
+		FacesUtil.addInfoMessage("Inventário finalizado com sucesso!");
+	}
+
+
+	public Inventario getInventario() {
+		return inventario;
+	}
+
+	public void setInventario(Inventario inventario) {
+		this.inventario = inventario;
+	}
+	
+	public boolean isEditando(){
+		return true;
+	}
+
+	@Override
+	public void excluir() {
+		// vendas.remover(getObjetoSelecionado());
+		// getObjetosFiltrados().remove(getObjetoSelecionado());
+		// FacesUtil.addInfoMessage("Venda " + getObjetoSelecionado().getId() +
+		// " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(inventarioService.filtrados(getFiltro()));
+	}
+
+}

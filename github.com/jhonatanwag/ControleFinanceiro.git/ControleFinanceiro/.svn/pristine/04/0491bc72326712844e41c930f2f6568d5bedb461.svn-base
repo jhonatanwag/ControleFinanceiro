@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Produto/Serviço" widgetVar="DlgItem" modal="true"
+		responsive="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDlgItemEntrada">
+			<p:focus />
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid columns="6" style="margin-top: 10px">
+				<p:outputLabel value="Cód/Barras" for="item" />
+				<p:inputText id="item" size="10" maxlength="13"
+					value="#{notaEntradaBean.produtoSelecionado.id}" required="true" />
+
+				<p:commandButton icon="ui-icon-search" process="@this"
+					update="@none" action="#{pesquisaProdutoBean.abrirDialog}">
+					<p:ajax event="dialogReturn"
+						listener="#{notaEntradaBean.produtoSelecao}"
+						update="item, descricao" process="@this" />
+					<p:resetInput target="descricao" />
+				</p:commandButton>
+
+				<p:inputText id="descricao" size="100" maxlength="100"
+					disabled="true"
+					value="#{notaEntradaBean.produtoSelecionado.descricao}" />
+
+				<p:outputLabel value="Unidade de Medida" for="unidadeMedida" />
+				<p:selectOneMenu id="unidadeMedida" required="true" filter="true"
+					filterMatchMode="startsWith"
+					value="#{notaEntradaBean.notaEntradaItem.unidadeMedida}">
+					<f:selectItems var="un" itemLabel="#{un.descricao}"
+						itemValue="#{un}" value="#{notaEntradaBean.unidadeMedidas}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Qtd." for="qtd" />
+				<p:inputText id="qtd" size="4" maxlength="4"
+					value="#{notaEntradaBean.quantidade}">
+					<p:ajax process="@this" />
+				</p:inputText>
+
+
+				<p:outputLabel value="#{msg['label.preco']}" for="valUnitario" />
+				<p:inputText id="valUnitario" size="10" maxlength="10"
+					styleClass="moeda" required="true"
+					value="#{notaEntradaBean.notaEntradaItem.valorUnitario}">
+					<f:convertNumber maxFractionDigits="8" minFractionDigits="2" />
+				</p:inputText>
+
+				<p:outputLabel value="#{msg['label.preco']}" for="valTotal" />
+				<p:inputText id="valTotal" size="10" maxlength="10" required="false"
+					value="#{notaEntradaBean.notaEntradaItem.valorUnitario}"
+					styleClass="moeda">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+			</p:panelGrid>
+
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton id="bntConfirmarItem" value="Confirmar"
+					actionListener="#{notaEntradaBean.confirmarNovoItem()}"
+					update=":formDlgItemEntrada, :form:tabViewPrincipal:tabViewItem:dataTableItem"
+					oncomplete="if (!args.validationFailed) PF('DlgItem').hide();" />
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgItem').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

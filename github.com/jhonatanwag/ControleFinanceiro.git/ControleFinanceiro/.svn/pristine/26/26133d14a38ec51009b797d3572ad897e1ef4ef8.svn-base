@@ -1,0 +1,207 @@
+package nfe;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
+
+public final class Propriedades
+{
+  private static final Propriedades INSTANCIA = new Propriedades();
+  private Properties properties = new Properties();
+  private Set<String> propriedadesNaoPersistentes = new HashSet();
+  private String pathArquivoCarregado;
+  private String nomeArquivoPropriedades;
+  
+  public static Propriedades getInstancia()
+  {
+    return INSTANCIA;
+  }
+  
+  public void carregar(String paramNomeArquivoPropriedades)
+  {
+    String edigHome = System.getenv("EDIG_HOME");
+    this.nomeArquivoPropriedades = paramNomeArquivoPropriedades;
+    if (edigHome == null) {
+      throw new DB1EdigException("N�o foi especifica a vari�vel de ambiente EDIG_HOME");
+    }
+    this.pathArquivoCarregado = (edigHome + "/" + paramNomeArquivoPropriedades);
+    try
+    {
+      InputStream arquivoStream = new FileInputStream(this.pathArquivoCarregado);
+      try
+      {
+        this.properties.load(arquivoStream);
+        this.propriedadesNaoPersistentes.clear();
+        
+        setPropriedade("edig.home", edigHome, false);
+      }
+      finally
+      {
+        arquivoStream.close();
+      }
+    }
+    catch (FileNotFoundException e)
+    {
+      throw new DB1EdigException("N�o foi encontrado o arquivo " + this.pathArquivoCarregado, e);
+    }
+    catch (IOException e)
+    {
+      throw new DB1EdigException("Erro ao tentar abrir o arquivo " + this.pathArquivoCarregado, e);
+    }
+  }
+  
+  public Propriedades setPropriedade(String paramPropriedade, String paramValor, boolean paramPersistente)
+  {
+    ValidatorUtil.checarNull("paramPropriedade", paramPropriedade);
+    if (paramPersistente) {
+      this.propriedadesNaoPersistentes.remove(paramPropriedade);
+    } else {
+      this.propriedadesNaoPersistentes.add(paramPropriedade);
+    }
+    this.properties.setProperty(paramPropriedade, paramValor);
+    
+    return this;
+  }
+  
+  public Propriedades setPropriedade(String paramPropriedade, String paramValor)
+  {
+    return setPropriedade(paramPropriedade, paramValor, true);
+  }
+  
+  public String asString(String nomePropriedade)
+  {
+    ValidatorUtil.checarNull("nomePropriedade", nomePropriedade);
+    if (!contemPropriedade(nomePropriedade)) {
+      try
+      {
+        ValorPadraoPropriedade valorPadrao = ValorPadraoPropriedade.getInstancia();
+        String valorPropriedade = valorPadrao.getValorPropriedade(nomePropriedade);
+        String conteudoArquivoPropriedade = FileUtil.lerArquivoTexto(new File(this.pathArquivoCarregado));
+        
+        FileOutputStream saida = new FileOutputStream(this.pathArquivoCarregado);
+        saida.write((conteudoArquivoPropriedade + "\r" + nomePropriedade + "=" + valorPropriedade + "\r").getBytes());
+        
+        saida.close();
+        getInstancia().carregar(this.nomeArquivoPropriedades);
+      }
+      catch (DB1EdigException e)
+      {
+        throw new DB1EdigException("Inst�ncia de Propriedades n�o cont�m a propriedade " + nomePropriedade, e);
+      }
+      catch (FileNotFoundException e)
+      {
+        throw new DB1EdigException("O arquivo " + this.pathArquivoCarregado + " n�o foi encontrado.", e);
+      }
+      catch (IOException e)
+      {
+        throw new DB1EdigException("Erro ao tentar escrever o arquivo de propriedades " + this.pathArquivoCarregado, e);
+      }
+    }
+    return this.properties.getProperty(nomePropriedade);
+  }
+  
+  public BigInteger asBigInteger(String nomePropriedade)
+  {
+    String valor = asString(nomePropriedade);
+    if (StringUtil.isInteiro(valor)) {
+      return new BigInteger(valor);
+    }
+    throw new DB1EdigException("O valor '" + valor + "' da propriedade '" + nomePropriedade + "' n�o � um n�mero inteiro v�lido.");
+  }
+  
+  public Integer asInteger(String nomePropriedade)
+  {
+    return Integer.valueOf(asBigInteger(nomePropriedade).intValue());
+  }
+  
+  public Long asLong(String nomePropriedade)
+  {
+    return Long.valueOf(asBigInteger(nomePropriedade).longValue());
+  }
+  
+  public BigDecimal asBigDecimal(String nomePropriedade)
+  {
+    String valor = asString(nomePropriedade);
+    if (StringUtil.isDecimal(valor)) {
+      return new BigDecimal(valor);
+    }
+    throw new DB1EdigException("O valor '" + valor + "' da propriedade '" + nomePropriedade + "' n�o � um n�mero decimal v�lido.");
+  }
+  
+  public Float asFloat(String nomePropriedade)
+  {
+    return Float.valueOf(asBigDecimal(nomePropriedade).floatValue());
+  }
+  
+  public Double asDouble(String nomePropriedade)
+  {
+    return Double.valueOf(asBigDecimal(nomePropriedade).doubleValue());
+  }
+  
+  public Boolean asBoolean(String nomePropriedade)
+  {
+    String valor = asString(nomePropriedade);
+    if ((valor == null) || (!valor.toLowerCase().matches("sim|nao"))) {
+      throw new DB1EdigException("O valor '" + valor + "' da propriedade '" + nomePropriedade + "' n�o pode ser convertido para Boolean. Os valores esperados s�o: 'sim' ou 'nao'");
+    }
+    return Boolean.valueOf(valor.equalsIgnoreCase("sim"));
+  }
+  
+  public Date asDate(String nomePropriedade)
+  {
+    String valor = asString(nomePropriedade);
+    try
+    {
+      return new SimpleDateFormat("dd/MM/yyyy kk:MM:ss").parse(valor);
+    }
+    catch (ParseException e)
+    {
+      throw new DB1EdigException("O valor '" + valor + "' da propriedade '" + nomePropriedade + "' n�o pode ser convertido para Date. Formato esperado: dd/MM/yyyy kk:MM:ss", e);
+    }
+  }
+  
+  public void salvar()
+  {
+    try
+    {
+      Properties paraSalvar = (Properties)this.properties.clone();
+      for (String naoPersistente : this.propriedadesNaoPersistentes) {
+        paraSalvar.remove(naoPersistente);
+      }
+      OutputStream streamArquivo = new FileOutputStream(this.pathArquivoCarregado);
+      try
+      {
+        paraSalvar.store(streamArquivo, null);
+      }
+      finally
+      {
+        streamArquivo.close();
+      }
+    }
+    catch (FileNotFoundException e)
+    {
+      throw new DB1EdigException("N�o foi encontrado o arquivo " + this.pathArquivoCarregado, e);
+    }
+    catch (IOException e)
+    {
+      throw new DB1EdigException("Erro ao tentar abrir o arquivo " + this.pathArquivoCarregado, e);
+    }
+  }
+  
+  public boolean contemPropriedade(String paramNomePropriedade)
+  {
+    return this.properties.containsKey(paramNomePropriedade);
+  }
+}

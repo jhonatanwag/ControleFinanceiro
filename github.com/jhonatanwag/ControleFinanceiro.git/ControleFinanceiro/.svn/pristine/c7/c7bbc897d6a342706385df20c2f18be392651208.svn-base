@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+		<p:panelGrid columns="7" style="margin-top: 5px; width:100%;"
+			styleClass="painelTotaisNota">
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<p:outputLabel value="Base de cálculo do ICMS" for="baseCalcIcms" />
+				<p:inputText id="baseCalcIcms" size="20" maxlength="20"
+					styleClass="moeda" style="text-align: right;">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<p:outputLabel value="Valor do ICMS" for="valorIcms" />
+				<p:inputText id="valorIcms" size="20" maxlength="10">
+					<f:convertNumber type="currency" />
+				</p:inputText>
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="baseCalcIcmsSt" value="Base cálculo ICMS ST" />
+				<p:inputText id="baseCalcIcmsSt" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valoIcmsST" value="Valor do ICMS ST" />
+				<p:inputText id="valoIcmsST" required="true"
+					style="text-align: right;" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalCofins" value="Valor total COFINS" />
+				<p:inputText id="valorTotalCofins" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalPis" value="Valor total PIS" />
+				<p:inputText id="valorTotalPis" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalProdutos" value="Total produtos" />
+				<p:inputText id="valorTotalProdutos" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalIpi" value="Valor total IPI" />
+				<p:inputText id="valorTotalIpi" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalFrete" value="Valor do frete" />
+				<p:inputText id="valorTotalFrete" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalSeguro" value="Valor do seguro" />
+				<p:inputText id="valorTotalSeguro" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalOutrasDespesas"
+					value="Outras desp. acessoriais" />
+				<p:inputText id="valorTotalOutrasDespesas" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalDescontos" value="Descontos" />
+				<p:inputText id="valorTotalDescontos" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalII" value="Valor total II" />
+				<p:inputText id="valorTotalII" required="true" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" style="margin: 0 auto;">
+				<h:outputLabel for="valorTotalNota" value="Total nota" />
+				<p:inputText id="valorTotalNota" required="true" />
+			</h:panelGrid>
+
+
+		</p:panelGrid>
+	
+</ui:composition>

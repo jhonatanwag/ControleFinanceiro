@@ -1,0 +1,149 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:tabView id="tabViewPrincipal">
+		<p:tab id="tabPrincipal" title="Informações Principais">
+			<p:panel>
+				<div align="center">
+					<p:panel header="Tipo de Cadastro">
+						<p:panelGrid columns="6"
+							columnClasses="col1,col2,col1,col2,col1,col2"
+							id="painelTipoPessoa" layout="grid"
+							styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Cliente" for="cli" />
+							<p:selectBooleanCheckbox id="cli" disabled="true"
+								value="#{cadastroPessoaBean.objeto.cliente}">
+							</p:selectBooleanCheckbox>
+							<p:outputLabel value="Funcionário" for="func" />
+							<p:selectBooleanCheckbox id="func"
+								value="#{cadastroPessoaBean.objeto.funcionario}">
+								<p:ajax event="change"
+									listener="#{cadastroPessoaBean.defineFuncionario()}"
+									update="tabViewPrincipal" process="@this" />
+							</p:selectBooleanCheckbox>
+							<p:outputLabel value="Fornecedor" for="forn" />
+							<p:selectBooleanCheckbox id="forn"
+								value="#{cadastroPessoaBean.objeto.fornecedor}">
+							</p:selectBooleanCheckbox>
+						</p:panelGrid>
+					</p:panel>
+				</div>
+				<br />
+
+				<p:panelGrid columns="2" id="painel" columnClasses="rotulo, campo"
+					style="width: 100%">
+
+					<p:outputLabel value="
+					Código:" for="codigo" />
+					<p:inputText id="codigo" value="#{cadastroPessoaBean.objeto.id}"
+						required="false" maxlength="10" class="campo25" readonly="true" />
+
+
+					<p:outputLabel value="Data do cadastro" for="dataCadastro" />
+					<p:inputText id="dataCadastro"
+						value="#{cadastroPessoaBean.objeto.dataCadastro}" disabled="true"
+						class="campo25">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+					</p:inputText>
+
+					<p:outputLabel value="Tipo Pessoa" for="tpPessoa" />
+					<p:selectOneMenu id="tpPessoa"
+						value="#{cadastroPessoaBean.objeto.tipoPessoa}" required="true"
+						disabled="#{cadastroPessoaBean.editando}" class="campo25"
+						filterMatchMode="startsWith" filter="true">
+						<f:selectItem itemLabel="--Selecione--" />
+						<f:selectItems value="#{cadastroPessoaBean.tipoPessoas}"
+							var="tipoPessoa" itemValue="#{tipoPessoa}"
+							itemLabel="#{tipoPessoa.toString()}" />
+						<p:ajax event="change"
+							listener="#{cadastroPessoaBean.defineTipoPessoa()}"
+							update="cpfCnpj, razao, tabViewPrincipal" process="@this" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="CPF/CNPJ" for="cpfCnpj" />
+					<p:inputMask value="#{cadastroPessoaBean.objeto.documentoFederal}"
+						disabled="#{cadastroPessoaBean.editando}"
+						mask="#{cadastroPessoaBean.mascaraTipoPessoa}" id="cpfCnpj"
+						required="true" maxlength="20" class="campo25">
+					</p:inputMask>
+
+					<p:outputLabel value="RG/Inscrição Estadual" for="rgInsctricao" />
+					<p:inputText id="rgInsctricao" maxlength="20" class="campo25"
+						value="#{cadastroPessoaBean.objeto.documentoEstadual}"
+						required="true" />
+					<p:outputLabel value="Nome" for="nome" />
+					<p:inputText id="nome" maxlength="255"
+						value="#{cadastroPessoaBean.objeto.nome}" required="true"
+						class="campo90 uppercase" converter="#{upperToCaseConverter}" />
+					<p:outputLabel value="Razão social" for="razao" />
+					<p:inputText id="razao" maxlength="255" class="campo90 uppercase"
+						converter="#{upperToCaseConverter}"
+						disabled="#{cadastroPessoaBean.objeto.tipoPessoa.toString().equals('Física')}"
+						value="#{cadastroPessoaBean.objeto.razaoSocial}" required="false" />
+
+					<p:outputLabel value="Observações" for="obs" />
+					<p:inputText id="obs" maxlength="255" class="campo90 uppercase"
+						converter="#{upperToCaseConverter}"
+						value="#{cadastroPessoaBean.objeto.observacao}" required="false" />
+
+				</p:panelGrid>
+			</p:panel>
+			<br />
+			<p:tabView id="tabView">
+				<ui:include src="/WEB-INF/template/pessoa/TabEndereco.xhtml" />
+				<ui:include src="/WEB-INF/template/pessoa/TabTelefone.xhtml" />
+				<ui:include src="/WEB-INF/template/pessoa/TabEmail.xhtml" />
+			</p:tabView>
+		</p:tab>
+
+		<p:tab id="tabInfPessoais" title="Informações Pessoais"
+			rendered="#{!cadastroPessoaBean.objeto.tipoPessoa.toString().equals('Jurídica')}"
+			disabled="#{cadastroPessoaBean.objeto.tipoPessoa.toString().equals('Jurídica')}">
+
+
+			<p:panel>
+				<p:panelGrid columns="2" id="painelInformacaoPessoal"
+					columnClasses="rotulo, campo">
+					<p:outputLabel value="Data Emissão RG:" for="dataEmissaoRg" />
+					<p:calendar id="dataEmissaoRg" pattern="dd/MM/yyyy"
+						value="#{cadastroPessoaBean.objeto.informacoesPessoais.dataEmissaoRG}"
+						required="false" maxlength="10" size="10" />
+					<p:outputLabel value="Data Nascimento:" for="dataNascimento" />
+					<p:calendar id="dataNascimento" pattern="dd/MM/yyyy"
+						value="#{cadastroPessoaBean.objeto.informacoesPessoais.dataNascimento}"
+						required="false" maxlength="10" size="10" />
+
+					<p:outputLabel value="Estado Civil:" for="estadoCivil" />
+					<p:selectOneMenu id="estadoCivil" required="true"
+						filterMatchMode="startsWith" filter="true"
+						value="#{cadastroPessoaBean.objeto.informacoesPessoais.estadoCivil}"
+						size="10">
+						<f:selectItem itemLabel="--Selecione--" />
+						<f:selectItems value="#{cadastroPessoaBean.todosEstadosCivis}"
+							var="estadoCivil" itemValue="#{estadoCivil}"
+							itemLabel="#{estadoCivil.descricao}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Etnia:" for="etnia" />
+					<p:selectOneMenu id="etnia" required="true"
+						value="#{cadastroPessoaBean.objeto.etnia}" size="10"
+						filterMatchMode="startsWith" filter="true">
+						<f:selectItem itemLabel="--Selecione--" />
+						<f:selectItems value="#{cadastroPessoaBean.todosEtnias}"
+							var="etnia" itemValue="#{etnia}" itemLabel="#{etnia.descricao}" />
+					</p:selectOneMenu>
+
+				</p:panelGrid>
+			</p:panel>
+		</p:tab>
+
+		<ui:include src="/WEB-INF/template/pessoa/TabFuncionario.xhtml" />
+		<ui:include src="/WEB-INF/template/pessoa/TabCliente.xhtml" />		
+		<ui:include src="/WEB-INF/template/pessoa/TabInfBancaria.xhtml" />
+	</p:tabView>
+
+</ui:composition>

@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
+import br.com.sistemacomercial.model.Rede;
+import br.com.sistemacomercial.repository.Redes;
+
+@FacesConverter(forClass = Rede.class)
+public class RedeConverter implements Converter {
+
+	@Inject
+	private Redes redes;
+
+	// public CidadeConverter() {
+	// paises = CDIServiceLocator.getBean(Cidades.class);
+	// }
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		Rede retorno = null;
+
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = redes.porId(id);
+		}
+
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value != null) {
+			Rede rede = (Rede) value;
+			return rede.getId() == null ? null : rede.getId().toString();
+		}
+
+		return "";
+	}
+
+}

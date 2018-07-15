@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.ContaCorrente;
+import br.com.sistemacomercial.repository.ContaCorrentes;
+import br.com.sistemacomercial.repository.filter.ContaCorrenteFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaContaCorrenteBean extends PesquisaBeanAbstrato<ContaCorrente, ContaCorrenteFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private ContaCorrentes ContaCorrentes;
+
+	public PesquisaContaCorrenteBean() {
+		setFiltro(new ContaCorrenteFilter());
+	}
+
+	@Override
+	public void excluir() {
+		ContaCorrentes.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("ContaCorrente " + getObjetoSelecionado().getNumeroConta() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(ContaCorrentes.filtrados(getFiltro()));
+	}
+
+}

@@ -1,0 +1,44 @@
+package br.com.sistemacomercial.enums;
+
+public enum SituacaoVenda {
+
+	N("Normal"), 
+	C("Cancelada"), 
+	E("Estornada");	
+	private String value;
+
+	private SituacaoVenda(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return this.value;
+	}
+
+	public static SituacaoVenda getTipoVenda(Integer value) {
+		switch (value) {
+		case 0:
+			return N;
+		case 1:
+			return C;
+		case 2:
+			return E;		
+		default:
+			return null;
+		}
+	}
+
+	public static String getTipoVenda(SituacaoVenda tipoVenda) {
+		switch (tipoVenda) {
+		case N:
+			return "N";
+		case C:
+			return "C";
+		case E:
+			return "E";		
+		default:
+			return null;
+		}
+	}
+}

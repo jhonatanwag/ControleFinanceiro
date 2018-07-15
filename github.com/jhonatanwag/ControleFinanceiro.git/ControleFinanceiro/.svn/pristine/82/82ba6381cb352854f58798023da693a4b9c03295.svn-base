@@ -1,0 +1,82 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroContaCorrenteBean.editando ? 'Edição da conta corrente' : 'Nova conta corrente'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="contaCorrente"
+				value="#{cadastroContaCorrenteBean.objeto}" />
+			<f:viewAction action="#{cadastroContaCorrenteBean.inicializar}" />
+		</f:metadata>
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<h:form>
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">#{cadastroContaCorrenteBean.editando
+						? 'Edição da conta corrente' : 'Nova conta corrente'}</div>
+
+					<p:messages autoUpdate="true" closable="true" />
+					<p:focus for="agencia" />
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:button value="Novo"
+								outcome="/contaCorrente/CadastroContaCorrente" />
+							<p:commandButton value="Salvar" id="botaoSalvar"
+								action="#{cadastroContaCorrenteBean.salvar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Pesquisa"
+								outcome="/contaCorrente/PesquisaContaCorrente" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:panelGrid columns="2" id="painel"
+						style="width: 100%; margin-top: 20px"
+						columnClasses="rotulo, campo">
+
+						<p:outputLabel value="Código:" for="codigo" />
+						<p:inputText id="codigo"
+							value="#{cadastroContaCorrenteBean.objeto.id}" required="false"
+							size="10" maxlength="10" readonly="true" />
+
+						<p:outputLabel value="Data do cadastro" for="dataCadastro" />
+						<p:inputText id="dataCadastro" size="11"
+							value="#{cadastroContaCorrenteBean.objeto.dataCadastro}"
+							disabled="true">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+						</p:inputText>
+
+						<p:outputLabel value="Data da Abertura" />
+
+						<p:calendar size="10" pattern="dd/MM/yyyy" required="true"
+							value="#{cadastroContaCorrenteBean.objeto.dataAbertura}" />
+
+						<p:outputLabel value="Agência" for="agencia" />
+						<p:selectOneMenu id="agencia"
+							value="#{cadastroContaCorrenteBean.objeto.agencia}"
+							required="true">
+							<f:selectItem itemLabel="Selecione a agência" />
+							<f:selectItems value="#{cadastroContaCorrenteBean.todasAgencias}"
+								var="agencia" itemValue="#{agencia}"
+								itemLabel="#{agencia.nomeBancoAgencia}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="Número da Conta" for="conta" />
+						<p:inputText id="conta"
+							value="#{cadastroContaCorrenteBean.objeto.numeroConta}"
+							required="true" size="10" maxlength="10" />
+						<p:outputLabel value="Dígito verificador" for="digito" />
+						<p:inputText id="digito"
+							value="#{cadastroContaCorrenteBean.objeto.digitoVerificador}"
+							required="true" size="10" maxlength="10" />
+					</p:panelGrid>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,81 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.Vendas;
+import br.com.sistemacomercial.repository.filter.VendaFilter;
+import br.com.sistemacomercial.service.VendaService;
+import br.com.sistemacomercial.util.DataUtils;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class GerenciadorVendaBean extends PesquisaBeanAbstrato<Venda, VendaFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Vendas vendas;
+	@Inject 
+	private VendaService vendaService;
+	@Inject
+	private Pessoas pessoas;
+	private List<Funcionario> todosFuncionarios = new ArrayList<>();
+
+	public GerenciadorVendaBean() {
+		setFiltro(new VendaFilter());
+		try {
+			getFiltro().setDataVendaDe(DataUtils.dataHora(new Date(), "00:00"));
+		} catch (ParseException e) {
+			FacesUtil.addErrorMessage("Problemas ao formatar a data inicial!");
+		}
+		getFiltro().setDataVendaAte(new Date());
+	}
+
+	public void inicializar() {
+		todosFuncionarios = pessoas.listaFuncionarios();
+	}
+
+	@Override
+	public void excluir() {
+		vendaService.excluirVenda(getObjetoSelecionado());	
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Venda " + getObjetoSelecionado().getId() + " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(vendas.filtrados(getFiltro()));
+	}
+
+	public List<Funcionario> getTodosFuncionarios() {
+		return todosFuncionarios;
+	}
+	
+	/**
+	 * @author Danilo D. de Paula
+	 * @since 02/12/2017
+	 * Ao estornar a venda o titulo será cancelado, baixa de estoque estornada, movimentação do caixa(No Caixa Atual) e a movimentação de estoque!
+	 * Caso a venda seja avista o valor sera estornado do caixa atual, caso seja a prazo o título será cancelado.
+	 */
+	public void estornarVenda(){
+		if(getObjetoSelecionado() != null){
+			vendaService.estornarVenda(getObjetoSelecionado());	
+			pesquisar();
+			FacesUtil.addInfoMessage("Venda " + getObjetoSelecionado().getId() + " estornada com sucesso.");
+		}
+		
+	}
+
+}

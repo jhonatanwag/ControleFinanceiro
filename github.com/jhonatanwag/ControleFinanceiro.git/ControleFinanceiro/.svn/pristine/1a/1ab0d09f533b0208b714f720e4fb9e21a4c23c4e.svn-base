@@ -1,0 +1,1033 @@
+
+package br.com.sistemacomercial.nfe;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+@Entity(name = "NFE_NF")
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlRootElement(name = "NFe")
+public class NfeNf implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private static final String FORMATO_HORA = "HH:mm:ss";
+	@Id
+	@Column(name = "ID_NOTA_FISCAL", unique = true, nullable = false, length = 45, updatable = false)
+	private String idNotaFiscal;
+	@Column(name = "IDE_CUF", nullable = false, precision = 2, scale = 0, updatable = false)
+	private byte ideCuf;
+	@Column(name = "ISSQNTOT_VSERV", precision = 15, updatable = false)
+	private BigDecimal issqntotVserv;
+	@Column(name = "IDE_CNF", nullable = false, precision = 9, scale = 0, updatable = false)
+	private int ideCnf;
+	@Column(name = "ISSQNTOT_VBC", precision = 15, updatable = false)
+	private BigDecimal issqntotVbc;
+	@Column(name = "IDE_NATOP", nullable = false, length = 60, updatable = false)
+	private String ideNatop;
+	@Column(name = "ISSQNTOT_VISS", precision = 15, updatable = false)
+	private BigDecimal issqntotViss;
+	@Column(name = "IDE_INDPAG", nullable = true, precision = 1, scale = 0, updatable = false)
+	private int ideIndpag;
+	@Column(name = "ISSQNTOT_VPIS", precision = 15, updatable = false)
+	private BigDecimal issqntotVpis;
+	@Column(name = "IDE_MOD", nullable = false, precision = 2, scale = 0, updatable = false)
+	private Byte ideMod;
+	@Column(name = "ISSQNTOT_VCOFINS", precision = 15, updatable = false)
+	private BigDecimal issqntotVcofins;
+	@Column(name = "ISSQNTOT_DCOMPET", precision = 15, updatable = false)
+	private BigDecimal issqntotVdCompet;
+	@Column(name = "ISSQNTOT_VDEDUCAO", precision = 15, scale = 2, updatable = false)
+	private BigDecimal issqntotVdeducao;
+	@Column(name = "ISSQNTOT_VOUTRO", precision = 15, scale = 2, updatable = false)
+	private BigDecimal issqntotVoutro;
+	@Column(name = "ISSQNTOT_VDESCINCOND", precision = 15, scale = 2, updatable = false)
+	private BigDecimal issqntotVdescIncond;
+	@Column(name = "ISSQNTOT_VDESCCOND", precision = 15, scale = 2, updatable = false)
+	private BigDecimal issqntotVdescCond;
+	@Column(name = "ISSQNTOT_VISSRET", precision = 15, scale = 2, updatable = false)
+	private BigDecimal issqntotVissRet;
+	@Column(name = "ISSQNTOT_CREGTRIB", precision = 2, updatable = false)
+	private BigDecimal issqntotCregTrib;
+	@Column(name = "IDE_SERIE", nullable = false, precision = 3, scale = 0, updatable = false)
+	private short ideSerie;
+	@Column(name = "IDE_NNF", nullable = false, precision = 9, scale = 0, updatable = false)
+	private int ideNnf;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "IDE_DEMI", nullable = false, updatable = false)
+	private Date ideDemi;
+	@Column(name = "IDE_HEMI", nullable = true, updatable = false)
+	private String ideHemi;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "IDE_DSAIENT", nullable = true, updatable = false)
+	private Date ideDsaient;
+	@Column(name = "IDE_HSAIENT", nullable = true, length = 8, updatable = false)
+	private String ideHsaient;
+	@Column(name = "IDE_TPNF", nullable = false, length = 1, updatable = false)
+	private String ideTpnf;
+	@Column(name = "IDE_CMUNFG", nullable = false, precision = 7, scale = 0, updatable = false)
+	private int ideCmunfg;
+	@Column(name = "IDE_FINNFE", nullable = true, length = 1, updatable = false)
+	private String ideFinnfe;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "IDE_DHCONT", nullable = true, updatable = false)
+	private Date ideDhCont;
+	@Column(name = "IDE_HCONT", nullable = true, updatable = false)
+	private String ideHCont;
+	@Column(name = "IDE_XJUST", nullable = true, length = 256, updatable = false)
+	private String ideXJust;
+	@Column(name = "EMIT_CNPJ", length = 14, updatable = false)
+	private String emitCnpj;
+	@Column(name = "EMIT_IEST", length = 14, updatable = false)
+	private String emitIest;
+	@Column(name = "EMIT_IM", length = 15, updatable = false)
+	private String emitIm;
+	@Column(name = "EMIT_CNAE", length = 7, updatable = false)
+	private String emitCnae;
+	@Column(name = "DEST_CNPJ_CPF", length = 14, updatable = false)
+	private String destCnpjCpf;
+	@Column(name = "DEST_XNOME", nullable = true, length = 60, updatable = false)
+	private String destXnome;
+	@Column(name = "ENDERDEST_XLGR", nullable = true, length = 60, updatable = false)
+	private String enderdestXlgr;
+	@Column(name = "ENDERDEST_NRO", nullable = true, length = 60, updatable = false)
+	private String enderdestNro;
+	@Column(name = "ENDERDEST_XCPL", length = 60, updatable = false)
+	private String enderdestXcpl;
+	@Column(name = "ENDERDEST_XBAIRRO", nullable = true, length = 60, updatable = false)
+	private String enderdestXbairro;
+	@Column(name = "ENDERDEST_CMUN", nullable = true, precision = 7, scale = 0, updatable = false)
+	private Integer enderdestCmun;
+	@Column(name = "ENDERDEST_XMUN", length = 60, updatable = false)
+	private String enderdestXmun;
+	@Column(name = "ENDERDEST_UF", nullable = true, length = 2, updatable = false)
+	private String enderdestUf;
+	@Column(name = "ENDERDEST_CEP", precision = 8, scale = 0, updatable = false)
+	private Integer enderdestCep;
+	@Column(name = "ENDERDEST_CPAIS", length = 4, updatable = false)
+	private String enderdestCpais;
+	@Column(name = "ENDERDEST_XPAIS", length = 60, updatable = false)
+	private String enderdestXpais;
+	@Column(name = "ENDERDEST_FONE", precision = 14, scale = 0, updatable = false)
+	private Long enderdestFone;
+	@Column(name = "DEST_INDIE", precision = 1, updatable = false)
+	private Integer destIndIe;
+	@Column(name = "DEST_IE", length = 14, updatable = false)
+	private String destIe;
+	@Column(name = "DEST_ISUF", length = 9, updatable = false)
+	private String destIsuf;
+	@Column(name = "DEST_IM", length = 15, updatable = false)
+	private String destIm;
+	@Column(name = "DEST_EMAIL", length = 300, updatable = false)
+	private String destEmail;
+	@Column(name = "ICMSTOT_VBC", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVbc;
+	@Column(name = "ICMSTOT_VICMS", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVicms;
+	@Column(name = "ICMSTOT_VICMSDESON", precision = 15, scale = 2, updatable = false)
+	private BigDecimal icmstotVicmsDeson;
+	@Column(name = "ICMSTOT_VBCST", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVbcst;
+	@Column(name = "ICMSTOT_VST", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVst;
+	@Column(name = "ICMSTOT_VPROD", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVprod;
+	@Column(name = "ICMSTOT_VFRETE", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVfrete;
+	@Column(name = "ICMSTOT_VSEG", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVseg;
+	@Column(name = "ICMSTOT_VDESC", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVdesc;
+	@Column(name = "ICMSTOT_VII", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVii;
+	@Column(name = "ICMSTOT_VIPI", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVipi;
+	@Column(name = "ICMSTOT_VPIS", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVpis;
+	@Column(name = "ICMSTOT_VCOFINS", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVcofins;
+	@Column(name = "ICMSTOT_VOUTRO", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVoutro;
+	@Column(name = "ICMSTOT_VNF", nullable = false, precision = 15, updatable = false)
+	private BigDecimal icmstotVnf;
+	@Column(name = "RETTRIB_VRETPIS", precision = 15, updatable = false)
+	private BigDecimal rettribVretpis;
+	@Column(name = "RETTRIB_VRETCOFINS", precision = 15, updatable = false)
+	private BigDecimal rettribVretcofins;
+	@Column(name = "RETTRIB_VRETCSLL", precision = 15, updatable = false)
+	private BigDecimal rettribVretcsll;
+	@Column(name = "RETTRIB_VBCIRRF", precision = 15, updatable = false)
+	private BigDecimal rettribVbcirrf;
+	@Column(name = "RETTRIB_VIRRF", precision = 15, updatable = false)
+	private BigDecimal rettribVirrf;
+	@Column(name = "RETTRIB_VBCRETPREV", precision = 15, updatable = false)
+	private BigDecimal rettribVbcretprev;
+	@Column(name = "RETTRIB_VRETPREV", precision = 15, updatable = false)
+	private BigDecimal rettribVretprev;
+	@Column(name = "TRANSP_MODFRETE", nullable = false, precision = 1, scale = 0, updatable = false)
+	private Integer transpModfrete;
+	@Column(name = "TRANSP_VAGAO", length = 20, updatable = false)
+	private String transpVagao;
+	@Column(name = "TRANSP_BALSA", length = 20, updatable = false)
+	private String transpBalsa;
+	@Column(name = "FAT_NFAT", length = 60, updatable = false)
+	private String fatNfat;
+	@Column(name = "FAT_VORIG", precision = 15, updatable = false)
+	private BigDecimal fatVorig;
+	@Column(name = "FAT_VDESC", precision = 15, updatable = false)
+	private BigDecimal fatVdesc;
+	@Column(name = "FAT_VLIQ", precision = 15, updatable = false)
+	private BigDecimal fatVliq;
+	@Column(name = "INFADIC_INFADFISCO", length = 2000, updatable = false)
+	private String infadicInfadfisco;
+	@Lob
+	@Column(name = "INFADIC_INFCPL", updatable = false)
+	private String infadicInfcpl;
+
+	@Column(name = "EXPORTA_UFEMBARQ", length = 2, updatable = false)
+	private String exportaUfembarq;
+	@Column(name = "EXPORTA_XLOCEMBARQ", length = 60, updatable = false)
+	private String exportaXlocembarq;
+	@Column(name = "EXPORTA_UFSAIDAPAIS", length = 2, updatable = false)
+	private String exportaUfSaidaPais;
+	@Column(name = "EXPORTA_XLOCEXPORTA", length = 60, updatable = false)
+	private String exportaXlocExporta;
+	@Column(name = "EXPORTA_XLOCDESPACHO", length = 60, updatable = false)
+	private String exportaXlocDespacho;
+	@Column(name = "COMPRA_XNEMP", length = 17, updatable = false)
+	private String compraXnemp;
+	@Column(name = "COMPRA_XPED", length = 60, updatable = false)
+	private String compraXped;
+	@Column(name = "COMPRA_XCONT", length = 60, updatable = false)
+	private String compraXcont;
+	@Column(name = "NOME_RECEBEDOR", length = 60, updatable = false)
+	private String nomeRecebedor;
+	@Column(name = "VTOTTRIB", precision = 15, scale = 2)
+	private BigDecimal vTotTrib;
+
+	private String xmlns;
+
+	@Lob
+	@Column(name = "OBS_IMPRIMIR_NO_CORPO", updatable = false)
+	private String obsImprimirNoCorpo;
+
+	@Column(name = "GERA_IDEDSAIENT_AUTOMATICO", updatable = false)
+	private Integer geraIdeDsaientAutomatico;
+
+	@OneToMany(cascade = { javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "nfeNf")
+	@Fetch(FetchMode.SELECT)
+	private Set<NfeProdutos> nfeProdutos = new WrapperSet(this, new HashSet(0));
+
+	public String getIdNotaFiscal() {
+		return idNotaFiscal;
+	}
+
+	public void setIdNotaFiscal(String idNotaFiscal) {
+		this.idNotaFiscal = idNotaFiscal;
+	}
+
+	@XmlElement(name = "cUF")
+	public byte getIdeCuf() {
+		return ideCuf;
+	}
+
+	public void setIdeCuf(byte ideCuf) {
+		this.ideCuf = ideCuf;
+	}
+	
+	
+	@XmlAttribute(name = "xmlns")
+	public String getXmlns() {
+		return xmlns;
+	}
+
+	public void setXmlns(String xmlns) {
+		this.xmlns = xmlns;
+	}
+
+	public BigDecimal getIssqntotVserv() {
+		return issqntotVserv;
+	}
+
+	public void setIssqntotVserv(BigDecimal issqntotVserv) {
+		this.issqntotVserv = issqntotVserv;
+	}
+
+	
+	@XmlElement(name = "cNF")
+	public int getIdeCnf() {
+		return ideCnf;
+	}
+
+	public void setIdeCnf(int ideCnf) {
+		this.ideCnf = ideCnf;
+	}
+
+	public BigDecimal getIssqntotVbc() {
+		return issqntotVbc;
+	}
+
+	public void setIssqntotVbc(BigDecimal issqntotVbc) {
+		this.issqntotVbc = issqntotVbc;
+	}
+
+	public String getIdeNatop() {
+		return ideNatop;
+	}
+
+	public void setIdeNatop(String ideNatop) {
+		this.ideNatop = ideNatop;
+	}
+
+	public BigDecimal getIssqntotViss() {
+		return issqntotViss;
+	}
+
+	public void setIssqntotViss(BigDecimal issqntotViss) {
+		this.issqntotViss = issqntotViss;
+	}
+
+	public int getIdeIndpag() {
+		return ideIndpag;
+	}
+
+	public void setIdeIndpag(int ideIndpag) {
+		this.ideIndpag = ideIndpag;
+	}
+
+	public BigDecimal getIssqntotVpis() {
+		return issqntotVpis;
+	}
+
+	public void setIssqntotVpis(BigDecimal issqntotVpis) {
+		this.issqntotVpis = issqntotVpis;
+	}
+
+	public Byte getIdeMod() {
+		return ideMod;
+	}
+
+	public void setIdeMod(Byte ideMod) {
+		this.ideMod = ideMod;
+	}
+
+	public BigDecimal getIssqntotVcofins() {
+		return issqntotVcofins;
+	}
+
+	public void setIssqntotVcofins(BigDecimal issqntotVcofins) {
+		this.issqntotVcofins = issqntotVcofins;
+	}
+
+	public BigDecimal getIssqntotVdCompet() {
+		return issqntotVdCompet;
+	}
+
+	public void setIssqntotVdCompet(BigDecimal issqntotVdCompet) {
+		this.issqntotVdCompet = issqntotVdCompet;
+	}
+
+	public BigDecimal getIssqntotVdeducao() {
+		return issqntotVdeducao;
+	}
+
+	public void setIssqntotVdeducao(BigDecimal issqntotVdeducao) {
+		this.issqntotVdeducao = issqntotVdeducao;
+	}
+
+	public BigDecimal getIssqntotVoutro() {
+		return issqntotVoutro;
+	}
+
+	public void setIssqntotVoutro(BigDecimal issqntotVoutro) {
+		this.issqntotVoutro = issqntotVoutro;
+	}
+
+	public BigDecimal getIssqntotVdescIncond() {
+		return issqntotVdescIncond;
+	}
+
+	public void setIssqntotVdescIncond(BigDecimal issqntotVdescIncond) {
+		this.issqntotVdescIncond = issqntotVdescIncond;
+	}
+
+	public BigDecimal getIssqntotVdescCond() {
+		return issqntotVdescCond;
+	}
+
+	public void setIssqntotVdescCond(BigDecimal issqntotVdescCond) {
+		this.issqntotVdescCond = issqntotVdescCond;
+	}
+
+	public BigDecimal getIssqntotVissRet() {
+		return issqntotVissRet;
+	}
+
+	public void setIssqntotVissRet(BigDecimal issqntotVissRet) {
+		this.issqntotVissRet = issqntotVissRet;
+	}
+
+	public BigDecimal getIssqntotCregTrib() {
+		return issqntotCregTrib;
+	}
+
+	public void setIssqntotCregTrib(BigDecimal issqntotCregTrib) {
+		this.issqntotCregTrib = issqntotCregTrib;
+	}
+
+	public short getIdeSerie() {
+		return ideSerie;
+	}
+
+	public void setIdeSerie(short ideSerie) {
+		this.ideSerie = ideSerie;
+	}
+
+	public int getIdeNnf() {
+		return ideNnf;
+	}
+
+	public void setIdeNnf(int ideNnf) {
+		this.ideNnf = ideNnf;
+	}
+
+	public Date getIdeDemi() {
+		return ideDemi;
+	}
+
+	public void setIdeDemi(Date ideDemi) {
+		this.ideDemi = ideDemi;
+	}
+
+	public String getIdeHemi() {
+		return ideHemi;
+	}
+
+	public void setIdeHemi(String ideHemi) {
+		this.ideHemi = ideHemi;
+	}
+
+	public Date getIdeDsaient() {
+		return ideDsaient;
+	}
+
+	public void setIdeDsaient(Date ideDsaient) {
+		this.ideDsaient = ideDsaient;
+	}
+
+	public String getIdeHsaient() {
+		return ideHsaient;
+	}
+
+	public void setIdeHsaient(String ideHsaient) {
+		this.ideHsaient = ideHsaient;
+	}
+
+	public String getIdeTpnf() {
+		return ideTpnf;
+	}
+
+	public void setIdeTpnf(String ideTpnf) {
+		this.ideTpnf = ideTpnf;
+	}
+
+	public int getIdeCmunfg() {
+		return ideCmunfg;
+	}
+
+	public void setIdeCmunfg(int ideCmunfg) {
+		this.ideCmunfg = ideCmunfg;
+	}
+
+	public String getIdeFinnfe() {
+		return ideFinnfe;
+	}
+
+	public void setIdeFinnfe(String ideFinnfe) {
+		this.ideFinnfe = ideFinnfe;
+	}
+
+	public Date getIdeDhCont() {
+		return ideDhCont;
+	}
+
+	public void setIdeDhCont(Date ideDhCont) {
+		this.ideDhCont = ideDhCont;
+	}
+
+	public String getIdeHCont() {
+		return ideHCont;
+	}
+
+	public void setIdeHCont(String ideHCont) {
+		this.ideHCont = ideHCont;
+	}
+
+	public String getIdeXJust() {
+		return ideXJust;
+	}
+
+	public void setIdeXJust(String ideXJust) {
+		this.ideXJust = ideXJust;
+	}
+
+	public String getEmitCnpj() {
+		return emitCnpj;
+	}
+
+	public void setEmitCnpj(String emitCnpj) {
+		this.emitCnpj = emitCnpj;
+	}
+
+	public String getEmitIest() {
+		return emitIest;
+	}
+
+	public void setEmitIest(String emitIest) {
+		this.emitIest = emitIest;
+	}
+
+	public String getEmitIm() {
+		return emitIm;
+	}
+
+	public void setEmitIm(String emitIm) {
+		this.emitIm = emitIm;
+	}
+
+	public String getEmitCnae() {
+		return emitCnae;
+	}
+
+	public void setEmitCnae(String emitCnae) {
+		this.emitCnae = emitCnae;
+	}
+
+	public String getDestCnpjCpf() {
+		return destCnpjCpf;
+	}
+
+	public void setDestCnpjCpf(String destCnpjCpf) {
+		this.destCnpjCpf = destCnpjCpf;
+	}
+
+	public String getDestXnome() {
+		return destXnome;
+	}
+
+	public void setDestXnome(String destXnome) {
+		this.destXnome = destXnome;
+	}
+
+	public String getEnderdestXlgr() {
+		return enderdestXlgr;
+	}
+
+	public void setEnderdestXlgr(String enderdestXlgr) {
+		this.enderdestXlgr = enderdestXlgr;
+	}
+
+	public String getEnderdestNro() {
+		return enderdestNro;
+	}
+
+	public void setEnderdestNro(String enderdestNro) {
+		this.enderdestNro = enderdestNro;
+	}
+
+	public String getEnderdestXcpl() {
+		return enderdestXcpl;
+	}
+
+	public void setEnderdestXcpl(String enderdestXcpl) {
+		this.enderdestXcpl = enderdestXcpl;
+	}
+
+	public String getEnderdestXbairro() {
+		return enderdestXbairro;
+	}
+
+	public void setEnderdestXbairro(String enderdestXbairro) {
+		this.enderdestXbairro = enderdestXbairro;
+	}
+
+	public Integer getEnderdestCmun() {
+		return enderdestCmun;
+	}
+
+	public void setEnderdestCmun(Integer enderdestCmun) {
+		this.enderdestCmun = enderdestCmun;
+	}
+
+	public String getEnderdestXmun() {
+		return enderdestXmun;
+	}
+
+	public void setEnderdestXmun(String enderdestXmun) {
+		this.enderdestXmun = enderdestXmun;
+	}
+
+	public String getEnderdestUf() {
+		return enderdestUf;
+	}
+
+	public void setEnderdestUf(String enderdestUf) {
+		this.enderdestUf = enderdestUf;
+	}
+
+	public Integer getEnderdestCep() {
+		return enderdestCep;
+	}
+
+	public void setEnderdestCep(Integer enderdestCep) {
+		this.enderdestCep = enderdestCep;
+	}
+
+	public String getEnderdestCpais() {
+		return enderdestCpais;
+	}
+
+	public void setEnderdestCpais(String enderdestCpais) {
+		this.enderdestCpais = enderdestCpais;
+	}
+
+	public String getEnderdestXpais() {
+		return enderdestXpais;
+	}
+
+	public void setEnderdestXpais(String enderdestXpais) {
+		this.enderdestXpais = enderdestXpais;
+	}
+
+	public Long getEnderdestFone() {
+		return enderdestFone;
+	}
+
+	public void setEnderdestFone(Long enderdestFone) {
+		this.enderdestFone = enderdestFone;
+	}
+
+	public Integer getDestIndIe() {
+		return destIndIe;
+	}
+
+	public void setDestIndIe(Integer destIndIe) {
+		this.destIndIe = destIndIe;
+	}
+
+	public String getDestIe() {
+		return destIe;
+	}
+
+	public void setDestIe(String destIe) {
+		this.destIe = destIe;
+	}
+
+	public String getDestIsuf() {
+		return destIsuf;
+	}
+
+	public void setDestIsuf(String destIsuf) {
+		this.destIsuf = destIsuf;
+	}
+
+	public String getDestIm() {
+		return destIm;
+	}
+
+	public void setDestIm(String destIm) {
+		this.destIm = destIm;
+	}
+
+	public String getDestEmail() {
+		return destEmail;
+	}
+
+	public void setDestEmail(String destEmail) {
+		this.destEmail = destEmail;
+	}
+
+	public BigDecimal getIcmstotVbc() {
+		return icmstotVbc;
+	}
+
+	public void setIcmstotVbc(BigDecimal icmstotVbc) {
+		this.icmstotVbc = icmstotVbc;
+	}
+
+	public BigDecimal getIcmstotVicms() {
+		return icmstotVicms;
+	}
+
+	public void setIcmstotVicms(BigDecimal icmstotVicms) {
+		this.icmstotVicms = icmstotVicms;
+	}
+
+	public BigDecimal getIcmstotVicmsDeson() {
+		return icmstotVicmsDeson;
+	}
+
+	public void setIcmstotVicmsDeson(BigDecimal icmstotVicmsDeson) {
+		this.icmstotVicmsDeson = icmstotVicmsDeson;
+	}
+
+	public BigDecimal getIcmstotVbcst() {
+		return icmstotVbcst;
+	}
+
+	public void setIcmstotVbcst(BigDecimal icmstotVbcst) {
+		this.icmstotVbcst = icmstotVbcst;
+	}
+
+	public BigDecimal getIcmstotVst() {
+		return icmstotVst;
+	}
+
+	public void setIcmstotVst(BigDecimal icmstotVst) {
+		this.icmstotVst = icmstotVst;
+	}
+
+	public BigDecimal getIcmstotVprod() {
+		return icmstotVprod;
+	}
+
+	public void setIcmstotVprod(BigDecimal icmstotVprod) {
+		this.icmstotVprod = icmstotVprod;
+	}
+
+	public BigDecimal getIcmstotVfrete() {
+		return icmstotVfrete;
+	}
+
+	public void setIcmstotVfrete(BigDecimal icmstotVfrete) {
+		this.icmstotVfrete = icmstotVfrete;
+	}
+
+	public BigDecimal getIcmstotVseg() {
+		return icmstotVseg;
+	}
+
+	public void setIcmstotVseg(BigDecimal icmstotVseg) {
+		this.icmstotVseg = icmstotVseg;
+	}
+
+	public BigDecimal getIcmstotVdesc() {
+		return icmstotVdesc;
+	}
+
+	public void setIcmstotVdesc(BigDecimal icmstotVdesc) {
+		this.icmstotVdesc = icmstotVdesc;
+	}
+
+	public BigDecimal getIcmstotVii() {
+		return icmstotVii;
+	}
+
+	public void setIcmstotVii(BigDecimal icmstotVii) {
+		this.icmstotVii = icmstotVii;
+	}
+
+	public BigDecimal getIcmstotVipi() {
+		return icmstotVipi;
+	}
+
+	public void setIcmstotVipi(BigDecimal icmstotVipi) {
+		this.icmstotVipi = icmstotVipi;
+	}
+
+	public BigDecimal getIcmstotVpis() {
+		return icmstotVpis;
+	}
+
+	public void setIcmstotVpis(BigDecimal icmstotVpis) {
+		this.icmstotVpis = icmstotVpis;
+	}
+
+	public BigDecimal getIcmstotVcofins() {
+		return icmstotVcofins;
+	}
+
+	public void setIcmstotVcofins(BigDecimal icmstotVcofins) {
+		this.icmstotVcofins = icmstotVcofins;
+	}
+
+	public BigDecimal getIcmstotVoutro() {
+		return icmstotVoutro;
+	}
+
+	public void setIcmstotVoutro(BigDecimal icmstotVoutro) {
+		this.icmstotVoutro = icmstotVoutro;
+	}
+
+	public BigDecimal getIcmstotVnf() {
+		return icmstotVnf;
+	}
+
+	public void setIcmstotVnf(BigDecimal icmstotVnf) {
+		this.icmstotVnf = icmstotVnf;
+	}
+
+	public BigDecimal getRettribVretpis() {
+		return rettribVretpis;
+	}
+
+	public void setRettribVretpis(BigDecimal rettribVretpis) {
+		this.rettribVretpis = rettribVretpis;
+	}
+
+	public BigDecimal getRettribVretcofins() {
+		return rettribVretcofins;
+	}
+
+	public void setRettribVretcofins(BigDecimal rettribVretcofins) {
+		this.rettribVretcofins = rettribVretcofins;
+	}
+
+	public BigDecimal getRettribVretcsll() {
+		return rettribVretcsll;
+	}
+
+	public void setRettribVretcsll(BigDecimal rettribVretcsll) {
+		this.rettribVretcsll = rettribVretcsll;
+	}
+
+	public BigDecimal getRettribVbcirrf() {
+		return rettribVbcirrf;
+	}
+
+	public void setRettribVbcirrf(BigDecimal rettribVbcirrf) {
+		this.rettribVbcirrf = rettribVbcirrf;
+	}
+
+	public BigDecimal getRettribVirrf() {
+		return rettribVirrf;
+	}
+
+	public void setRettribVirrf(BigDecimal rettribVirrf) {
+		this.rettribVirrf = rettribVirrf;
+	}
+
+	public BigDecimal getRettribVbcretprev() {
+		return rettribVbcretprev;
+	}
+
+	public void setRettribVbcretprev(BigDecimal rettribVbcretprev) {
+		this.rettribVbcretprev = rettribVbcretprev;
+	}
+
+	public BigDecimal getRettribVretprev() {
+		return rettribVretprev;
+	}
+
+	public void setRettribVretprev(BigDecimal rettribVretprev) {
+		this.rettribVretprev = rettribVretprev;
+	}
+
+	public Integer getTranspModfrete() {
+		return transpModfrete;
+	}
+
+	public void setTranspModfrete(Integer transpModfrete) {
+		this.transpModfrete = transpModfrete;
+	}
+
+	public String getTranspVagao() {
+		return transpVagao;
+	}
+
+	public void setTranspVagao(String transpVagao) {
+		this.transpVagao = transpVagao;
+	}
+
+	public String getTranspBalsa() {
+		return transpBalsa;
+	}
+
+	public void setTranspBalsa(String transpBalsa) {
+		this.transpBalsa = transpBalsa;
+	}
+
+	public String getFatNfat() {
+		return fatNfat;
+	}
+
+	public void setFatNfat(String fatNfat) {
+		this.fatNfat = fatNfat;
+	}
+
+	public BigDecimal getFatVorig() {
+		return fatVorig;
+	}
+
+	public void setFatVorig(BigDecimal fatVorig) {
+		this.fatVorig = fatVorig;
+	}
+
+	public BigDecimal getFatVdesc() {
+		return fatVdesc;
+	}
+
+	public void setFatVdesc(BigDecimal fatVdesc) {
+		this.fatVdesc = fatVdesc;
+	}
+
+	public BigDecimal getFatVliq() {
+		return fatVliq;
+	}
+
+	public void setFatVliq(BigDecimal fatVliq) {
+		this.fatVliq = fatVliq;
+	}
+
+	public String getInfadicInfadfisco() {
+		return infadicInfadfisco;
+	}
+
+	public void setInfadicInfadfisco(String infadicInfadfisco) {
+		this.infadicInfadfisco = infadicInfadfisco;
+	}
+
+	public String getInfadicInfcpl() {
+		return infadicInfcpl;
+	}
+
+	public void setInfadicInfcpl(String infadicInfcpl) {
+		this.infadicInfcpl = infadicInfcpl;
+	}
+
+	public String getExportaUfembarq() {
+		return exportaUfembarq;
+	}
+
+	public void setExportaUfembarq(String exportaUfembarq) {
+		this.exportaUfembarq = exportaUfembarq;
+	}
+
+	public String getExportaXlocembarq() {
+		return exportaXlocembarq;
+	}
+
+	public void setExportaXlocembarq(String exportaXlocembarq) {
+		this.exportaXlocembarq = exportaXlocembarq;
+	}
+
+	public String getExportaUfSaidaPais() {
+		return exportaUfSaidaPais;
+	}
+
+	public void setExportaUfSaidaPais(String exportaUfSaidaPais) {
+		this.exportaUfSaidaPais = exportaUfSaidaPais;
+	}
+
+	public String getExportaXlocExporta() {
+		return exportaXlocExporta;
+	}
+
+	public void setExportaXlocExporta(String exportaXlocExporta) {
+		this.exportaXlocExporta = exportaXlocExporta;
+	}
+
+	public String getExportaXlocDespacho() {
+		return exportaXlocDespacho;
+	}
+
+	public void setExportaXlocDespacho(String exportaXlocDespacho) {
+		this.exportaXlocDespacho = exportaXlocDespacho;
+	}
+
+	public String getCompraXnemp() {
+		return compraXnemp;
+	}
+
+	public void setCompraXnemp(String compraXnemp) {
+		this.compraXnemp = compraXnemp;
+	}
+
+	public String getCompraXped() {
+		return compraXped;
+	}
+
+	public void setCompraXped(String compraXped) {
+		this.compraXped = compraXped;
+	}
+
+	public String getCompraXcont() {
+		return compraXcont;
+	}
+
+	public void setCompraXcont(String compraXcont) {
+		this.compraXcont = compraXcont;
+	}
+
+	public String getNomeRecebedor() {
+		return nomeRecebedor;
+	}
+
+	public void setNomeRecebedor(String nomeRecebedor) {
+		this.nomeRecebedor = nomeRecebedor;
+	}
+
+	public BigDecimal getvTotTrib() {
+		return vTotTrib;
+	}
+
+	public void setvTotTrib(BigDecimal vTotTrib) {
+		this.vTotTrib = vTotTrib;
+	}
+
+	public String getObsImprimirNoCorpo() {
+		return obsImprimirNoCorpo;
+	}
+
+	public void setObsImprimirNoCorpo(String obsImprimirNoCorpo) {
+		this.obsImprimirNoCorpo = obsImprimirNoCorpo;
+	}
+
+	public Integer getGeraIdeDsaientAutomatico() {
+		return geraIdeDsaientAutomatico;
+	}
+
+	public void setGeraIdeDsaientAutomatico(Integer geraIdeDsaientAutomatico) {
+		this.geraIdeDsaientAutomatico = geraIdeDsaientAutomatico;
+	}
+
+	public static String getFormatoHora() {
+		return FORMATO_HORA;
+	}
+
+	public Set<NfeProdutos> getNfeProdutos() {
+		return nfeProdutos;
+	}
+
+	public void setNfeProdutos(Set<NfeProdutos> nfeProdutos) {
+		this.nfeProdutos = nfeProdutos;
+	}
+
+}

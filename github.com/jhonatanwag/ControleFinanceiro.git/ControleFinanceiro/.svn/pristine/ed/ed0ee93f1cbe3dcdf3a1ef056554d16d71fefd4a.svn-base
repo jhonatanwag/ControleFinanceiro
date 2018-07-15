@@ -1,0 +1,89 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.model.DualListModel;
+
+import br.com.sistemacomercial.enums.Opcao;
+import br.com.sistemacomercial.model.ObjetoOpcao;
+import br.com.sistemacomercial.model.ObjetoSistema;
+import br.com.sistemacomercial.service.CadastroObjetoSistemaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroObjetoSistemaBean extends BeanAbstrato<ObjetoSistema>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroObjetoSistemaService cadastroObjetoSistemaService;
+	private List<Opcao> fullList = new ArrayList<>();
+	private List<Opcao> fullTarget = new ArrayList<>();
+	private DualListModel<Opcao> model;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		fullTarget.clear();
+		fullList.clear();		
+		for (Opcao op : Opcao.values()) {
+			fullList.add(op);
+		}
+		if (getObjeto().getObjetoOpcoes().isEmpty() || getObjeto().getObjetoOpcoes().size() == 0) {
+			fullTarget = new ArrayList<Opcao>();			
+		} else {
+			for (ObjetoOpcao objetoOpcao : getObjeto().getObjetoOpcoes()) {
+				fullList.remove(objetoOpcao.getOpcao());
+				fullTarget.add(objetoOpcao.getOpcao());
+			}
+		}
+		model = new DualListModel<>(new ArrayList<>(fullList), new ArrayList<>(fullTarget));
+		System.out.println("teste");
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new ObjetoSistema());
+	}
+
+	@Override
+	public void salvar() {
+		getObjeto().getObjetoOpcoes().clear();
+		for (Opcao opcao : model.getTarget()) {
+			getObjeto().getObjetoOpcoes().add(new ObjetoOpcao(getObjeto(), opcao));
+		}
+		setObjeto(cadastroObjetoSistemaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Objeto do sistema salvo com sucesso!");
+	}
+
+	@Override
+	public void setObjeto(ObjetoSistema objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	public DualListModel<Opcao> getModel() {
+		return model;
+	}
+
+	public void setModel(DualListModel<Opcao> model) {
+		this.model = model;
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+}

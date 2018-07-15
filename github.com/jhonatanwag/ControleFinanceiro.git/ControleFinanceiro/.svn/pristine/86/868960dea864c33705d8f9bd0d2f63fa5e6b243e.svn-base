@@ -1,0 +1,108 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{lancFluxoCaixaBean.editando ? 'Edição do
+				lançamento em fluxo de caixa' : 'Novo lançamento em fluxo de caixa'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="lancFluxoCaixa"
+				value="#{lancFluxoCaixaBean.objeto}" />
+			<f:viewAction action="#{lancFluxoCaixaBean.inicializar}" />
+		</f:metadata>
+
+		<h:form id="formLancFluxo">
+			<h1>#{lancFluxoCaixaBean.editando ? 'Edição do lançamento em
+				fluxo de caixa' : 'Novo lançamento em fluxo de caixa'}</h1>
+
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:toolbar style="margin-top: 20px">
+				<p:toolbarGroup>
+					<p:button value="Novo" outcome="/lancFluxoCaixa/LancFluxoCaixa" />
+					<p:commandButton value="Salvar" id="botaoSalvar"
+						action="#{lancFluxoCaixaBean.confirmar}" update=":formLancFluxo" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:button value="Pesquisa"
+						outcome="/lancFluxoCaixa/PesquisaLancFluxoCaixa.xhtml" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:panelGrid columns="2" id="painel"
+				style="width: 100%; margin-top: 20px" columnClasses="rotulo, campo">
+
+				<p:outputLabel value="Tipo de despesas" for="tipoDespesa" />
+				<p:selectOneMenu id="tipoDespesa" required="true" filter="true"
+					filterMatchMode="startsWith"
+					value="#{lancFluxoCaixaBean.objeto.tipoDespesa}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems var="td" itemLabel="#{td.descricao}"
+						itemValue="#{td}" value="#{lancFluxoCaixaBean.todosTipoDespesas}"
+						itemDisabled="#{td.situacaoCadastro.toString() eq 'Inativo'}" />
+					<p:ajax update=":formLancFluxo:painelGroupPessoa" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Dinheiro" for="valEmDinheiro" />
+				<h:panelGroup>
+					<p:inputText id="valEmDinheiro" size="15" maxlength="10"
+						styleClass="moeda" style="text-align: right"
+						value="#{lancFluxoCaixaBean.objeto.valorDinheiro}">
+						<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+					</p:inputText>
+				</h:panelGroup>
+
+
+				<p:outputLabel value="Cheques:" for="valEmCheque" />
+				<h:panelGroup>
+					<p:inputText id="valEmCheque" size="15" maxlength="10"
+						styleClass="moeda" style="text-align: right"
+						value="#{lancFluxoCaixaBean.objeto.valorCheque}">
+						<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+					</p:inputText>
+					<p:commandButton value="Selecionar cheques" update="@none"
+						process="@this" action="#{selecaoChequesBean.abrirDialogo}"></p:commandButton>
+				</h:panelGroup>
+
+
+				<p:outputLabel value="Observação" for="observacao" />
+				<p:inputText id="observacao" size="60" maxlength="80"
+					value="#{lancFluxoCaixaBean.objeto.observacao}" required="true" />
+
+
+
+				<p:outputLabel value="Cód. Cliente" for="codCli" />
+				<h:panelGroup id="painelGroupPessoa">
+					<p:inputText id="codCli" size="6" maxlength="6"
+						required="#{lancFluxoCaixaBean.objeto.tipoDespesa.informaPessoa}"
+						onkeyup="onlyNumbers(this)" style="text-align: right"
+						value="#{lancFluxoCaixaBean.pessoaSelecionada.id}">
+
+						<p:ajax event="change" process="@this"
+							listener="#{lancFluxoCaixaBean.pessoaPorId()}"
+							update="codCli, cliente" />
+					</p:inputText>
+
+					<p:commandButton icon="ui-icon-search" process="@this"
+						disabled="#{!lancFluxoCaixaBean.objeto.tipoDespesa.informaPessoa}"
+						update="@none" action="#{pesquisaPessoaBean.abrirDialogo}">
+						<p:ajax event="dialogReturn"
+							listener="#{lancFluxoCaixaBean.pessoaSelecao}"
+							update="codCli, cliente" process="@this" />
+						<p:resetInput target="cliente, codCli" />
+					</p:commandButton>
+
+					<p:inputText id="cliente" size="100" maxlength="100"
+						disabled="true" value="#{lancFluxoCaixaBean.objeto.pessoa.nome}" />
+				</h:panelGroup>
+			</p:panelGrid>
+
+
+
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,9 @@
+package br.com.sistemacomercial.ws.retorno;
+
+public abstract interface WebServiceCall
+{
+  public abstract Object chamarWs(Integer paramInteger, Object... paramVarArgs);
+  
+  public abstract Object chamarWs(Object... paramVarArgs);
+}
+

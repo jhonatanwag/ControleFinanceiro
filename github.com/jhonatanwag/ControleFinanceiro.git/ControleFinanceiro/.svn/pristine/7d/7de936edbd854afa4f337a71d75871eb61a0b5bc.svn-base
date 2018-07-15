@@ -1,0 +1,303 @@
+package br.com.sistemacomercial.ws.retorno;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.KeyStore;
+import java.security.KeyStore.PasswordProtection;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class SystemProperties {
+	private static Properties props;
+	private static Map<String, Properties> propertiesByCompany;
+
+	private static Properties getProps() {
+		String workDir = System.getProperty("cnfe.home");
+		System.setProperty("javax.net.debug", "all");
+		System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+
+		Log log = LogFactory.getLog(SystemProperties.class);
+		log.info("Base dir = " + workDir);
+
+		String[] listOfProps = { "keystore", "lote", "database", "jobs", "wsdl" };
+
+		Properties allProps = new Properties();
+		for (int i = 0; i < listOfProps.length; i++) {
+			File file = new File(workDir, listOfProps[i] + ".properties");
+			try {
+				InputStream in = new FileInputStream(file);
+
+				Properties props = new Properties();
+				props.load(in);
+				allProps.putAll(props);
+			} catch (FileNotFoundException e) {
+				log.warn("Arquivo de propriedades nao encontrado.", e);
+			} catch (IOException e) {
+				log.warn("Erro na leitura de um arquivo de propriedades.", e);
+			}
+		}
+		String pwd = System.getProperty("cnfe.pwd");
+		if ((pwd != null) && (!"".equals(pwd))) {
+			certificatePassword = pwd;
+		}
+		return allProps;
+	}
+
+	public static boolean isOracle() {
+		String databaseName = get("db.driver.name", null);
+
+		return "oracle.jdbc.driver.OracleDriver".equalsIgnoreCase(databaseName);
+	}
+
+	public static boolean isMySQL() {
+		return (!isOracle()) && (!isDB2());
+	}
+
+	public static boolean isDB2() {
+		String databaseName = get("db.driver.name", null);
+		return databaseName.startsWith("com.ibm.db2");
+	}
+
+	public static String get(String name, String nfe) {
+		return get(name, nfe, null);
+	}
+
+	public static String get(String name, String nfe, String origem) {
+		Log log = LogFactory.getLog(SystemProperties.class);
+		if (name.equalsIgnoreCase("work.dir")) {
+			return System.getProperty("cnfe.home");
+		}
+		if (nfe == null) {
+			if (props == null) {
+				props = getProps();
+			}
+			String result = props.getProperty(name);
+			if (result == null) {
+				result = "";
+			}
+			return result;
+		}
+		if (propertiesByCompany == null) {
+			propertiesByCompany = loadCompanyProperties();
+		}
+		String nfeWithoutPrefix = nfe.replaceAll("NFe", "");
+
+		String cnpj = nfeWithoutPrefix.substring(6, 20);
+		String serieAsString = nfeWithoutPrefix.substring(22, 25);
+
+		int serie = 0;
+		try {
+			serie = Integer.parseInt(serieAsString);
+		} catch (NumberFormatException e) {
+			serie = 0;
+		}
+		String prefix = "";
+		if ((origem == null) && (serie >= 900) && (serie <= 999)) {
+			prefix = "scan.";
+		}
+		Properties properties = (Properties) propertiesByCompany.get(cnpj);
+		if (properties == null) {
+			log.warn("Sem propriedades para o CNPJ : " + cnpj + ". Utilizando padr��es.");
+			properties = (Properties) propertiesByCompany.get("default");
+		}
+		if (properties == null) {
+			return "";
+		}
+		String value = properties.getProperty(prefix + name);
+		if (value == null) {
+			value = properties.getProperty(name);
+		}
+		return value;
+	}
+
+	private static Map<String, Properties> loadCompanyProperties() {
+		String workDir = System.getProperty("cnfe.home");
+		File folder = new File(workDir);
+
+		Map<String, Properties> result = new HashMap();
+
+		File[] files = folder.listFiles();
+		for (File file : files) {
+			if ((!file.isDirectory()) && (file.getName().endsWith(".properties"))) {
+				try {
+					InputStream in = new FileInputStream(file);
+
+					Properties props = new Properties();
+					props.load(in);
+
+					String name = file.getName().replace(".properties", "");
+					if (name.equalsIgnoreCase("wsdl")) {
+						name = "default";
+					}
+					result.put(name, props);
+				} catch (FileNotFoundException e) {
+				} catch (IOException e) {
+				}
+			}
+		}
+		return result;
+	}
+
+	public static void set(String name, String value) {
+		get(name, null);
+
+		props.setProperty(name, value);
+
+		Properties props = new Properties();
+		props.setProperty(name, value);
+		try {
+			OutputStream out = new FileOutputStream(System.getProperty("cnfe.home") + "/lote.properties");
+			props.store(out, "");
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static String certificatePassword = "";
+	private static String keysAsString;
+
+	public static void setCertificatePassword(String s) {
+		Log log = LogFactory.getLog(SystemProperties.class);
+		try {
+			KeyStore ks = KeyStore.getInstance("JKS");
+			log.info("Setting password");
+
+			ks.load(getKeystorePath(), getKeystorePassword().toCharArray());
+
+			Enumeration<String> aliases = ks.aliases();
+			while (aliases.hasMoreElements()) {
+				String alias = (String) aliases.nextElement();
+				KeyStore.PrivateKeyEntry keyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(alias,
+						new KeyStore.PasswordProtection(s.toCharArray()));
+				keyEntry.getCertificate();
+			}
+		} catch (Exception e) {
+			log.info("Error %s happened.", e);
+
+			certificatePassword = null;
+			return;
+		}
+		certificatePassword = s;
+	}
+
+	private static InputStream getKeystorePath() throws FileNotFoundException {
+		return new FileInputStream(get("work.dir", null) + "/NF-e.jks");
+	}
+
+	public static String getCertificatePassword() {
+		return certificatePassword;
+	}
+
+	public static String getKeystorePassword() {
+		return "conector";
+	}
+
+	private static int keyCount = 0;
+
+	public static int getKeyCount() {
+		if (keyCount > 0) {
+			return keyCount;
+		}
+		keyCount = 6;
+		//keyCount = getKeysAsArray().length;
+		return keyCount;
+	}
+
+	public static String getQuestionMarks() {
+		String r = "";
+		for (int i = 0; i < getKeyCount(); i++) {
+			r = r + "?";
+			if (i != getKeyCount() - 1) {
+				r = r + ", ";
+			}
+		}
+		return r;
+	}
+
+	public static String getKeysAsString() {
+		if (keysAsString != null) {
+			return keysAsString;
+		}
+		keysAsString = get("db.keys", null);
+		if ((keysAsString == null) || (keysAsString.equals(""))) {
+			keysAsString = "CD_FIL, NR_FISC, SR_FISC, TP_ESPECIE";
+		}
+		return keysAsString;
+	}
+
+	public static String getKeysAsPrefixedString(String prefix) {
+		String[] keys = getKeysAsArray(prefix);
+
+		String result = "";
+		for (int i = 0; i < keys.length; i++) {
+			result = result + keys[i];
+			if (i != keys.length - 1) {
+				result = result + ", ";
+			}
+		}
+		return result;
+	}
+
+	public static String joinTables(String t1, String t2) {
+		String[] keysForTable1 = getKeysAsArray(t1);
+		String[] keysForTable2 = getKeysAsArray(t2);
+
+		int keyLength = keysForTable1.length;
+
+		String result = "";
+		for (int i = 0; i < keyLength; i++) {
+			result = result + String.format("%s = %s", new Object[] { keysForTable1[i], keysForTable2[i] });
+			if (i != keyLength - 1) {
+				result = result + " AND ";
+			}
+		}
+		return result;
+	}
+
+	public static String[] getKeysAsArray() {
+		return getKeysAsArray(null);
+	}
+
+	public static String[] getKeysAsArray(String prefix) {
+		String keyList = getKeysAsString();
+		if (prefix != null) {
+			prefix = prefix + ".";
+		} else {
+			prefix = "";
+		}
+		String[] keysAsArray = keyList.split(",");
+		for (int i = 0; i < keysAsArray.length; i++) {
+			keysAsArray[i] = (prefix + keysAsArray[i].trim());
+		}
+		return keysAsArray;
+	}
+
+	public static String joinTablesWithJoinStatement(String joinStatement, String t1, String p2, String t2) {
+		String[] keysForTable1 = getKeysAsArray(t1);
+		String[] keysForTable2 = getKeysAsArray(t2);
+
+		int keyLength = keysForTable1.length;
+
+		String result = String.format(" %s %s %s on ", new Object[] { joinStatement, p2, t2 });
+		for (int i = 0; i < keyLength; i++) {
+			result = result + String.format("%s = %s", new Object[] { keysForTable1[i], keysForTable2[i] });
+			if (i != keyLength - 1) {
+				result = result + " AND ";
+			}
+		}
+		return result;
+	}
+}

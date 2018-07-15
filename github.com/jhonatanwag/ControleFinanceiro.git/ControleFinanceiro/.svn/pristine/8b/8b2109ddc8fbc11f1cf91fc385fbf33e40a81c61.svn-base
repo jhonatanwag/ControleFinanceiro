@@ -1,0 +1,67 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.context.RequestContext;
+
+import br.com.sistemacomercial.model.Cheque;
+import br.com.sistemacomercial.repository.Cheques;
+import br.com.sistemacomercial.repository.filter.ChequeFilter;
+
+
+@Named
+@ViewScoped
+public class SelecaoChequesBean extends PesquisaBeanAbstrato<Cheque, ChequeFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Cheques cheques;
+	private List<Cheque> chequeSelecionados;
+
+	public SelecaoChequesBean() {
+		setFiltro(new ChequeFilter());
+	}
+
+	public void pesquisar() {
+		setObjetosFiltrados(cheques.filtrados(getFiltro()));
+	}
+
+	public void abrirDialogo() {
+		Map<String, Object> opcoes = new HashMap<>();
+		opcoes.put("modal", true);
+		opcoes.put("resizable", false);
+		opcoes.put("contentHeight", 550);
+		opcoes.put("contentWidth", 770);
+		RequestContext.getCurrentInstance().openDialog("/cheque/DlgPesquisaCheque.xhtml", opcoes, null);
+		// RequestContext.getCurrentInstance().openDialog("/webapp/pessoa/DlgPesquisaPessoa.xhtml",
+		// opcoes, null);
+		// RequestContext.getCurrentInstance().openDialog("/WEB-INF/template/cheque/DlgPesquisaCheque.xhtml",opcoes, null);
+	}
+
+	public void selecionar(Cheque cheque) {
+		RequestContext.getCurrentInstance().closeDialog(cheque);
+	}
+
+	public List<Cheque> getChequeSelecionados() {
+		return chequeSelecionados;
+	}
+
+	public void setChequeSelecionados(List<Cheque> chequeSelecionados) {
+		this.chequeSelecionados = chequeSelecionados;
+	}
+
+	@Override
+	public void excluir() {
+		// TODO Auto-generated method stub
+
+	}
+
+}

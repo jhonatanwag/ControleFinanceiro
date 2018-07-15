@@ -1,0 +1,195 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import br.com.sistemacomercial.enums.CstIpi;
+import br.com.sistemacomercial.enums.FormatoImpressao;
+import br.com.sistemacomercial.enums.SituacaoConferencia;
+
+@Entity
+@Table(name = "nf_entrada")
+public class NotaEntrada implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "nf_entrada_id")
+	private Long id;
+	@ManyToOne
+	@JoinColumn(name = "filial_id")
+	private Filial filial;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "sit_conferencia", nullable = false)
+	private SituacaoConferencia situacaoConferencia = SituacaoConferencia.NAO_CONFERIDO;
+	@ManyToOne
+	@JoinColumn(nullable = false, name = "mod_doc_fis_id")
+	private ModeloDocumentoFiscal modeloDocumentoFiscal;
+	@ManyToOne
+	@JoinColumn(nullable = true, name = "fornecedor_id")
+	private Fornecedor fornecedor;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_emissao", nullable = false)
+	private Date dataEmissao;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_entrada", nullable = false)
+	private Date dataEntrada = new Date();
+	@Column(name = "num_nf", nullable = false)
+	private Integer numeroNota;
+	@Column(name = "ser_nota", nullable = false, length = 4)
+	private String serieNota;
+	@Column(name = "sub_serie_nf", nullable = true, length = 3)
+	private String subSerieNota;
+	@Column(name = "chave_nfe_ent", nullable = true, length = 44)
+	private String chaveNfeEnt;
+	@Column(name = "chave_nfe_ent_ref", nullable = true, length = 44)
+	private String chavenfeentref;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "fmt_impressao")
+	private FormatoImpressao formatoImpressao = FormatoImpressao.PAISAGEM;
+
+	@OneToMany(mappedBy = "notaEntrada", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<NotaEntradaItem> notaEntradaItems = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+		
+	public Filial getFilial() {
+		return filial;
+	}
+
+	public void setFilial(Filial filial) {
+		this.filial = filial;
+	}
+
+	public SituacaoConferencia getSituacaoConferencia() {
+		return situacaoConferencia;
+	}
+
+	public void setSituacaoConferencia(SituacaoConferencia situacaoConferencia) {
+		this.situacaoConferencia = situacaoConferencia;
+	}
+
+	public ModeloDocumentoFiscal getModeloDocumentoFiscal() {
+		return modeloDocumentoFiscal;
+	}
+
+	public void setModeloDocumentoFiscal(ModeloDocumentoFiscal modeloDocumentoFiscal) {
+		this.modeloDocumentoFiscal = modeloDocumentoFiscal;
+	}
+
+	public Fornecedor getFornecedor() {
+		return fornecedor;
+	}
+
+	public void setFornecedor(Fornecedor fornecedor) {
+		this.fornecedor = fornecedor;
+	}
+
+	public Date getDataEmissao() {
+		return dataEmissao;
+	}
+
+	public void setDataEmissao(Date dataEmissao) {
+		this.dataEmissao = dataEmissao;
+	}
+
+	public Date getDataEntrada() {
+		return dataEntrada;
+	}
+
+	public void setDataEntrada(Date dataEntrada) {
+		this.dataEntrada = dataEntrada;
+	}
+
+	public Integer getNumeroNota() {
+		return numeroNota;
+	}
+
+	public void setNumeroNota(Integer numeroNota) {
+		this.numeroNota = numeroNota;
+	}
+
+	public String getSerieNota() {
+		return serieNota;
+	}
+
+	public void setSerieNota(String serieNota) {
+		this.serieNota = serieNota;
+	}
+
+	public String getSubSerieNota() {
+		return subSerieNota;
+	}
+
+	public void setSubSerieNota(String subSerieNota) {
+		this.subSerieNota = subSerieNota;
+	}
+
+	public String getChaveNfeEnt() {
+		return chaveNfeEnt;
+	}
+
+	public void setChaveNfeEnt(String chaveNfeEnt) {
+		this.chaveNfeEnt = chaveNfeEnt;
+	}
+
+	public String getChavenfeentref() {
+		return chavenfeentref;
+	}
+
+	public void setChavenfeentref(String chavenfeentref) {
+		this.chavenfeentref = chavenfeentref;
+	}
+
+	public FormatoImpressao getFormatoImpressao() {
+		return formatoImpressao;
+	}
+
+	public void setFormatoImpressao(FormatoImpressao formatoImpressao) {
+		this.formatoImpressao = formatoImpressao;
+	}
+
+	public List<NotaEntradaItem> getNotaEntradaItems() {
+		return notaEntradaItems;
+	}
+
+	public void setNotaEntradaItems(List<NotaEntradaItem> notaEntradaItems) {
+		this.notaEntradaItems = notaEntradaItems;
+	}
+
+	public boolean isNovo() {
+		return this.id == null;
+	}
+
+	public boolean isXmlRecebido() {
+		return true;
+	}
+
+	public boolean isValidadoSefaz() {
+		return true;
+	}
+
+}

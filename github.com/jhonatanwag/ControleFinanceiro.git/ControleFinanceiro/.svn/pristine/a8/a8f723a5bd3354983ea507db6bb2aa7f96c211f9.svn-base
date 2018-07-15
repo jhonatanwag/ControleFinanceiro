@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Estoque"
+		widgetVar="DlgProdutoEstoque" modal="true" dynamic="true"
+		resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDlgProdutoEstoque">
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid id="painelProdutoEstoque" columns="2" 	columnClasses="rotulo,campo">
+				<p:outputLabel value="Dep." for="dep" />
+				<p:selectOneMenu id="dep"
+					value="#{cadastroProdutoBean.produtoEstoqueSelecionado.deposito}"
+					required="true" filterMatchMode="startsWith" filter="true">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroProdutoBean.todosDepositos}"
+						var="dep" itemValue="#{dep}" itemLabel="#{dep.descricaoDeposito}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Saldo" for="saldo" />
+				<p:inputText id="saldo" size="10" maxlength="10" styleClass="moeda"
+					required="true"
+					value="#{cadastroProdutoBean.produtoEstoqueSelecionado.saldo}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+				<p:outputLabel value="Mínimo" for="min" />
+				<p:inputText id="min" size="10" maxlength="10" styleClass="moeda"
+					required="true"
+					value="#{cadastroProdutoBean.produtoEstoqueSelecionado.qtdMinimo}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+				<p:outputLabel value="Máximo" for="max" />
+				<p:inputText id="max" size="10" maxlength="10" styleClass="moeda"
+					required="true"
+					value="#{cadastroProdutoBean.produtoEstoqueSelecionado.qtdMaximo}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton id="bntConfirmarEstoque" value="Confirmar"
+					actionListener="#{cadastroProdutoBean.confirmarProdutoEstoque}"
+					update=":formDlgProdutoEstoque :form:tabViewPrincipal:tabelaEstoques"
+					oncomplete="if (!args.validationFailed) PF('DlgProdutoEstoque').hide();" />
+
+				<p:commandButton id="bntCancelarEstoque" value="Cancelar"
+					immediate="true" oncomplete="PF('DlgProdutoEstoque').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

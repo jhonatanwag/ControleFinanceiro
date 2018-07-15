@@ -1,0 +1,78 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+	<ui:define name="titulo">
+			#{cadastroModeloDctoFiscalBean.editando ? 'Edição do modelo' : 'Novo
+			modelo'}
+	</ui:define>
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="modelo"
+				value="#{cadastroModeloDctoFiscalBean.objeto}" />
+			<f:viewAction action="#{cadastroModeloDctoFiscalBean.inicializar}" />
+		</f:metadata>
+		<h:form>
+			<div class="ContainerIndent">
+				<p:panel>
+					<h1>
+						<div class="FontBold Fs18 hardblue">
+							#{cadastroModeloDctoFiscalBean.editando ? 'Edição do modelo' :
+							'Novo modelo'}</div>
+					</h1>
+					<p:messages autoUpdate="true" closable="true" />
+					
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup align="left">
+							<p:button value="#{msg['button.novo']}"
+								outcome="/modeloDctoFiscal/CadastroModeloDctoFiscal" />
+							<p:commandButton value="#{msg['button.salvar']}" id="botaoSalvar"
+								action="#{cadastroModeloDctoFiscalBean.salvar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="#{msg['button.pesquisar']}"
+								outcome="/modeloDctoFiscal/PesquisaModeloDctoFiscal" />
+						</p:toolbarGroup>
+					</p:toolbar>
+					
+					<p:panel style="border:none">
+						<p:panelGrid columns="2" id="painel"
+							style="width: 100%; margin-top: 20px"
+							columnClasses="rotulo, campo">
+
+							<p:outputLabel value="Código:" for="codigo" />
+							<p:inputText id="codigo" size="10"
+								value="#{cadastroModeloDctoFiscalBean.objeto.id}"
+								required="false" maxlength="10" readonly="true" />
+
+							<p:outputLabel value="Cód. Modelo" for="codigoModelo" />
+							<p:inputText id="codigoModelo" maxlength="2"
+								value="#{cadastroModeloDctoFiscalBean.objeto.codigoModelo}"
+								required="true" size="10" />
+
+							<p:outputLabel value="Descrição" for="descricao" />
+							<p:inputText id="descricao" maxlength="80"
+								class="uppercase campo90"
+								value="#{cadastroModeloDctoFiscalBean.objeto.descricao}"
+								required="true" converter="#{upperToCaseConverter}" />
+
+							<p:outputLabel value="Modelo" for="modelo" />
+							<p:inputText id="modelo" required="true" size="10"
+								value="#{cadastroModeloDctoFiscalBean.objeto.modelo}"
+								disabled="false" converter="#{upperToCaseConverter}"
+								class="uppercase" />
+
+							<p:outputLabel value="Exige série" for="exigeSerie" />
+							<p:selectBooleanCheckbox id="exigeSerie" required="true"
+								value="#{cadastroModeloDctoFiscalBean.objeto.exigeSerie}"
+								disabled="false" />
+
+						</p:panelGrid>
+					</p:panel>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

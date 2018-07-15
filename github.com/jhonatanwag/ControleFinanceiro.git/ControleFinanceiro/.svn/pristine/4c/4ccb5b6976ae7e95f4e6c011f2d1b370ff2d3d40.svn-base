@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:tabView id="tabViewPrincipal">
+		<p:tab id="tabPrincipal" title="Informações Principais">
+			<p:panelGrid columns="2" id="painel"
+				style="width: 100%; margin-top: 20px" columnClasses="rotulo, campo">
+
+
+				<p:outputLabel value="Código:" for="codigo" />
+				<p:inputText id="codigo" value="#{cadastroProdutoBean.objeto.id}"
+					required="false" size="13" maxlength="10" readonly="true" />
+
+
+				<p:outputLabel value="Data do cadastro" for="dataCadastro" />
+				<p:inputText id="dataCadastro" size="13"
+					value="#{cadastroProdutoBean.objeto.dataCadastro}" disabled="true">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</p:inputText>
+
+				<p:outputLabel value="Descricao" for="descricao" />
+				<p:inputText id="descricao" maxlength="255"
+					converter="#{upperToCaseConverter}" class="uppercase campo90"
+					value="#{cadastroProdutoBean.objeto.descricao}" required="true" />
+
+				<p:outputLabel value="Descricao Reduzida" for="descricaoReduzida" />
+				<p:inputText id="descricaoReduzida" maxlength="30"
+					converter="#{upperToCaseConverter}" class="uppercase campo90"
+					value="#{cadastroProdutoBean.objeto.descricaoReduzida}"
+					required="true" />
+
+				<p:outputLabel value="Marca" for="marca" />
+				<p:selectOneMenu id="marca"
+					value="#{cadastroProdutoBean.objeto.marca}" required="true">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroProdutoBean.todasMarcas}"
+						var="marca" itemValue="#{marca}" itemLabel="#{marca.descricao}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Código de barras" for="barra" />
+				<p:inputText id="barra" size="13" maxlength="13"
+					value="#{cadastroProdutoBean.objeto.ean13}" required="true" />
+
+				<p:outputLabel value="Grupo" for="grupo" />
+				<p:selectOneMenu id="grupo" value="#{cadastroProdutoBean.grupo}"
+					required="true">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroProdutoBean.todosGrupos}"
+						var="grupo" itemValue="#{grupo}" itemLabel="#{grupo.descricao}" />
+					<p:ajax listener="#{cadastroProdutoBean.carregarSubGrupos}"
+						update="subGrupo" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="SubGrupo" for="subGrupo" />
+				<p:selectOneMenu id="subGrupo" required="true"
+					value="#{cadastroProdutoBean.objeto.subGrupo}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroProdutoBean.subGrupos}"
+						var="subgrupo" itemValue="#{subgrupo}"
+						itemLabel="#{subgrupo.descricao}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Unidade Medida" for="unideMedida" />
+				<p:selectOneMenu id="unideMedida"
+					value="#{cadastroProdutoBean.objeto.unidadeMedida}" required="true">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroProdutoBean.todasUnidadeMedidas}"
+						var="unidadeMedida" itemValue="#{unidadeMedida}"
+						itemLabel="#{unidadeMedida.descricao}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Observações" for="obs" />
+				<p:inputText id="obs" maxlength="255"
+					converter="#{upperToCaseConverter}" class="uppercase campo90"
+					value="#{cadastroProdutoBean.objeto.observacao}" required="false" />
+			</p:panelGrid>
+
+		</p:tab>
+
+		<ui:include src="/WEB-INF/template/produto/TabEstoque.xhtml" />
+
+		<ui:include src="/WEB-INF/template/produto/TabPreco.xhtml" />
+
+	</p:tabView>
+
+</ui:composition>

@@ -1,0 +1,43 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Danilo
+ */
+public enum SituacaoInventario {
+
+    CRIADO("Criado"),
+    CANCELADO("Cancelado"),
+    EM_ANDAMENTO("Em andamento"),    
+    FINALIZADO("Finalizado");
+    private String value;
+
+    private SituacaoInventario(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static SituacaoInventario getSituacaoDocumento(Integer value) {
+        switch (value) {
+            case 0:
+                return CRIADO;
+            case 1:
+                return CANCELADO;
+            case 2:
+                return EM_ANDAMENTO;
+            case 3:
+                return FINALIZADO;                
+            default:
+                return CRIADO;
+        }
+    }
+}

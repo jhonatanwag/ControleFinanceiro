@@ -1,0 +1,85 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Estoque;
+import br.com.sistemacomercial.model.ItemVenda;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.ProdutoOpcional;
+import br.com.sistemacomercial.model.ProdutoPreco;
+import br.com.sistemacomercial.model.ProdutoSabor;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroProdutoService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Produtos produtos;
+
+	@Transactional
+	public Produto salvar(Produto pro) {
+		Produto produtoExiste = produtos.porNomeUnico(pro.getDescricao(), pro.getId());
+
+		if (produtoExiste != null && !produtoExiste.equals(pro)) {
+			throw new NegocioException("Já existe um produto com o mesmo nome cadastrado.");
+		}
+
+		produtoExiste = produtos.porEAN(pro.getEan13(), pro.getId());
+		if (produtoExiste != null && !produtoExiste.equals(pro)) {
+			throw new NegocioException("Já existe um produto com o mesmo código EAN cadastrado.");
+		}
+		
+		if(pro.getProdutoEstoques().size() == 0){
+			throw new NegocioException("Informe pelo menos 1 estoque/depósito para o produto!");
+		}
+		
+		if(pro.getProdutoPrecos().size() == 0){
+			throw new NegocioException("Informe pelo menos 1 preço para o produto!");
+		}
+
+		return produtos.salvar(pro);
+	}
+	
+	public void excluirProdutoEstoque(Estoque Estoque) {
+		if (!produtos.validaExclusaoProdutoEstoque(Estoque)) {
+			throw new NegocioException("Estoque não pode ser excluído.");
+		}
+
+	}
+
+	public void excluirProdutoPreco(ProdutoPreco produtoPrecoSelecionado) {
+		if (!produtos.validaExclusaoProdutoPreco(produtoPrecoSelecionado)) {
+			throw new NegocioException("Preço não pode ser excluído.");
+		}
+
+	}
+
+	public void excluirProdutoOpcional(ProdutoOpcional produtoOpcional) {
+		if (!produtos.validaExclusaoProdutoOpcional(produtoOpcional)) {
+			throw new NegocioException("Opcional não pode ser excluído.");
+		}
+
+	}
+
+	public void excluirProdutoSabor(ProdutoSabor produtoSabor) {
+		if (!produtos.validaExclusaoProdutoSabor(produtoSabor)) {
+			throw new NegocioException("Sabor não pode ser excluído.");
+		}
+
+	}
+	
+	public void baixarEstoque(List<ItemVenda> itensVenda) {
+		for(ItemVenda item : itensVenda){
+			Produto produto = produtos.porId(item.getId());	
+		}
+		
+		
+	}
+
+}

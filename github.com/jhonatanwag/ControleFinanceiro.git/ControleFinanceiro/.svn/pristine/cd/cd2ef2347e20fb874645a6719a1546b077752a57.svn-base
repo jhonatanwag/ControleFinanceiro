@@ -1,0 +1,47 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Sabor;
+import br.com.sistemacomercial.service.CadastroSaborService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroSaborBean extends BeanAbstrato<Sabor>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroSaborService cadastroSaborService;
+
+	@Override
+	public void inicializar() {
+			if(this.getObjeto() == null){
+				limpar();
+			}
+		
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Sabor());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroSaborService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Sabor salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+}

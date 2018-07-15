@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.service.CadastroUnidadeMedidaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroUnidadeMedidaBean extends BeanAbstrato<UnidadeMedida>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroUnidadeMedidaService cadastroUnidadeMedidaService;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new UnidadeMedida());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroUnidadeMedidaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Unidade de medida salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+}

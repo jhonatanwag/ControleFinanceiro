@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab id="tabEmails" title="Email"
+		style="width:50%, text-align:center;">
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo"
+					oncomplete="PF('DlgEmail').show()" process="@this"
+					action="#{cadastroPessoaBean.novoEmail()}"
+					update=":formDialogEmail" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable id="dataTableEmails" rows="10" paginatorPosition="bottom"
+			value="#{cadastroPessoaBean.objeto.emails}"
+			var="email" paginator="true"
+			style="text-align:center, width: 50%;"
+			emptyMessage="#{msg['msg.nenhum.registro.encontrado']}" reflow="true">
+
+			<p:column id="tipoEndereco" headerText="Tipo"
+				sortBy="#{email.tipoEmail.toString()}">
+				<h:outputText value="#{email.tipoEmail.toString()}" />
+			</p:column>
+			<p:column id="sequenciaEndereco" headerText="Seq."
+				 sortBy="#{email.sequencia}">
+				<h:outputText value="#{email.sequencia}" />
+			</p:column>
+			<p:column id="email" headerText="Email" sortBy="#{email.endereco}">
+				<h:outputText value="#{email.endereco}" />
+			</p:column>
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-pencil"
+					oncomplete="PF('DlgEmail').show();" process="@this"
+					action="#{cadastroPessoaBean.alterarEmail()}"
+					update=":formDialogEmail:painelEmail"
+					title="#{msg['label.editar']} #{email.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroPessoaBean.emailSelecionado}" value="#{email}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationEmail').show()" process="@this"
+					title="#{msg['label.excluir']} #{email.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroPessoaBean.emailSelecionado}" value="#{email}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogEmail" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationEmail">
+
+			<p:commandButton value="#{msg['confirma.sim']}"
+				update=":formCadastroPessoa:tabViewPrincipal:tabView:dataTableEmails"
+				oncomplete="PF('confirmationEmail').hide();" immediate="true"
+				actionListener="#{cadastroPessoaBean.excluirEmail()}">
+			</p:commandButton>
+			<p:commandButton value="#{msg['confirma.nao']}"
+				onclick="PF('confirmationEmail').hide();" ajax="false" />
+
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

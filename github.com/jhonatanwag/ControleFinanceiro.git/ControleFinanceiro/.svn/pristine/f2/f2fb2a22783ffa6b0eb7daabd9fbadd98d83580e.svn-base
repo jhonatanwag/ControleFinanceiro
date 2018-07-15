@@ -1,0 +1,66 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ * 
+ * @author Jhonatan
+ */
+@Entity	
+@Table(name = "tipo_corte_cabelo")
+public class TipoCorteCabelo implements Serializable {
+	private static final long serialVersionUID = 1L;
+	@Id	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "tipo_corte_cabelo_id")
+	private Long id;
+	@Column(name = "descricao", nullable = false)
+	private String descricao;
+	@Column(name="minutos", nullable = false)
+	private Integer minutos;
+	@Column(name = "valor", nullable = false)
+	private BigDecimal valor; 
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+	
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public Integer getMinutos() {
+		return minutos;
+	}
+
+	public void setMinutos(Integer minutos) {
+		this.minutos = minutos;
+	}
+
+	public BigDecimal getValor() {
+		return valor;
+	}
+
+	public void setValor(BigDecimal valor) {
+		this.valor = valor;
+	}
+	
+
+}

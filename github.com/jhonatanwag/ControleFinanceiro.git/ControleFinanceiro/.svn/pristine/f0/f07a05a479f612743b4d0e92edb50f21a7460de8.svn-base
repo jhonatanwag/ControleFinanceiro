@@ -1,0 +1,50 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Agencia;
+import br.com.sistemacomercial.model.Banco;
+import br.com.sistemacomercial.model.Email;
+import br.com.sistemacomercial.model.Enderecos;
+import br.com.sistemacomercial.model.InformacoesBancaria;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.Telefone;
+import br.com.sistemacomercial.repository.Bancos;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroBancoService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Bancos bancos;
+
+	@Transactional
+	public Banco salvar(Banco banco) {
+		Banco bancoExiste = bancos.porNomeUnico(banco.getNomeBanco());
+
+		if (bancoExiste != null && !bancoExiste.equals(banco)) {
+			throw new NegocioException("Já existe uma banco cadastrado com o mesmo nome.");
+		}
+		
+		bancoExiste = bancos.porCodCompensacaoUnico(banco.getCodigoCompensacao());
+		
+		if (bancoExiste != null && !bancoExiste.equals(banco)) {
+			throw new NegocioException("Já existe um banco cadastrado com o mesmo código");
+		}
+		
+		return bancos.salvar(banco);
+	}
+
+	@Transactional
+	public void excluirAgencia(Agencia agencia) {
+		if (!bancos.validaExclusaoAgencia(agencia)) {
+			throw new NegocioException("Agência não pode ser excluída.");
+		}
+	}
+
+
+}

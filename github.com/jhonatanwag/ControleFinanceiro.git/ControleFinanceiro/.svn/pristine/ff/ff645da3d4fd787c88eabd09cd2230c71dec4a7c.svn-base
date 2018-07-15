@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab id="tabTelefoness" title="Telefone"
+		style="width:50%, text-align:center;">
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo"
+					oncomplete="PF('DlgTelefone').show()" process="@this"
+					action="#{cadastroPessoaBean.novoTelefone()}"
+					update=":formDlgTelefone" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable id="dataTableTelefones" rows="10"
+			paginatorPosition="bottom"
+			value="#{cadastroPessoaBean.objeto.telefones}" var="telefone"
+			paginator="true" style="text-align:center, width: 50%;"
+			emptyMessage="#{msg['msg.nenhum.registro.encontrado']}" reflow="true">
+
+			<p:column headerText="Tipo" 
+				sortBy="#{telefone.tipoTelefone.toString()}">
+				<h:outputText value="#{telefone.tipoTelefone.toString()}" />
+			</p:column>
+			<p:column headerText="Seq." 
+				sortBy="#{telefone.sequencia}">
+				<h:outputText value="#{telefone.sequencia}" />
+			</p:column>
+			<p:column headerText="Número" sortBy="#{telefone.numero}">
+				<h:outputText value="#{telefone.numero}" />
+			</p:column>
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-pencil"
+					oncomplete="PF('DlgTelefone').show();" process="@this"
+					action="#{cadastroPessoaBean.alterarTelefone()}"
+					update=":formDlgTelefone:painelTelefone"
+					title="#{msg['label.editar']} #{telefone.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroPessoaBean.telefoneSelecionado}"
+						value="#{telefone}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationTelefone').show()" process="@this"
+					title="#{msg['label.excluir']} #{telefone.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroPessoaBean.telefoneSelecionado}"
+						value="#{telefone}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogTelefone" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationTelefone">
+			<p:commandButton value="#{msg['confirma.sim']}"
+				update=":formCadastroPessoa:tabViewPrincipal:tabView:dataTableTelefones"
+				oncomplete="PF('confirmationTelefone').hide();" immediate="true"
+				actionListener="#{cadastroPessoaBean.excluirTelefone()}">
+			</p:commandButton>
+			<p:commandButton value="#{msg['confirma.nao']}"
+				onclick="PF('confirmationTelefone').hide();" ajax="false" />
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

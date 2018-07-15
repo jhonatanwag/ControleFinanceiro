@@ -1,0 +1,130 @@
+package br.com.sistemacomercial.util;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import br.com.sistemacomercial.exception.DB1EdigException;
+
+public final class FileUtil
+{
+  private static final int UM_MEGA_BYTE = 1024;
+  
+  public static String lerArquivoTexto(URL url)
+  {
+    return lerArquivoTexto(new File(url.getPath()));
+  }
+  
+  public static String lerArquivoTexto(File arquivo)
+  {
+    ByteArrayOutputStream texto = new ByteArrayOutputStream();
+    try
+    {
+      FileInputStream input = new FileInputStream(arquivo);
+      try
+      {
+        byte[] array = new byte[32767];
+        int tamanho = 0;
+        while ((tamanho = input.read(array)) > 0) {
+          texto.write(array, 0, tamanho);
+        }
+      }
+      finally
+      {
+        input.close();
+      }
+    }
+    catch (IOException e)
+    {
+      throw new DB1EdigException("Erro ao tentar ler o arquivo " + arquivo, e);
+    }
+    return texto.toString();
+  }
+  
+  public static void escreverArquivo(String nomeArquivo, byte[] bytes)
+  {
+    try
+    {
+      FileOutputStream out = new FileOutputStream(nomeArquivo);
+      out.write(bytes);
+      out.close();
+    }
+    catch (Exception e)
+    {
+      throw new DB1EdigException("Erro ao tentar escrever o arquivo " + nomeArquivo, e);
+    }
+  }
+  
+  public static void criaDiretorio(String path)
+  {
+    if (!new File(path).isDirectory()) {
+      new File(path).mkdir();
+    }
+  }
+  
+  public static void apagarArquivo(String caminhoArquivo)
+  {
+    File arquivoApagar = new File(caminhoArquivo);
+    if (arquivoApagar.exists()) {
+      arquivoApagar.delete();
+    }
+  }
+  
+  public static void apagarArquivosDiretorio(String paramCaminhoDiretorio, String paramExtensaoArquivo)
+  {
+    File[] arquivosDiretorio = getListFilesFromDiretorio(paramCaminhoDiretorio, paramExtensaoArquivo);
+    for (int i = 0; i < arquivosDiretorio.length; i++) {
+      if (arquivosDiretorio[i] != null) {
+        apagarArquivo(arquivosDiretorio[i].getAbsolutePath());
+      }
+    }
+  }
+  
+  public static File[] getListFilesFromDiretorio(String paramCaminhoDiretorio, String paramExtensaoArquivo)
+  {
+    File[] listFilesFromDiretorio = new File(paramCaminhoDiretorio).listFiles();
+    String extensao = "." + paramExtensaoArquivo.toLowerCase();
+    File[] listFilesRetorno = new File[listFilesFromDiretorio.length];
+    for (int i = 0; i < listFilesFromDiretorio.length; i++) {
+      if ((listFilesFromDiretorio[i].exists()) && (listFilesFromDiretorio[i].getName().toLowerCase().endsWith(extensao))) {
+        listFilesRetorno[i] = listFilesFromDiretorio[i];
+      }
+    }
+    return listFilesRetorno;
+  }
+  
+  public static void addArquivoAoZip(String caminhoArquivo, String nomeArquivo, ZipOutputStream zipOut)
+    throws IOException
+  {
+    FileInputStream in = new FileInputStream(caminhoArquivo);
+    zipOut.putNextEntry(new ZipEntry(nomeArquivo));
+    byte[] buffer = new byte[1024];
+    
+    int tamBuffer = 0;
+    while ((tamBuffer = in.read(buffer)) > 0) {
+      zipOut.write(buffer, 0, tamBuffer);
+    }
+    zipOut.closeEntry();
+    in.close();
+  }
+  
+  public static boolean isValideFile(String paramPath)
+  {
+    if (!StringUtil.isVazia(paramPath))
+    {
+      File file = new File(paramPath);
+      if (!file.isAbsolute())
+      {
+        String edigHome = Propriedades.getInstancia().asString("edig.home");
+        file = new File(edigHome.concat(File.separator).concat(paramPath));
+      }
+      return file.isFile();
+    }
+    return false;
+  }
+}

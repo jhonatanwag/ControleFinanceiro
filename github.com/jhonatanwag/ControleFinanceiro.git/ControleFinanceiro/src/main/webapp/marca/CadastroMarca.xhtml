@@ -1,0 +1,55 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroMarcaBean.editando ? 'Edição da marca' : 'Nova marca'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="marca" value="#{cadastroMarcaBean.objeto}" />
+			<f:viewAction action="#{cadastroMarcaBean.inicializar}" />
+		</f:metadata>
+
+		<h:form>
+			<div class="ContainerIndent">
+				<p:panel>
+					<h1>
+						<div class="FontBold Fs18 hardblue">#{cadastroMarcaBean.editando
+							? 'Edição da marca' : 'Nova marca'}</div>
+					</h1>
+
+					<p:messages autoUpdate="true" closable="true" />
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:button value="Novo" outcome="/marca/CadastroMarca" />
+							<p:commandButton value="Salvar" id="botaoSalvar"
+								action="#{cadastroMarcaBean.salvar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Pesquisa" outcome="/marca/PesquisaMarca" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:panelGrid columns="2" id="painel"
+						style="width: 100%; margin-top: 20px"
+						columnClasses="rotulo, campo">
+
+						<p:outputLabel value="Código:" for="codigo" />
+						<p:inputText id="codigo" value="#{cadastroMarcaBean.objeto.id}"
+							required="false" size="10" maxlength="10" readonly="true" />
+
+						<p:outputLabel value="Descrição" for="descricao" />
+						<p:inputText id="descricao" class="uppercase campo90"
+							converter="#{upperToCaseConverter}" maxlength="80"
+							value="#{cadastroMarcaBean.objeto.descricao}" required="true" />
+
+					</p:panelGrid>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,42 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import br.com.sistemacomercial.model.Deposito;
+import br.com.sistemacomercial.repository.Depositos;
+
+@FacesConverter(forClass = Deposito.class)
+public class DepositoConverter implements Converter {
+
+	@Inject
+	private Depositos depositos;
+
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		Deposito retorno = null;
+
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = depositos.porId(id);
+		}
+
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value != null) {
+			Deposito deposito = (Deposito) value;
+			return deposito.getId() == null ? null : deposito.getId().toString();
+		}
+
+		return "";
+	}
+
+}

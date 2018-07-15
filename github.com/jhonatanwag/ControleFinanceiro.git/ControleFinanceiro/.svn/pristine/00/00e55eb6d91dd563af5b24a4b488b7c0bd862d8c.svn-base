@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Incluir Cheque" widgetVar="DlgIncluirCheque" modal="true"
+		dynamic="true" responsive="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formIncluirCheque">
+			<p:messages id="messagesInclurCheque" closable="true"
+				autoUpdate="true" />
+
+			<p:panelGrid rendered="true" columns="2" cellpadding="5"
+				layout="grid" styleClass="ui-panelgrid-blank"
+				style="border:0px none; background-color:transparent;">
+
+				<p:commandButton id="bntConfirmarIncluirCheque" value="Confirmar"
+					update=":formIncluirCheque :formGerenciadorCheque:dataTableItem"
+					oncomplete="if (!args.validationFailed) PF('DlgAlterarStatus').hide();" />
+
+				<p:commandButton id="bntCancelarIncluirCheque" value="Cancelar"
+					immediate="true" oncomplete="PF('DlgIncluirCheque').hide();" />
+			</p:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Opcionais/Observações" widgetVar="DlgOpcionais" modal="true"
+		responsive="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+	
+		<h:form id="formDialogOpcionais">
+
+			<p:panel header="#{vendaBeanTouch.produtoSelecionado.descricao}"
+				style="text-align:center" />
+
+			<p:dataGrid var="prod"
+				value="#{vendaBeanTouch.produtoSelecionado.produtoOpcionais}"
+				columns="3" layout="grid" rows="12" id="item" reflow="true">
+
+				<p:panel style="text-align:center">
+					<h:panelGrid columns="1" style="width:100%">
+
+						<h:outputText value="#{prod.produtoOpcional.descricao}" />
+						<h:outputText value="#{prod.preco}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+						<p:selectBooleanCheckbox value="#{prod.selecionado}"
+							style="font-size: 15px"></p:selectBooleanCheckbox>
+
+					</h:panelGrid>
+				</p:panel>
+
+			</p:dataGrid>
+
+
+ 			<p:dataTable id="dataTableItem" resizableColumns="true" 
+				value="#{vendaBeanTouch.produtoSelecionado.produtoOpcionais}"
+				var="item" reflow="true"
+				selection="#{vendaBeanTouch.opcionaisSelecionados}"
+				rowKey="#{item.id}" scrollable="true" scrollHeight="150"
+				style="margin-top: 10px">
+
+				<f:facet name="header">
+                 Meus Opcionais
+                </f:facet>
+
+				<p:column id="dcto" headerText="Descr." style="text-align: left;">
+					<h:outputText value="#{item.produtoOpcional.descricao}" />
+				</p:column>
+
+				<p:column id="valor" headerText="Valor" style="text-align: right;">
+					<h:outputText value="#{item.preco}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column footerText="" />
+						<p:column footerText="" />
+						<p:column style="text-align:right" footerText="Totais:" />
+
+						<p:column footerText="" />
+						<p:column footerText="" />
+						<p:column footerText="" />
+						<p:column footerText="" />
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{vendaBeanTouch.incluirItemComOpcioanais()}"
+					update=":formVendaGourmet"
+					oncomplete="if (!args.validationFailed) PF('DlgOpcionais').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar"
+				    action="#{vendaBeanTouch.cancelarOpcional()}"
+					oncomplete="PF('DlgOpcionais').hide();" />
+			</h:panelGrid>
+
+
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

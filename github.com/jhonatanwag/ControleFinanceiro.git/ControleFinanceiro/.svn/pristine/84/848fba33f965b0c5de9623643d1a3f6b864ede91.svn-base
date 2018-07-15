@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<p:tab title="Filial">
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo" process="@this"
+					oncomplete="PF('DlgFilial').show()"
+					action="#{cadastroEmpresaBean.novaFilial()}"
+					update=":formDialogFilial" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable value="#{cadastroEmpresaBean.objeto.filiais}"
+			var="filial" rowIndexVar="linha" id="tabelaFilial" reflow="true"
+			emptyMessage="Nenhuma filial encontrada">
+			<p:column id="filialId" headerText="Código" sortBy="#{filial.id}">
+				<h:outputText value="#{filial.id}">
+				</h:outputText>
+			</p:column>
+
+			<p:column id="pessoa" headerText="Pessoa filial"
+				sortBy="#{filial.pessoa.nome}">
+				<h:outputText value="#{filial.pessoa.nome}" />
+			</p:column>
+
+			<p:column id="caixaFilial" headerText="Fecha caixa por filial"
+				sortBy="#{filial.fechaCaixaTerminal}">
+				<h:selectBooleanCheckbox value="#{filial.fechaCaixaTerminal}"
+					disabled="true" />
+			</p:column>
+
+			<p:column id="sede" headerText="Sede" sortBy="#{filial.sede}">
+				<h:selectBooleanCheckbox value="#{filial.sede}" disabled="true" />
+			</p:column>
+
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-pencil"
+					action="#{cadastroEmpresaBean.alterarFilial()}"
+					oncomplete="PF('DlgFilial').show();" process="@this"
+					update=":formDialogFilial"
+					title="#{msg['label.editar']} #{filial.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroEmpresaBean.filialSelecionada}"
+						value="#{filial}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationFilial').show()" process="@this"
+					title="#{msg['label.excluir']} #{filial.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroEmpresaBean.filialSelecionada}"
+						value="#{filial}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogFilial" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationFilial">
+			<p:commandButton id="confirm" value="#{msg['confirma.sim']}"
+				update=":form:tabView:tabelaFilial"
+				oncomplete="PF('confirmationFilial').hide();" immediate="true"
+				actionListener="#{cadastroEmpresaBean.excluirFilial()}" />
+
+			<p:commandButton id="decline" value="#{msg['confirma.nao']}"
+				onclick="PF('confirmationFilial').hide();" ajax="false" />
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

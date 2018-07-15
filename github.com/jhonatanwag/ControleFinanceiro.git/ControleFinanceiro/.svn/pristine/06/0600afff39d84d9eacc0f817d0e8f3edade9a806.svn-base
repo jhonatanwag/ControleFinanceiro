@@ -1,0 +1,32 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Usuario;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroUsuarioService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Pessoas pessoas;
+
+	@Transactional
+	public Usuario salvar(Usuario usuario) {
+		Usuario usuarioExiste = pessoas.porLoginUsuarioUnico(usuario.getLogin(), usuario.getId());
+
+		if (usuarioExiste != null && !usuarioExiste.equals(usuario)) {
+			throw new NegocioException("Já existe um usuário com o mesmo login cadastrado.");
+		}
+		
+		if (usuario.getUsuarioFiliais().size() == 0) {
+			throw new NegocioException("Defina pelo menos uma filial de acesso para o usuário");
+		}
+		return pessoas.salvar(usuario);
+	}
+
+}

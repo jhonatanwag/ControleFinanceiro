@@ -1,0 +1,43 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.filter.VendaFilter;
+
+public class Vendas extends RepositoryAbstrato<Venda> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Vendas() {
+		super(Venda.class);
+	}
+
+	@Override
+	public Venda salvar(Venda objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Venda> filtrados(VendaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Venda.class);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (filtro.getDataVendaDe() != null && filtro.getDataVendaAte() != null) {
+			criteria.add(Restrictions.between("dataVenda", filtro.getDataVendaDe(), filtro.getDataVendaAte()));
+		}
+		return criteria.addOrder(Order.asc("dataVenda")).list();
+	}
+
+}

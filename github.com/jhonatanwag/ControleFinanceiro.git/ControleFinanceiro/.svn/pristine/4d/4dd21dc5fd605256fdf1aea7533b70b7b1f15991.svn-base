@@ -1,0 +1,225 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.sistemacomercial.enums.SituacaoDocumento;
+import br.com.sistemacomercial.util.DataUtils;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name = "parcela_titulo")
+public class ParcelaTitulo implements Serializable, Comparable<ParcelaTitulo> {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "titulo_id")
+	private Titulo titulo;
+	@Column(name = "num_parcela", nullable = false)
+	private Integer numeroParcela;
+	@Column(name = "data_vecimento", nullable = false)
+	@Temporal(TemporalType.DATE)
+	private Date dataVencimento;
+	@Column(name = "valor_titulo", nullable = false)
+	private BigDecimal valorTitulo = BigDecimal.ZERO;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_pgto")
+	private Date dataPagamento;
+	@Column(name = "valor_desconto")
+	private BigDecimal valorDesconto = BigDecimal.ZERO;
+	@Column(name = "valor_juro")
+	private BigDecimal valorJuro = BigDecimal.ZERO;
+	@Column(name = "valor_recebido")
+	private BigDecimal valorRecebido = BigDecimal.ZERO;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "sit_titulo")
+	private SituacaoDocumento situacaoTitulo = SituacaoDocumento.NORMAL;
+	@Column(length = 200, name = "obs")
+	private String observacoes;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne
+	@JoinColumn(name = "receb_id", nullable = true)
+	private Recebimento recebimento;
+	@Transient
+	private Boolean selecionado = Boolean.FALSE;
+
+	public ParcelaTitulo() {
+	}
+
+	public ParcelaTitulo(Titulo titulo, Integer numeroParcela, Date dataVencimento, BigDecimal valorTitulo) {
+		this.titulo = titulo;
+		this.numeroParcela = numeroParcela;
+		this.dataVencimento = dataVencimento;
+		this.valorTitulo = valorTitulo;
+	}
+
+	public ParcelaTitulo(Integer numeroParcela, Date dataVencimento, BigDecimal valorTitulo) {
+		this.numeroParcela = numeroParcela;
+		this.dataVencimento = dataVencimento;
+		this.valorTitulo = valorTitulo;
+	}
+
+	public ParcelaTitulo(Titulo titulo) {
+		this.titulo = titulo;
+	}
+
+	public Titulo getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(Titulo titulo) {
+		this.titulo = titulo;
+	}
+
+	public Date getDataPagamento() {
+		return dataPagamento;
+	}
+
+	public void setDataPagamento(Date dataPagamento) {
+		this.dataPagamento = dataPagamento;
+	}
+
+	public Date getDataVencimento() {
+		return dataVencimento;
+	}
+
+	public void setDataVencimento(Date dataVencimento) {
+		this.dataVencimento = dataVencimento;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getNumeroParcela() {
+		return numeroParcela;
+	}
+
+	public void setNumeroParcela(Integer numeroParcela) {
+		this.numeroParcela = numeroParcela;
+	}
+
+	public String getObservacoes() {
+		return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+		this.observacoes = observacoes;
+	}
+
+	public Boolean getSelecionado() {
+		return selecionado;
+	}
+
+	public void setSelecionado(Boolean selecionado) {
+		this.selecionado = selecionado;
+	}
+
+	public SituacaoDocumento getSituacaoTitulo() {
+		return situacaoTitulo;
+	}
+
+	public void setSituacaoTitulo(SituacaoDocumento situacaoTitulo) {
+		this.situacaoTitulo = situacaoTitulo;
+	}
+
+	public BigDecimal getValorDesconto() {
+		return valorDesconto;
+	}
+
+	public void setValorDesconto(BigDecimal valorDesconto) {
+		this.valorDesconto = valorDesconto;
+	}
+
+	public BigDecimal getValorJuro() {
+		return valorJuro;
+	}
+
+	public void setValorJuro(BigDecimal valorJuro) {
+		this.valorJuro = valorJuro;
+	}
+
+	public BigDecimal getValorRecebido() {
+		return valorRecebido;
+	}
+
+	public void setValorRecebido(BigDecimal valorRecebido) {
+		this.valorRecebido = valorRecebido;
+	}
+
+	public BigDecimal getValorTitulo() {
+		return valorTitulo;
+	}
+
+	public void setValorTitulo(BigDecimal valorTitulo) {
+		this.valorTitulo = valorTitulo;
+	}
+
+	public Recebimento getRecebimento() {
+		return recebimento;
+	}
+
+	public void setRecebimento(Recebimento recebimento) {
+		this.recebimento = recebimento;
+	}
+
+	/**
+	 * 
+	 * @return Número do documento da venda ou nota de entrada
+	 */
+	public String getNumeroDocumento() {
+//		if (this.getTitulo().getVenda() != null) {
+//			return this.getTitulo().getVenda().getId().toString();
+//		}
+
+		return null;
+	}
+
+	/**
+	 * 
+	 * @return true se a parcela estiver vencida!
+	 */
+	public Boolean getParcelaVencida() {
+		if (this.dataVencimento.before(new Date())) {
+			return true;
+		}
+		return false;
+	}
+
+	public Integer getDiasParaVencimento() {
+		return DataUtils.diferencaEntreDatas(new Date(), this.dataVencimento);
+	}
+
+	@Override
+	public int compareTo(ParcelaTitulo o) {
+		return this.getDataVencimento().compareTo(o.getDataVencimento());
+	}
+}

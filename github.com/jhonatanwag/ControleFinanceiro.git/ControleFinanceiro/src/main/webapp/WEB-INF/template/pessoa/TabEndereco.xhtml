@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab id="tabEnderecos" title="Endereços"
+		style="width:50%, text-align:center;">
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo" oncomplete="PF('DlgEndereco').show()"
+					process="@this" action="#{cadastroPessoaBean.novoEndereco()}"
+					update=":formDlgEndereco" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable id="dataTableEnderecos" rows="10"
+			paginatorPosition="bottom"
+			value="#{cadastroPessoaBean.objeto.enderecos}" var="endereco"
+			paginator="true" style="text-align:center, width: 50%;"
+			emptyMessage="#{msg['msg.nenhum.registro.encontrado']}" reflow="true">
+
+			<p:column id="tipoEndereco" headerText="Tipo"
+				sortBy="#{endereco.tipoEndereco.toString()}">
+				<h:outputText value="#{endereco.tipoEndereco.toString()}" />
+			</p:column>
+			<p:column id="sequenciaEndereco" headerText="Seq."
+				sortBy="#{endereco.sequencia}">
+				<h:outputText value="#{endereco.sequencia}" />
+			</p:column>
+			<p:column id="padrao" headerText="Padrão" sortBy="#{endereco.padrao}">
+				<h:selectBooleanCheckbox value="#{endereco.padrao}" disabled="true" />
+			</p:column>
+			<p:column id="endereco" headerText="Endereço."
+				sortBy="#{endereco.endereco.enderecoCompleto}">
+				<h:outputText value="#{endereco.endereco.enderecoCompleto}" />
+			</p:column>
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-pencil"
+					oncomplete="PF('DlgEndereco').show();" process="@this"
+					action="#{cadastroPessoaBean.alterarEndereco()}"
+					update=":formDlgEndereco:painelEndereco"
+					title="#{msg['label.editar']} #{endereco.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroPessoaBean.enderecoSelecionado}"
+						value="#{endereco}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationEndereco').show()" process="@this"
+					title="#{msg['label.excluir']} #{endereco.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroPessoaBean.enderecoSelecionado}"
+						value="#{endereco}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogEndereco" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationEndereco">
+			<p:commandButton value="#{msg['confirma.sim']}"
+				update=":formCadastroPessoa:tabViewPrincipal:tabView:dataTableEnderecos"
+				oncomplete="PF('confirmationEndereco').hide();" immediate="true"
+				actionListener="#{cadastroPessoaBean.excluirEndereco()}">
+			</p:commandButton>
+			<p:commandButton value="#{msg['confirma.nao']}"
+				onclick="PF('confirmationEndereco').hide();" ajax="false" />
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

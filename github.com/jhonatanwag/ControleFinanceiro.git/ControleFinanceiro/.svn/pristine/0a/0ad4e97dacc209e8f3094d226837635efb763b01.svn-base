@@ -1,0 +1,45 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.Terminais;
+
+@FacesConverter(forClass = Terminal.class)
+public class TerminalConverter implements Converter {
+
+	@Inject
+	private Terminais terminais;
+
+//	public TerminalConverter() {
+//		terminais = CDIServiceLocator.getBean(Terminais.class);
+//	}
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		Terminal retorno = null;
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = terminais.porId(id);
+		}
+
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value != null) {
+			Terminal terminal = (Terminal) value;
+			return terminal.getId() == null ? null : terminal.getId().toString();
+		}
+
+		return "";
+	}
+
+}

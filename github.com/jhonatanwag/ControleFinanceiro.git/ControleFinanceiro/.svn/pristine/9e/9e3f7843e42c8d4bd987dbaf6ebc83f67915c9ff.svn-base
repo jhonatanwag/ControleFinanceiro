@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Estado;
+import br.com.sistemacomercial.repository.Estados;
+import br.com.sistemacomercial.repository.filter.EstadoFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaEstadoBean extends PesquisaBeanAbstrato<Estado, EstadoFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Estados estados;
+
+	public PesquisaEstadoBean() {
+		setFiltro(new EstadoFilter());
+	}
+
+	@Override
+	public void excluir() {
+		estados.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Estado " + getObjetoSelecionado().getNome() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(estados.filtrados(getFiltro()));
+	}
+
+}

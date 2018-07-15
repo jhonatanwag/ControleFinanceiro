@@ -1,0 +1,200 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Produto/Serviço" widgetVar="DlgItem" modal="true" responsive="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDlgItemEntrada">
+			<p:focus />
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid columns="6" style="margin-top: 10px">
+				<p:outputLabel value="Cód/Barras" for="item" />
+				<p:inputText id="item" size="10" maxlength="13"
+					value="#{notaEntradaBean.produtoSelecionado.id}" required="true" />
+
+				<p:commandButton icon="ui-icon-search" process="@this"
+					update="@none" action="#{pesquisaProdutoBean.abrirDialog}">
+					<p:ajax event="dialogReturn"
+						listener="#{notaEntradaBean.produtoSelecao}"
+						update="item, descricao" process="@this" />
+					<p:resetInput target="descricao" />
+				</p:commandButton>
+
+				<p:inputText id="descricao" size="100" maxlength="100"
+					disabled="true"
+					value="#{notaEntradaBean.produtoSelecionado.descricao}" />
+
+				<p:outputLabel value="Unidade de Medida" for="unidadeMedida" />
+				<p:selectOneMenu id="unidadeMedida" required="true" filter="true"
+					filterMatchMode="startsWith"
+					value="#{notaEntradaBean.notaEntradaItem.unidadeMedida}">
+					<f:selectItems var="un" itemLabel="#{un.descricao}"
+						itemValue="#{un}" value="#{notaEntradaBean.unidadeMedidas}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Qtd." for="qtd" />
+				<p:inputText id="qtd" size="4" maxlength="4"
+					value="#{notaEntradaBean.quantidade}">
+					<p:ajax process="@this" />
+				</p:inputText>
+
+
+				<p:outputLabel value="#{msg['label.preco']}" for="valUnitario" />
+				<p:inputText id="valUnitario" size="10" maxlength="10"
+					styleClass="moeda" required="true"
+					value="#{notaEntradaBean.notaEntradaItem.valorUnitario}">
+					<f:convertNumber maxFractionDigits="8" minFractionDigits="2" />
+				</p:inputText>
+
+				<p:outputLabel value="#{msg['label.preco']}" for="valTotal" />
+				<p:inputText id="valTotal" size="10" maxlength="10" required="false"
+					value="#{notaEntradaBean.notaEntradaItem.valorUnitario}"
+					styleClass="moeda">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+			</p:panelGrid>
+
+			<p:tabView style="margin-top: 5px;">
+				<p:tab title="Calculo dos Impostos" tyle="margin-top: 5px;">
+					<p:panelGrid styleClass="painelTotaisNota" columns="12">
+						<p:outputLabel value="Base Cal. ICMS" for="baseCalculoIcsmItem" />
+						<p:inputText id="baseCalculoIcsmItem" size="10" maxlength="10"
+							required="false" styleClass="moeda" />
+
+						<p:outputLabel value="CST ICMS" for="cstIcmsItem" />
+						<p:selectOneMenu id="cstIcmsItem" required="false"  style="width: 200px;"
+							value="#{notaEntradaBean.notaEntradaItem.cstIcms}">
+							<f:selectItems value="#{notaEntradaBean.cstIcmses}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="Aliq. ICMS" for="aliqIcsmItem" />
+						<p:inputText id="aliqIcsmItem" size="10" maxlength="10"
+							required="false" />
+						<p:outputLabel value="Valor ICMS" for="valorIcsmItem" />
+						<p:inputText id="valorIcsmItem" size="10" maxlength="10"
+							required="false" styleClass="moeda" />
+
+						<p:outputLabel value="Valor Isenta ICMS" for="isentaIcmsItem" />
+						<p:inputText id="isentaIcmsItem" size="10" maxlength="10"
+							required="false" styleClass="moeda" />
+
+						<p:outputLabel value="Outras ICMS" for="outrasIcmsItem" />
+						<p:inputText id="outrasIcmsItem" size="10" maxlength="10"
+							required="false" styleClass="moeda" />
+
+						<p:outputLabel value="Base Cal. IPI" for="baseCalculoIpiItem" />
+						<p:inputText id="baseCalculoIpiItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="CST IPI" for="cstIpiItem" />
+						<p:selectOneMenu id="cstIpiItem" required="false" style="width: 200px;"
+							value="#{notaEntradaBean.notaEntradaItem.cstIpi}">
+							<f:selectItems value="#{notaEntradaBean.cstIpis}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="Aliq. Ipi" for="aliqIpiItem" />
+						<p:inputText id="aliqIpiItem" size="10" maxlength="10"
+							required="false" />
+						<p:outputLabel value="Valor Ipi" for="valorIpiItem" />
+						<p:inputText id="valorIpiItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Isenta Ipi" for="isentaIpiItem" />
+						<p:inputText id="isentaIpiItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Outras Ipi" for="outrasIpiItem" />
+						<p:inputText id="outrasIpiItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Base Cal. ISS" for="baseCalculoIssItem" />
+						<p:inputText id="baseCalculoIssItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="CST ISS" for="cstIssItem" />
+						<p:inputText id="cstIssItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Aliq. ISS" for="aliqIssItem" />
+						<p:inputText id="aliqIssItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor ISS" for="valorIssItem" />
+						<p:inputText id="valorIssItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Isenta ISS" for="isentaIssItem" />
+						<p:inputText id="isentaIssItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Outras ISS" for="outrasIssItem" />
+						<p:inputText id="outrasIssItem" size="10" maxlength="10"
+							required="false" />
+
+
+						<p:outputLabel value="Base Cal. Sub. Trib."
+							for="baseCalcSubTribItem" />
+						<p:inputText id="baseCalcSubTribItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Aliq. Sub. Trib." for="aliqSubTribItem" />
+						<p:inputText id="aliqSubTribItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Sub. Trib." for="valorSubTribItem" />
+						<p:inputText id="valorSubTribItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Isenta Sub. Trib."
+							for="isentaSubTribItem" />
+						<p:inputText id="isentaSubTribItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Outras Sub. Trib. " for="outrasSubTribItem" />
+						<p:inputText id="outrasSubTribItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Desconto" for="valorDescontoItem" />
+						<p:inputText id="valorDescontoItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Despesas" for="valorDespesaItem" />
+						<p:inputText id="valorDespesaItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Frete" for="valorFreteItem" />
+						<p:inputText id="valorFreteItem" size="10" maxlength="10"
+							required="false" />
+
+						<p:outputLabel value="Valor Seguro" for="valorSeguroItem" />
+						<p:inputText id="valorSeguroItem" size="10" maxlength="10"
+							required="false" />
+
+
+					</p:panelGrid>
+
+				</p:tab>
+
+				<p:tab title="Estoque">
+				</p:tab>
+			</p:tabView>
+
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton id="bntConfirmarItem" value="Confirmar"
+					actionListener="#{notaEntradaBean.confirmarNovoItem()}"
+					update=":formDlgItemEntrada, :form:tabViewPrincipal:tabViewItem:dataTableItem"
+					oncomplete="if (!args.validationFailed) PF('DlgItem').hide();" />
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgItem').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,63 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "rede")
+public class Rede implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue
+	@Column(name = "rede_id")
+	private Long id;
+	@Column(name = "cod_rede", nullable = false, length=10)
+	private String codigoRede;
+	@Column(length = 60, nullable = false, name="nome_rede")
+	private String nomeRede;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "rede", orphanRemoval = true)
+	private List<Administradora> administradoras = new ArrayList<>();
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getCodigoRede() {
+		return codigoRede;
+	}
+	public void setCodigoRede(String codigoRede) {
+		this.codigoRede = codigoRede;
+	}
+	public String getNomeRede() {
+		return nomeRede;
+	}
+	public void setNomeRede(String nomeRede) {
+		this.nomeRede = nomeRede;
+	}
+	public List<Administradora> getAdministradoras() {
+		return administradoras;
+	}
+	public void setAdministradoras(List<Administradora> administradoras) {
+		this.administradoras = administradoras;
+	}
+	
+	
+	//http://www2.linx.com.br/Intranet/portal/html/009092.html
+	//http://www2.linx.com.br/Intranet/portal/html/095010.html
+}

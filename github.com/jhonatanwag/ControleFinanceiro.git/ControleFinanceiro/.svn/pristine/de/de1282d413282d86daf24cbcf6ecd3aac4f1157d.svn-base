@@ -1,0 +1,147 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity(name="usuario_filial")
+public class UsuarioFilial implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue()
+	@Column(name = "usu_filial_id")
+	private Long id;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "usuario_id")
+	private Usuario usuario;
+	@Fetch(FetchMode.JOIN)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "filial_id")
+	private Filial filial;	
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name="situacao_cadastro")
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+	private Boolean padrao = Boolean.FALSE;
+	@Version
+	private Long versao;
+
+	public UsuarioFilial() {
+	}
+	
+	
+
+
+	public UsuarioFilial(Usuario usuario, Filial filial, Boolean padrao) {
+		super();
+		this.usuario = usuario;
+		this.filial = filial;
+		this.padrao = padrao;
+	}
+
+
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+	public Filial getFilial() {
+		return filial;
+	}
+
+	public void setFilial(Filial filial) {
+		this.filial = filial;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+
+	public Boolean getPadrao() {
+		return padrao;
+	}
+
+	public void setPadrao(Boolean padrao) {
+		this.padrao = padrao;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UsuarioFilial other = (UsuarioFilial) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	
+
+}

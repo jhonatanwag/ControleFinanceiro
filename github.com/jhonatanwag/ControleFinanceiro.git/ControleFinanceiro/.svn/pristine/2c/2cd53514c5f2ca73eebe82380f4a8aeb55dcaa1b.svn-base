@@ -1,0 +1,47 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Etnia;
+import br.com.sistemacomercial.service.CadastroEtniaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroEtniaBean extends BeanAbstrato<Etnia> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroEtniaService cadastroEtniaService;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Etnia());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroEtniaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Etnia salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+}

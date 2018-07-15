@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.ModeloDocumentoFiscal;
+import br.com.sistemacomercial.repository.ModeloDocumentoFiscais;
+import br.com.sistemacomercial.repository.filter.ModeloDocumentoFiscalFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaModeloDctoFiscalBean extends PesquisaBeanAbstrato<ModeloDocumentoFiscal, ModeloDocumentoFiscalFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private ModeloDocumentoFiscais modelos;
+
+	public PesquisaModeloDctoFiscalBean() {
+		setFiltro(new ModeloDocumentoFiscalFilter());
+	}
+	
+	@Override
+	public void excluir() {
+		modelos.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Modelo de documento fiscal " + getObjetoSelecionado().getDescricao() + " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(modelos.filtrados(getFiltro()));
+	}
+
+}

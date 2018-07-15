@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Estornar venda"
+		widgetVar="DlgEstornarVenda" modal="true" dynamic="true"
+		resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogEstornarVenda">
+			<p:messages id="messagesEstornarVenda" closable="true"
+				autoUpdate="true" />
+			<div align="center">
+				<p:panelGrid columns="2"
+					columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+					layout="grid" styleClass="ui-panelgrid-blank"
+					style="border:0px none; background-color:transparent;">
+					
+				</p:panelGrid>
+			</div>
+
+			<p:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Estornar venda" actionListener="#{gerenciadorVendaBean.estornarVenda()}" process="@this"				
+					oncomplete="if (!args.validationFailed) PF('DlgEstornarVenda').hide();" update=":formEstornoVenda"/>
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					icon="icon-cancel" oncomplete="PF('DlgEstornarVenda').hide();" />
+			</p:panelGrid>
+
+
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,43 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Douglas
+ */
+public enum TipoTelefone {
+
+    TELEFONERESIDENCIAL("Telefone Residencial"),
+    TELEFONECOMERCIAL("Telefone Comercial"),
+    CELULAR("Celular"),
+    GRATUITO("Gratuito");
+    private String value;
+
+    private TipoTelefone(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static TipoTelefone getTipoTelefone(Integer value) {
+        switch (value) {
+            case 0:
+                return TELEFONERESIDENCIAL;
+            case 1:
+                return TELEFONECOMERCIAL;
+            case 2:
+                return CELULAR;
+            case 3:
+                return GRATUITO;
+            default:
+                return TELEFONERESIDENCIAL;
+        }
+    }
+}

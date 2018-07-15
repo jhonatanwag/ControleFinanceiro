@@ -1,0 +1,42 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
+import br.com.sistemacomercial.model.NotaEntrada;
+import br.com.sistemacomercial.repository.NotaEntradas;
+
+@FacesConverter(forClass = NotaEntrada.class)
+public class NotaEntradaConverter implements Converter {
+
+	@Inject
+	private NotaEntradas notaEntradas;
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		NotaEntrada retorno = null;
+
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = notaEntradas.porId(id);
+		}
+
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object notaEntrada) {
+		if (notaEntrada != null) {
+			NotaEntrada nfEntrada = (NotaEntrada) notaEntrada;
+			return nfEntrada.getId() == null ? null : nfEntrada.getId().toString();
+		}
+
+		return "";
+	}
+
+}

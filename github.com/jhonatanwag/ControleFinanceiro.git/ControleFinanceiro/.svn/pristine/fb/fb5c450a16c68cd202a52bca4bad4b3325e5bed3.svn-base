@@ -1,0 +1,105 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name = "modelo_doc_fiscal")
+public class ModeloDocumentoFiscal implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "mod_doc_fis_id")
+	private Long id;
+	@Column(name = "codigo_modelo", length = 2, nullable = false, unique = true)
+	private String codigoModelo;
+	@Column(length = 255, unique = true)
+	private String descricao;
+	@Column(length = 4, nullable = false)
+	private String modelo;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name="situacao_cadastro")
+	private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+	@Column(name = "exige_serie", nullable = false)
+	private Boolean exigeSerie = Boolean.FALSE;
+	@Version
+	private Long versao;
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+
+	public String getCodigoModelo() {
+		return codigoModelo;
+	}
+
+	public void setCodigoModelo(String codigoModelo) {
+		this.codigoModelo = codigoModelo;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getModelo() {
+		return modelo;
+	}
+
+	public void setModelo(String modelo) {
+		this.modelo = modelo;
+	}
+
+	public SituacaoCadastro getSituacaoCadastro() {
+		return situacaoCadastro;
+	}
+
+	public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+		this.situacaoCadastro = situacaoCadastro;
+	}
+
+	public Boolean getExigeSerie() {
+		return exigeSerie;
+	}
+
+	public void setExigeSerie(Boolean exigeSerie) {
+		this.exigeSerie = exigeSerie;
+	}
+
+	public String getDescricaoCompletaModelo() {
+		return this.codigoModelo + " - " + this.descricao;
+	}
+	
+	
+}

@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Confirmação do recebimento"
+		widgetVar="DlgConfirmarRecebimento" modal="true" dynamic="true"
+		resizable="true" toggleSpeed="500" appendTo="@(boby)">
+
+		<div class="ContainerIndent ui-fluid">
+			<div class="ContainerIndent">
+
+				<h:form id="formDlgConfirmarRecebimento">
+
+
+					<p:panelGrid id="painelValores" columns="2"
+						style="margin-top: 10px; border:0px none; background-color:transparent;"
+						columnClasses="ui-grid-col-10,ui-grid-col-10" layout="grid"
+						styleClass="ui-panelgrid-blank">
+						<p:outputLabel value="[S]SubTotal" for="valTotSel" />
+						<p:inputText id="valTotSel" size="15" maxlength="10"
+							readonly="true" styleClass="moeda" disabled="true"
+							style="text-align: right"
+							value="#{recebimentoBean.valorTotalSelecionado}">
+							<f:convertNumber type="currency" />
+						</p:inputText>
+
+						<p:outputLabel value="[+]Juros" for="valTotJurosRec" />
+						<p:inputText id="valTotJurosRec" size="15" maxlength="10"
+							readonly="true" styleClass="moeda" disabled="true"
+							style="text-align: right"
+							value="#{recebimentoBean.valorTotalJuros}">
+							<f:convertNumber type="currency" />
+						</p:inputText>
+
+						<p:outputLabel value="[-]Descontos" for="valTotDescRec" />
+						<p:inputText id="valTotDescRec" size="15" maxlength="10"
+							readonly="true" styleClass="moeda" disabled="true"
+							style="text-align: right"
+							value="#{recebimentoBean.valorTotalDescontos}">
+							<f:convertNumber type="currency" />
+						</p:inputText>
+
+						<p:outputLabel value="[=]Total" for="total" />
+						<p:inputText id="total"
+							value="#{recebimentoBean.valorTotalSelecionado}" size="15"
+							disabled="true" styleClass="moeda" style="text-align: right">
+							<f:convertNumber type="currency" />
+						</p:inputText>
+
+					</p:panelGrid>
+
+
+					
+						<p:panelGrid id="painelDivisao" columns="2"
+							style="margin-top: 10px; border:0px none; background-color:transparent;"
+							columnClasses="ui-grid-col-10,ui-grid-col-10" layout="grid"
+							styleClass="ui-panelgrid-blank">
+
+							<p:outputLabel value="Dinheiro" for="valEmDinheiro" />
+
+							<p:inputText id="valEmDinheiro" size="15" maxlength="10"
+								styleClass="moeda" style="text-align: right"
+								value="#{recebimentoBean.valorEmDinheiro}">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+							
+
+
+							<p:outputLabel value="Cartão" for="valEmCheque" />
+
+							<p:inputText id="valEmCheque" size="15" maxlength="10"
+								styleClass="moeda" style="text-align: right"
+								value="#{recebimentoBean.valorEmCartao}">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+
+							
+
+							<p:outputLabel value="Cheque" for="valEmCartao" />
+
+							<p:inputText id="valEmCartao" size="15" maxlength="10"
+								styleClass="moeda" style="text-align: right"
+								value="#{recebimentoBean.valorEmCheque}">
+								<f:convertNumber type="currency" />
+							</p:inputText>
+
+
+						</p:panelGrid>
+				
+
+					<h:panelGrid rendered="true" columns="3" cellpadding="5"
+						style="margin: 0 auto;">
+
+						<p:commandButton value="Confirmar" immediate="true"
+							styleClass="botaoConfirmar"
+							action="#{recebimentoBean.confirmarRecebimento}"
+							update=":formRecebimento"
+							oncomplete="PF('DlgConfirmarRecebimento').hide();">
+						</p:commandButton>
+						<p:commandButton value="Cancelar" immediate="true"
+							oncomplete="PF('DlgConfirmarRecebimento').hide();">
+						</p:commandButton>
+					</h:panelGrid>
+
+					<ui:include
+						src="/WEB-INF/template/recebimento/DlgRecebimentoCheque.xhtml" />
+				</h:form>
+			</div>
+		</div>
+	</p:dialog>
+</ui:composition>

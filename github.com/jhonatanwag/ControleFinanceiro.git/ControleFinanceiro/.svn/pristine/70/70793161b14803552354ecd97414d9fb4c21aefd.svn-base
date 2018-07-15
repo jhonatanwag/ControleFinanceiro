@@ -1,0 +1,74 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "arquivo")
+public class Arquivo implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "arquivo_id")
+	private Long id;
+	@Column(name = "extensao", nullable = false)
+	private String extensao;
+	@Column(name = "nome_arquivo", nullable = false)
+	private String nomeArquivo;
+	@Column(name = "caminho", nullable = false)
+	private String caminho;
+		
+	public Arquivo() {
+		super();
+	}
+
+	public Arquivo(String extensao, String nomeArquivo, String caminho) {
+		super();		
+		this.extensao = extensao;
+		this.nomeArquivo = nomeArquivo;
+		this.caminho = caminho;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getExtensao() {
+		return extensao;
+	}
+
+	public void setExtensao(String extensao) {
+		this.extensao = extensao;
+	}
+
+	public String getNomeArquivo() {
+		return nomeArquivo;
+	}
+
+	public void setNomeArquivo(String nomeArquivo) {
+		this.nomeArquivo = nomeArquivo;
+	}
+
+	public String getCaminho() {
+		return caminho;
+	}
+
+	public void setCaminho(String caminho) {
+		this.caminho = caminho;
+	}
+
+}

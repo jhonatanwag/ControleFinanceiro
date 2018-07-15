@@ -1,0 +1,78 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import br.com.sistemacomercial.enums.TipoTitulo;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+@Entity
+@Table(name = "titulo")
+public class Titulo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "titulo_id")
+	private Long id;	
+	@Enumerated(EnumType.ORDINAL)
+	private TipoTitulo tipoTitulo;
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "titulo", fetch = FetchType.LAZY)
+	private List<ParcelaTitulo> parcelasTitulos = new ArrayList<ParcelaTitulo>();
+	@OneToOne(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "titulo", orphanRemoval = true)
+	private Venda venda;
+
+	public Titulo() {
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+
+	public TipoTitulo getTipoTitulo() {
+		return tipoTitulo;
+	}
+
+	public void setTipoTitulo(TipoTitulo tipoTitulo) {
+		this.tipoTitulo = tipoTitulo;
+	}
+
+	public Venda getVenda() {
+		return venda;
+	}
+
+	public void setVenda(Venda venda) {
+		this.venda = venda;
+	}
+
+	public List<ParcelaTitulo> getParcelasTitulos() {
+		return parcelasTitulos;
+	}
+
+	public void setParcelasTitulos(List<ParcelaTitulo> parcelasTitulos) {
+		this.parcelasTitulos = parcelasTitulos;
+	}
+}

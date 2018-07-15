@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Informação bancária"
+		widgetVar="DlgInfBancaria" modal="true" dynamic="true"
+		resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogInfBancaria">
+			<p:messages id="messagesInfBancaria" closable="true"
+				autoUpdate="true" />
+			<p:panelGrid id="painelInfBancaria" columns="2"
+				columnClasses="rotulo,campo">
+				<p:outputLabel value="Banco/Agência:" />
+				<p:selectOneMenu label="Banco/Agência" required="true" filter="true"
+					filterMatchMode="startsWith"
+					value="#{cadastroPessoaBean.informacoesBancariaSelecionada.agencia}">
+					<f:selectItems id="agencias" var="ag"
+						itemLabel="#{ag.nomeBancoAgencia}" itemValue="#{ag}"
+						value="#{cadastroPessoaBean.todasAgencias}" />
+				</p:selectOneMenu>
+
+
+				<p:outputLabel value="Nº. Conta" for="nrConta" />
+				<p:inputText id="nrConta" required="true"
+					value="#{cadastroPessoaBean.informacoesBancariaSelecionada.nrConta}"
+					disabled="false" />
+
+
+				<p:outputLabel value="Operação" for="operacao" />
+				<p:inputText id="operacao"
+					value="#{cadastroPessoaBean.informacoesBancariaSelecionada.operacao}"
+					disabled="false" />
+
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton value="Confirmar"
+					actionListener="#{cadastroPessoaBean.confirmarInfBancaria()}"
+					update=":formDialogInfBancaria, :formCadastroPessoa:tabViewPrincipal:dataTableInfBancarias"
+					oncomplete="if (!args.validationFailed) PF('DlgInfBancaria').hide();" />
+
+				<p:commandButton value="Cancelar" immediate="true"
+					oncomplete="PF('DlgInfBancaria').hide();" />
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,56 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Fale conosco!" widgetVar="DlgFaleConosco"
+		modal="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDlgFaleConosco">
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid id="painelFaleConosco" columns="2">
+
+				<p:outputLabel value="Selecione um email:" for="email" />
+				<p:selectOneMenu id="email" required="true"
+					value="#{faleConoscoBean.email}">
+					<f:selectItems var="em" itemLabel="#{em.endereco}"
+						itemValue="#{em}" value="#{faleConoscoBean.emails}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Assunto:" for="assunto" />
+				<p:inputText
+					value="#{faleConoscoBean.assunto}"
+					onkeyup="this.value = this.value.toUpperCase();" id="assunto"
+					required="true" size="37" maxlength="37" />
+
+				<p:outputLabel value="Mensagem:" for="msg" />
+				<p:panelGrid columns="1" layout="grid"
+					styleClass="ui-panelgrid-blank"
+					style="border:0px none; background-color:transparent;">
+					<p:inputTextarea required="true"
+						value="#{faleConoscoBean.mensagem}" id="msg" rows="5" cols="35"
+						counter="display" maxlength="500"
+						counterTemplate="{0} caracteres restantes" autoResize="false" />
+
+					<h:outputText id="display" />
+				</p:panelGrid>
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{faleConoscoBean.enviarEmail()}"
+					update=":formDlgFaleConosco"
+					oncomplete="if (!args.validationFailed) PF('DlgFaleConosco').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgFaleConosco').hide();" />
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+</ui:composition>

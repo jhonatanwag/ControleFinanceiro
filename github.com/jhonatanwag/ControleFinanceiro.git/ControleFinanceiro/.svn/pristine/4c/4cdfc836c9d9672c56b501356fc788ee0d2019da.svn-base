@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Preços" widgetVar="DlgProdutoPreco" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<p:panelGrid id="painelProdutoPreco" columns="2">
+			<p:outputLabel style="text-align:right" for="dataInicio"
+				value="#{msg['label.datainicio']}" />
+			<p:inputText id="dataInicio" readonly="true"
+				value="#{cadastroProdutoBean.produtoPrecoSelecionado.dataIni}"
+				required="true">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</p:inputText>
+
+			<p:outputLabel value="#{msg['label.preco']}" for="preco" />
+			<p:inputText id="preco" size="10" maxlength="10" styleClass="moeda"
+				required="true"
+				value="#{cadastroProdutoBean.produtoPrecoSelecionado.preco}">
+				<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+			</p:inputText>
+
+			<p:outputLabel for="dataFim" style="text-align:right"
+				value="#{msg['label.datafim']}" />
+			<p:calendar id="dataFim"
+				value="#{cadastroProdutoBean.produtoPrecoSelecionado.dataFim}"
+				required="false">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</p:calendar>
+
+		</p:panelGrid>
+
+		<h:panelGrid rendered="true" columns="3" cellpadding="5"
+			style="margin: 0 auto;">
+			<p:commandButton id="bntConfirmar" value="Confirmar"
+				actionListener="#{cadastroProdutoBean.confirmarProdutoPreco}"
+				update="painelProdutoPreco, :form:tabViewPrincipal:tabelaPrecos"
+				oncomplete="if (!args.validationFailed) PF('DlgProdutoPreco').hide();" />
+
+			<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+				oncomplete="PF('DlgProdutoPreco').hide();">
+			</p:commandButton>
+		</h:panelGrid>
+	</p:dialog>
+</ui:composition>

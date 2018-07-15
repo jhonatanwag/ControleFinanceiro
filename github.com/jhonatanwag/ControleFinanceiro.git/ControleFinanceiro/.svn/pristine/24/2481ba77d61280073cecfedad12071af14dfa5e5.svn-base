@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Telefone" widgetVar="DlgTelefone"
+		modal="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDlgTelefone">
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid id="painelTelefone" columns="2"
+				columnClasses="rotulo,campo">
+
+				<p:outputLabel value="Tipo de Telefone" for="tipoTelefone" />
+				<p:selectOneMenu id="tipoTelefone" required="true" class="campo80"
+					value="#{cadastroPessoaBean.telefoneSelecionado.tipoTelefone}"
+					filter="true" filterMatchMode="startsWith">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroPessoaBean.tipoTelefones}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Número" for="numero" />
+				<p:inputText
+					value="#{cadastroPessoaBean.telefoneSelecionado.numero}"
+					id="numero" required="true" maxlength="20" class="campo90" />
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmarTelefone" value="Confirmar"
+					actionListener="#{cadastroPessoaBean.confirmarTelefone()}"
+					update="painelTelefone, :formCadastroPessoa:tabViewPrincipal:tabView:dataTableTelefones"
+					oncomplete="if (!args.validationFailed) PF('DlgTelefone').hide();" />
+
+				<p:commandButton id="bntCancelarTelefone" value="Cancelar"
+					immediate="true" oncomplete="PF('DlgTelefone').hide();" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

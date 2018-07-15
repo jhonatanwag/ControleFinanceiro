@@ -1,0 +1,91 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.model.DualListModel;
+
+import br.com.sistemacomercial.enums.Opcao;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.model.ObjetoOpcao;
+import br.com.sistemacomercial.model.Usuario;
+import br.com.sistemacomercial.model.UsuarioFilial;
+import br.com.sistemacomercial.repository.Empresas;
+import br.com.sistemacomercial.service.CadastroUsuarioService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroUsuarioBean extends BeanAbstrato<Usuario> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroUsuarioService cadastroUsuarioService;
+	@Inject
+	private Empresas empresas;	
+	private List<Filial> fullList = new ArrayList<>();
+	private List<Filial> fullTarget = new ArrayList<>();
+	private DualListModel<Filial> model;
+	private List<Filial> filiais;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		fullTarget.clear();
+		fullList.clear();
+		filiais = empresas.todasFiliais();
+		for (Filial op : filiais) {
+			fullList.add(op);
+		}
+		if (getObjeto().getUsuarioFiliais().isEmpty() || getObjeto().getUsuarioFiliais().size() == 0) {
+			fullTarget = new ArrayList<Filial>();
+		} else {
+			for (UsuarioFilial filial : getObjeto().getUsuarioFiliais()) {
+				fullList.remove(filial.getFilial());
+				fullTarget.add(filial.getFilial());
+			}
+		}
+		model = new DualListModel<>(new ArrayList<>(fullList), new ArrayList<>(fullTarget));		
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Usuario());
+	}
+
+	@Override
+	public void salvar() {
+		boolean padrao = true;
+		getObjeto().getUsuarioFiliais().clear();
+		//O primeiro item do target é considerado como padrão!
+		for (Filial fi : model.getTarget()) {
+			getObjeto().getUsuarioFiliais().add(new UsuarioFilial(getObjeto(), fi, padrao));
+			padrao = false;
+		}
+		setObjeto(cadastroUsuarioService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Usuário salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public DualListModel<Filial> getModel() {
+		return model;
+	}
+
+	public void setModel(DualListModel<Filial> model) {
+		this.model = model;
+	}
+
+}

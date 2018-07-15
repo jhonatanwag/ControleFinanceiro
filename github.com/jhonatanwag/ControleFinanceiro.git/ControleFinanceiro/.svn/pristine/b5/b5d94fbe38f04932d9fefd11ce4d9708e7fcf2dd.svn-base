@@ -1,0 +1,129 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name = "receb")
+public class Recebimento implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "receb_id")
+	private Long id;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_receb", nullable = false)
+	private Date dataRecebimento = new Date();
+	@ManyToOne(cascade = javax.persistence.CascadeType.ALL)
+	@JoinColumn(nullable = false, name = "cliente_id")
+	private Cliente cliente;
+	@Column(name = "val_dinheiro", nullable = false)
+	private BigDecimal valorDinheiro = BigDecimal.ZERO;
+	@Column(name = "val_cartao", nullable = false)
+	private BigDecimal valorCartao  = BigDecimal.ZERO;
+	@Column(name = "val_cheque", nullable = false)
+	private BigDecimal valorCheque  = BigDecimal.ZERO;
+	@Cascade(CascadeType.ALL)
+	@OneToOne(mappedBy = "recebimento")
+	private CaixaMovimentacao caixaMovimentacao;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "recebimento", orphanRemoval = true)
+	private List<ParcelaTitulo> parcelaTitulos = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Date getDataRecebimento() {
+		return dataRecebimento;
+	}
+
+	public void setDataRecebimento(Date dataRecebimento) {
+		this.dataRecebimento = dataRecebimento;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public BigDecimal getValorDinheiro() {
+		return valorDinheiro;
+	}
+
+	public void setValorDinheiro(BigDecimal valorDinheiro) {
+		this.valorDinheiro = valorDinheiro;
+	}
+
+	public BigDecimal getValorCartao() {
+		return valorCartao;
+	}
+
+	public void setValorCartao(BigDecimal valorCartao) {
+		this.valorCartao = valorCartao;
+	}
+
+	public BigDecimal getValorCheque() {
+		return valorCheque;
+	}
+
+	public void setValorCheque(BigDecimal valorCheque) {
+		this.valorCheque = valorCheque;
+	}
+	
+	public BigDecimal getValorTotalRecebimento(){		
+		return this.valorCartao.add(this.valorCheque.add(this.valorDinheiro));
+	}
+
+	public List<ParcelaTitulo> getParcelaTitulos() {
+		return parcelaTitulos;
+	}
+
+	public void setParcelaTitulos(List<ParcelaTitulo> parcelaTitulos) {
+		this.parcelaTitulos = parcelaTitulos;
+	}
+
+	public CaixaMovimentacao getCaixaMovimentacao() {
+		return caixaMovimentacao;
+	}
+
+	public void setCaixaMovimentacao(CaixaMovimentacao caixaMovimentacao) {
+		this.caixaMovimentacao = caixaMovimentacao;
+	}
+
+}

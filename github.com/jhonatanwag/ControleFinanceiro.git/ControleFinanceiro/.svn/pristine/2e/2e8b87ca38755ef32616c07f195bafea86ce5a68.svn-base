@@ -1,0 +1,29 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Sabor;
+import br.com.sistemacomercial.repository.Sabores;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroSaborService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Sabores sabores;
+
+	@Transactional
+	public Sabor salvar(Sabor sabor) {
+		Sabor saborExiste = sabores.porDescricaoUnico(sabor.getDescricao(), sabor.getId());
+
+		if (saborExiste != null && !saborExiste.equals(sabor)) {
+			throw new NegocioException("Já existe uma sabor com a mesma descrição cadastrada.");
+		}
+
+		return sabores.salvar(sabor);
+	}
+
+}

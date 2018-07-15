@@ -1,0 +1,657 @@
+package br.com.sistemacomercial.ws.retorno;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class Webservice {
+	private static Map<String, Webservice> services;
+	private String cUF;
+	private String versao;
+	private String method;
+	private String address;
+	private String xmlRetorno;
+
+	public static Map<String, Webservice> getServices() {
+		if (services == null) {
+			services = new HashMap();
+
+			services.put("homologacao-am-cancelamento", new Webservice("13", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homnfe.sefaz.am.gov.br/services2/services/NfeCancelamento2"));
+			services.put("homologacao-am-consulta", new Webservice("13", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homnfe.sefaz.am.gov.br/services2/services/NfeConsulta2"));
+			services.put("homologacao-am-inutilizacao", new Webservice("13", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homnfe.sefaz.am.gov.br/services2/services/NfeInutilizacao2"));
+			services.put("homologacao-am-recepcao", new Webservice("13", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homnfe.sefaz.am.gov.br/services2/services/NfeRecepcao2?wsdl"));
+			services.put("homologacao-am-ret-recepcao", new Webservice("13", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://homnfe.sefaz.am.gov.br/services2/services/NfeRetRecepcao2"));
+			services.put("homologacao-am-status-servico", new Webservice("13", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://homnfe.sefaz.am.gov.br/services2/services/NfeStatusServico2"));
+			services.put("homologacao-am-evento", new Webservice("13", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://homnfe.sefaz.am.gov.br/services2/services/RecepcaoEvento"));
+
+			services.put("producao-am-cancelamento", new Webservice("13", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefaz.am.gov.br/services2/services/NfeCancelamento2"));
+			services.put("producao-am-consulta", new Webservice("13", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefaz.am.gov.br/services2/services/NfeConsulta2"));
+			services.put("producao-am-inutilizacao", new Webservice("13", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefaz.am.gov.br/services2/services/NfeInutilizacao2"));
+			services.put("producao-am-recepcao", new Webservice("13", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefaz.am.gov.br/services2/services/NfeRecepcao2?wsdl"));
+			services.put("producao-am-ret-recepcao", new Webservice("13", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.sefaz.am.gov.br/services2/services/NfeRetRecepcao2"));
+			services.put("producao-am-status-servico", new Webservice("13", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.sefaz.am.gov.br/services2/services/NfeStatusServico2"));
+			services.put("producao-am-evento", new Webservice("13", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.sefaz.am.gov.br/services2/services/RecepcaoEvento"));
+
+			services.put("homologacao-ba-cad-consulta-cadastro", new Webservice("29", "2.00", "CadConsultaCadastro2",
+					"retConsCad", "https://hnfe.sefaz.ba.gov.br/webservices/nfenw/CadConsultaCadastro2.asmx"));
+			services.put("homologacao-ba-cancelamento", new Webservice("29", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://hnfe.sefaz.ba.gov.br/webservices/nfenw/NfeCancelamento2.asmx"));
+			services.put("homologacao-ba-consulta", new Webservice("29", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://hnfe.sefaz.ba.gov.br/webservices/nfenw/NfeConsulta2.asmx"));
+			services.put("homologacao-ba-inutilizacao", new Webservice("29", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://hnfe.sefaz.ba.gov.br/webservices/nfenw/NfeInutilizacao2.asmx"));
+			services.put("homologacao-ba-recepcao", new Webservice("29", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://hnfe.sefaz.ba.gov.br/webservices/nfenw/NfeRecepcao2.asmx"));
+			services.put("homologacao-ba-ret-recepcao", new Webservice("29", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://hnfe.sefaz.ba.gov.br/webservices/nfenw/NfeRetRecepcao2.asmx"));
+			services.put("homologacao-ba-status-servico", new Webservice("29", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://hnfe.sefaz.ba.gov.br/webservices/nfenw/NfeStatusServico2.asmx"));
+			services.put("homologacao-ba-evento", new Webservice("29", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://hnfe.sefaz.ba.gov.br/webservices/sre/RecepcaoEvento.asmx"));
+
+			services.put("producao-ba-cad-consulta-cadastro", new Webservice("29", "2.00", "CadConsultaCadastro2",
+					"retConsCad", "https://nfe.sefaz.ba.gov.br/webservices/nfenw/CadConsultaCadastro2.asmx"));
+			services.put("producao-ba-cancelamento", new Webservice("29", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefaz.ba.gov.br/webservices/nfenw/NfeCancelamento2.asmx"));
+			services.put("producao-ba-consulta", new Webservice("29", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefaz.ba.gov.br/webservices/nfenw/NfeConsulta2.asmx"));
+			services.put("producao-ba-inutilizacao", new Webservice("29", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefaz.ba.gov.br/webservices/nfenw/NfeInutilizacao2.asmx"));
+			services.put("producao-ba-recepcao", new Webservice("29", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefaz.ba.gov.br/webservices/nfenw/NfeRecepcao2.asmx"));
+			services.put("producao-ba-ret-recepcao", new Webservice("29", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.sefaz.ba.gov.br/webservices/nfenw/NfeRetRecepcao2.asmx"));
+			services.put("producao-ba-status-servico", new Webservice("29", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.sefaz.ba.gov.br/webservices/nfenw/NfeStatusServico2.asmx"));
+			services.put("producao-ba-evento", new Webservice("29", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"\thttps://nfe.sefaz.ba.gov.br/webservices/sre/RecepcaoEvento.asmx"));
+
+			services.put("homologacao-ce-cad-consulta-cadastro", new Webservice("23", "2.00", "CadConsultaCadastro2",
+					"retConsCad", "https://nfeh.sefaz.ce.gov.br:443/nfe2/services/CadConsultaCadastro2"));
+			services.put("homologacao-ce-cancelamento", new Webservice("23", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfeh.sefaz.ce.gov.br:443/nfe2/services/NfeCancelamento2"));
+			services.put("homologacao-ce-consulta", new Webservice("23", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfeh.sefaz.ce.gov.br:443/nfe2/services/NfeConsulta2"));
+			services.put("homologacao-ce-inutilizacao", new Webservice("23", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfeh.sefaz.ce.gov.br:443/nfe2/services/NfeInutilizacao2"));
+			services.put("homologacao-ce-recepcao", new Webservice("23", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfeh.sefaz.ce.gov.br:443/nfe2/services/NfeRecepcao2"));
+			services.put("homologacao-ce-ret-recepcao", new Webservice("23", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://nfeh.sefaz.ce.gov.br:443/nfe2/services/NfeRetRecepcao2"));
+			services.put("homologacao-ce-status-servico", new Webservice("23", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfeh.sefaz.ce.gov.br:443/nfe2/services/NfeStatusServico2"));
+			services.put("homologacao-ce-evento", new Webservice("23", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfeh.sefaz.ce.gov.br/nfe2/services/RecepcaoEvento"));
+
+			services.put("producao-ce-cad-consulta-cadastro", new Webservice("23", "2.00", "CadConsultaCadastro2",
+					"retConsCad", "https://nfe.sefaz.ce.gov.br:443/nfe2/services/CadConsultaCadastro2"));
+			services.put("producao-ce-cancelamento", new Webservice("23", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefaz.ce.gov.br:443/nfe2/services/NfeCancelamento2"));
+			services.put("producao-ce-consulta", new Webservice("23", "2.00", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefaz.ce.gov.br:443/nfe2/services/NfeConsulta2"));
+			services.put("producao-ce-inutilizacao", new Webservice("23", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefaz.ce.gov.br:443/nfe2/services/NfeInutilizacao2"));
+			services.put("producao-ce-recepcao", new Webservice("23", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefaz.ce.gov.br:443/nfe2/services/NfeRecepcao2"));
+			services.put("producao-ce-ret-recepcao", new Webservice("23", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.sefaz.ce.gov.br:443/nfe2/services/NfeRetRecepcao2"));
+			services.put("producao-ce-status-servico", new Webservice("23", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.sefaz.ce.gov.br:443/nfe2/services/NfeStatusServico2"));
+			services.put("producao-ce-evento", new Webservice("23", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.sefaz.ce.gov.br/nfe2/services/RecepcaoEvento"));
+
+			services.put("homologacao-go-cancelamento", new Webservice("52", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeCancelamento2"));
+			services.put("homologacao-go-consulta", new Webservice("52", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeConsulta2"));
+			services.put("homologacao-go-inutilizacao", new Webservice("52", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeInutilizacao2"));
+			services.put("homologacao-go-recepcao", new Webservice("52", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeRecepcao2?wsdl"));
+			services.put("homologacao-go-ret-recepcao", new Webservice("52", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeRetRecepcao2"));
+			services.put("homologacao-go-status-servico", new Webservice("52", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeStatusServico2"));
+			services.put("homologacao-go-evento", new Webservice("52", "1.00", "NfeRecepcaoEvento", "retEnvEvento",
+					"https://homolog.sefaz.go.gov.br/nfe/services/v2/NfeRecepcaoEvento"));
+
+			services.put("producao-go-cancelamento", new Webservice("52", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeCancelamento2"));
+			services.put("producao-go-consulta", new Webservice("52", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeConsulta2"));
+			services.put("producao-go-inutilizacao", new Webservice("52", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeInutilizacao2"));
+			services.put("producao-go-recepcao", new Webservice("52", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeRecepcao2?wsdl"));
+			services.put("producao-go-ret-recepcao", new Webservice("52", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeRetRecepcao2"));
+			services.put("producao-go-status-servico", new Webservice("52", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeStatusServico2"));
+			services.put("producao-go-evento", new Webservice("52", "1.00", "NfeRecepcaoEvento", "retEnvEvento",
+					"https://nfe.sefaz.go.gov.br/nfe/services/v2/NfeRecepcaoEvento?wsdl"));
+
+			services.put("homologacao-mg-cancelamento", new Webservice("31", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://hnfe.fazenda.mg.gov.br/nfe2/services/NfeCancelamento2"));
+			services.put("homologacao-mg-consulta", new Webservice("31", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://hnfe.fazenda.mg.gov.br/nfe2/services/NfeConsulta2"));
+			services.put("homologacao-mg-inutilizacao", new Webservice("31", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://hnfe.fazenda.mg.gov.br/nfe2/services/NfeInutilizacao2"));
+			services.put("homologacao-mg-recepcao", new Webservice("31", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://hnfe.fazenda.mg.gov.br/nfe2/services/NfeRecepcao2?wsdl"));
+			services.put("homologacao-mg-ret-recepcao", new Webservice("31", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://hnfe.fazenda.mg.gov.br/nfe2/services/NfeRetRecepcao2"));
+			services.put("homologacao-mg-status-servico", new Webservice("31", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://hnfe.fazenda.mg.gov.br/nfe2/services/NfeStatusServico2"));
+			services.put("homologacao-mg-evento", new Webservice("31", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://hnfe.fazenda.mg.gov.br/nfe2/services/RecepcaoEvento"));
+
+			services.put("producao-mg-cancelamento", new Webservice("31", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.fazenda.mg.gov.br/nfe2/services/NfeCancelamento2"));
+			services.put("producao-mg-consulta", new Webservice("31", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.fazenda.mg.gov.br/nfe2/services/NfeConsulta2"));
+			services.put("producao-mg-inutilizacao", new Webservice("31", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.fazenda.mg.gov.br/nfe2/services/NfeInutilizacao2"));
+			services.put("producao-mg-recepcao", new Webservice("31", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.fazenda.mg.gov.br/nfe2/services/NfeRecepcao2?wsdl"));
+			services.put("producao-mg-ret-recepcao", new Webservice("31", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.fazenda.mg.gov.br/nfe2/services/NfeRetRecepcao2"));
+			services.put("producao-mg-status-servico", new Webservice("31", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.fazenda.mg.gov.br/nfe2/services/NfeStatusServico2"));
+			services.put("producao-mg-evento", new Webservice("31", "2.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.fazenda.mg.gov.br/nfe2/services/RecepcaoEvento"));
+
+			services.put("homologacao-ms-cad-consulta-cadastro", new Webservice("50", "2.00", "CadConsultaCadastro2",
+					"retConsCad", "https://homologacao.nfe.ms.gov.br/homologacao/services2/CadConsultaCadastro2"));
+			services.put("homologacao-ms-cancelamento", new Webservice("50", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homologacao.nfe.ms.gov.br/homologacao/services2/NfeCancelamento2"));
+			services.put("homologacao-ms-consulta", new Webservice("50", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homologacao.nfe.ms.gov.br/homologacao/services2/NfeConsulta2"));
+			services.put("homologacao-ms-inutilizacao", new Webservice("50", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homologacao.nfe.ms.gov.br/homologacao/services2/NfeInutilizacao2"));
+			services.put("homologacao-ms-recepcao", new Webservice("50", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homologacao.nfe.ms.gov.br/homologacao/services2/NfeRecepcao2?wsdl"));
+			services.put("homologacao-ms-ret-recepcao", new Webservice("50", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://homologacao.nfe.ms.gov.br/homologacao/services2/NfeRetRecepcao2"));
+			services.put("homologacao-ms-status-servico", new Webservice("50", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://homologacao.nfe.ms.gov.br/homologacao/services2/NfeStatusServico2"));
+			services.put("homologacao-ms-evento", new Webservice("50", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://homologacao.nfe.ms.gov.br/homologacao/services2/RecepcaoEvento"));
+
+			services.put("producao-ms-cad-consulta-cadastro", new Webservice("50", "2.00", "CadConsultaCadastro2",
+					"retConsCad", "https://nfe.fazenda.ms.gov.br/producao/services2/CadConsultaCadastro2"));
+			services.put("producao-ms-cancelamento", new Webservice("50", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.fazenda.ms.gov.br/producao/services2/NfeCancelamento2"));
+			services.put("producao-ms-consulta", new Webservice("50", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.fazenda.ms.gov.br/producao/services2/NfeConsulta2"));
+			services.put("producao-ms-inutilizacao", new Webservice("50", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.fazenda.ms.gov.br/producao/services2/NfeInutilizacao2"));
+			services.put("producao-ms-recepcao", new Webservice("50", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.fazenda.ms.gov.br/producao/services2/NfeRecepcao2?wsdl"));
+			services.put("producao-ms-ret-recepcao", new Webservice("50", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.fazenda.ms.gov.br/producao/services2/NfeRetRecepcao2"));
+			services.put("producao-ms-status-servico", new Webservice("50", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.fazenda.ms.gov.br/producao/services2/NfeStatusServico2"));
+			services.put("producao-ms-evento", new Webservice("50", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.fazenda.ms.gov.br/producao/services2/RecepcaoEvento"));
+
+			services.put("homologacao-mt-cancelamento", new Webservice("51", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homologacao.sefaz.mt.gov.br/nfews/v2/services/NfeCancelamento2"));
+			services.put("homologacao-mt-consulta", new Webservice("51", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homologacao.sefaz.mt.gov.br/nfews/v2/services/NfeConsulta2"));
+			services.put("homologacao-mt-inutilizacao", new Webservice("51", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homologacao.sefaz.mt.gov.br/nfews/v2/services/NfeInutilizacao2"));
+			services.put("homologacao-mt-recepcao", new Webservice("51", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homologacao.sefaz.mt.gov.br/nfews/v2/services/NfeRecepcao2?wsdl"));
+			services.put("homologacao-mt-ret-recepcao", new Webservice("51", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://homologacao.sefaz.mt.gov.br/nfews/v2/services/NfeRetRecepcao2"));
+			services.put("homologacao-mt-status-servico", new Webservice("51", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://homologacao.sefaz.mt.gov.br/nfews/v2/services/NfeStatusServico2"));
+			services.put("homologacao-mt-evento", new Webservice("51", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://homologacao.sefaz.mt.gov.br/nfews/v2/services/RecepcaoEvento"));
+
+			services.put("producao-mt-cancelamento", new Webservice("51", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefaz.mt.gov.br/nfews/v2/services/NfeCancelamento2"));
+			services.put("producao-mt-consulta", new Webservice("51", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefaz.mt.gov.br/nfews/v2/services/NfeConsulta2"));
+			services.put("producao-mt-inutilizacao", new Webservice("51", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefaz.mt.gov.br/nfews/v2/services/NfeInutilizacao2"));
+			services.put("producao-mt-recepcao", new Webservice("51", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefaz.mt.gov.br/nfews/v2/services/NfeRecepcao2?wsdl"));
+			services.put("producao-mt-ret-recepcao", new Webservice("51", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.sefaz.mt.gov.br/nfews/v2/services/NfeRetRecepcao2"));
+			services.put("producao-mt-status-servico", new Webservice("51", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.sefaz.mt.gov.br/nfews/v2/services/NfeStatusServico2"));
+			services.put("producao-mt-evento", new Webservice("51", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.sefaz.mt.gov.br/nfews/v2/services/RecepcaoEvento"));
+
+			services.put("homologacao-pe-cancelamento", new Webservice("26", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/NfeCancelamento2"));
+			services.put("homologacao-pe-consulta", new Webservice("26", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/NfeConsulta2"));
+			services.put("homologacao-pe-inutilizacao", new Webservice("26", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/NfeInutilizacao2"));
+			services.put("homologacao-pe-recepcao", new Webservice("26", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/NfeRecepcao2?wsdl"));
+			services.put("homologacao-pe-ret-recepcao", new Webservice("26", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/NfeRetRecepcao2"));
+			services.put("homologacao-pe-status-servico", new Webservice("26", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/NfeStatusServico2"));
+			services.put("homologacao-pe-evento", new Webservice("26", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfehomolog.sefaz.pe.gov.br/nfe-service/services/RecepcaoEvento"));
+
+			services.put("producao-pe-cancelamento", new Webservice("26", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefaz.pe.gov.br/nfe-service/services/NfeCancelamento2"));
+			services.put("producao-pe-consulta", new Webservice("26", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefaz.pe.gov.br/nfe-service/services/NfeConsulta2"));
+			services.put("producao-pe-inutilizacao", new Webservice("26", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefaz.pe.gov.br/nfe-service/services/NfeInutilizacao2"));
+			services.put("producao-pe-recepcao", new Webservice("26", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefaz.pe.gov.br/nfe-service/services/NfeRecepcao2?wsdl"));
+			services.put("producao-pe-ret-recepcao", new Webservice("26", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.sefaz.pe.gov.br/nfe-service/services/NfeRetRecepcao2"));
+			services.put("producao-pe-status-servico", new Webservice("26", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.sefaz.pe.gov.br/nfe-service/services/NfeStatusServico2"));
+			services.put("producao-pe-evento", new Webservice("26", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.sefaz.pe.gov.br/nfe-service/services/RecepcaoEvento"));
+
+			services.put("homologacao-pr-cancelamento", new Webservice("41", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homologacao.nfe2.fazenda.pr.gov.br/nfe/NFeCancelamento2"));
+			services.put("homologacao-pr-consulta", new Webservice("41", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homologacao.nfe2.fazenda.pr.gov.br/nfe/NFeConsulta2"));
+			services.put("homologacao-pr-inutilizacao", new Webservice("41", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homologacao.nfe2.fazenda.pr.gov.br/nfe/NFeInutilizacao2"));
+			services.put("homologacao-pr-recepcao", new Webservice("41", "3.10", "NfeRecepcao3", "retEnviNFe",
+					"https://homologacao.nfe.fazenda.pr.gov.br/nfe/NFeRecepcaoEvento"));
+			services.put("homologacao-pr-ret-recepcao", new Webservice("41", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://homologacao.nfe2.fazenda.pr.gov.br/nfe/NFeRetRecepcao2"));
+			services.put("homologacao-pr-status-servico", new Webservice("41", "3.10", "NfeStatusServico3",
+					"retConsStatServ", "https://homologacao.nfe.fazenda.pr.gov.br/nfe/NFeStatusServico3"));
+			services.put("homologacao-pr-evento", new Webservice("41", "1.00", "NFeRecepcaoEvento", "retEnvEvento",
+					"https://homologacao.nfe2.fazenda.pr.gov.br/nfe-evento/NFeRecepcaoEvento"));
+
+			services.put("producao-pr-cancelamento", new Webservice("41", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe2.fazenda.pr.gov.br/nfe/NFeCancelamento2"));
+			services.put("producao-pr-consulta", new Webservice("41", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe2.fazenda.pr.gov.br/nfe/NFeConsulta2"));
+			services.put("producao-pr-inutilizacao", new Webservice("41", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe2.fazenda.pr.gov.br/nfe/NFeInutilizacao2"));
+			services.put("producao-pr-recepcao", new Webservice("41", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe2.fazenda.pr.gov.br/nfe/NFeRecepcao2?wsdl"));
+			services.put("producao-pr-ret-recepcao", new Webservice("41", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe2.fazenda.pr.gov.br/nfe/NFeRetRecepcao2"));
+			services.put("producao-pr-status-servico", new Webservice("41", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe2.fazenda.pr.gov.br/nfe/NFeStatusServico2"));
+			services.put("producao-pr-evento", new Webservice("41", "1.00", "NFeRecepcaoEvento", "retEnvEvento",
+					"https://nfe2.fazenda.pr.gov.br/nfe-evento/NFeRecepcaoEvento"));
+
+			services.put("homologacao-rs-cancelamento", new Webservice("43", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homologacao.nfe.sefaz.rs.gov.br/ws/NfeCancelamento/NfeCancelamento2.asmx"));
+			services.put("homologacao-rs-consulta", new Webservice("43", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homologacao.nfe.sefaz.rs.gov.br/ws/NFeConsulta/NfeConsulta2.asmx"));
+			services.put("homologacao-rs-inutilizacao", new Webservice("43", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homologacao.nfe.sefaz.rs.gov.br/ws/nfeinutilizacao/nfeinutilizacao2.asmx"));
+			services.put("homologacao-rs-recepcao", new Webservice("43", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homologacao.nfe.sefaz.rs.gov.br/ws/NfeRecepcao/NfeRecepcao2.asmx?wsdl"));
+			services.put("homologacao-rs-ret-recepcao",
+					new Webservice("43", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+							"https://homologacao.nfe.sefaz.rs.gov.br/ws/NfeRetRecepcao/NfeRetRecepcao2.asmx"));
+			services.put("homologacao-rs-status-servico",
+					new Webservice("43", "2.00", "NfeStatusServico2", "retConsStatServ",
+							"https://homologacao.nfe.sefaz.rs.gov.br/ws/NfeStatusServico/NfeStatusServico2.asmx"));
+			services.put("homologacao-rs-evento", new Webservice("43", "1.00", "recepcaoevento", "retEnvEvento",
+					"https://homologacao.nfe.sefaz.rs.gov.br/ws/recepcaoevento/recepcaoevento.asmx"));
+
+			services.put("producao-rs-cancelamento", new Webservice("43", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://sef.sefaz.rs.gov.br/ws/NfeCancelamento/NfeCancelamento2.asmx"));
+			services.put("producao-rs-consulta", new Webservice("43", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://sef.sefaz.rs.gov.br/ws/NFeConsulta/NfeConsulta2.asmx"));
+			services.put("producao-rs-inutilizacao", new Webservice("43", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://sef.sefaz.rs.gov.br/ws/nfeinutilizacao2/nfeinutilizacao2.asmx"));
+			services.put("producao-rs-recepcao", new Webservice("43", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://sef.sefaz.rs.gov.br/ws/NfeRecepcao/NfeRecepcao2.asmx?wsdl"));
+			services.put("producao-rs-ret-recepcao", new Webservice("43", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://sef.sefaz.rs.gov.br/ws/NfeRetRecepcao/NfeRetRecepcao2.asmx"));
+			services.put("producao-rs-status-servico", new Webservice("43", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://sef.sefaz.rs.gov.br/ws/NfeStatusServico/NfeStatusServico2.asmx"));
+			services.put("producao-rs-evento", new Webservice("43", "1.00", "recepcaoevento", "retEnvEvento",
+					"https://nfe.sefaz.rs.gov.br/ws/recepcaoevento/recepcaoevento.asmx"));
+
+			services.put("homologacao-scan-cancelamento", new Webservice(null, "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://hom.nfe.fazenda.gov.br/SCAN/NfeCancelamento2/NfeCancelamento2.asmx"));
+			services.put("homologacao-scan-consulta", new Webservice(null, "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://hom.nfe.fazenda.gov.br/SCAN/NfeConsulta2/NfeConsulta2.asmx"));
+			services.put("homologacao-scan-inutilizacao", new Webservice(null, "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://hom.nfe.fazenda.gov.br/SCAN/NfeInutilizacao2/NfeInutilizacao2.asmx"));
+			services.put("homologacao-scan-recepcao", new Webservice(null, "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://hom.nfe.fazenda.gov.br/SCAN/NfeRecepcao2/NfeRecepcao2.asmx?wsdl"));
+			services.put("homologacao-scan-ret-recepcao", new Webservice(null, "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://hom.nfe.fazenda.gov.br/SCAN/NfeRetRecepcao2/NfeRetRecepcao2.asmx"));
+			services.put("homologacao-scan-status-servico", new Webservice(null, "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://hom.nfe.fazenda.gov.br/SCAN/NfeStatusServico2/NfeStatusServico2.asmx"));
+			services.put("homologacao-scan-evento", new Webservice(null, "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://hom.nfe.fazenda.gov.br/SCAN/RecepcaoEvento/RecepcaoEvento.asmx"));
+
+			services.put("producao-scan-cancelamento", new Webservice(null, "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://www.scan.fazenda.gov.br/NfeCancelamento2/NfeCancelamento2.asmx"));
+			services.put("producao-scan-consulta", new Webservice(null, "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://www.scan.fazenda.gov.br/NfeConsulta2/NfeConsulta2.asmx"));
+			services.put("producao-scan-inutilizacao", new Webservice(null, "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://www.scan.fazenda.gov.br/NfeInutilizacao2/NfeInutilizacao2.asmx"));
+			services.put("producao-scan-recepcao", new Webservice(null, "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://www.scan.fazenda.gov.br/NfeRecepcao2/NfeRecepcao2.asmx?wsdl"));
+			services.put("producao-scan-ret-recepcao", new Webservice(null, "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://www.scan.fazenda.gov.br/NfeRetRecepcao2/NfeRetRecepcao2.asmx"));
+			services.put("producao-scan-status-servico", new Webservice(null, "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://www.scan.fazenda.gov.br/NfeStatusServico2/NfeStatusServico2.asmx"));
+			services.put("producao-scan-evento", new Webservice(null, "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://www.scan.fazenda.gov.br/RecepcaoEvento/RecepcaoEvento.asmx"));
+
+			services.put("homologacao-sp-cancelamento", new Webservice("35", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/nfecancelamento2.asmx"));
+			services.put("homologacao-sp-consulta", new Webservice("35", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/nfeconsulta2.asmx"));
+			services.put("homologacao-sp-inutilizacao", new Webservice("35", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/nfeinutilizacao2.asmx"));
+			services.put("homologacao-sp-recepcao", new Webservice("35", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/nferecepcao2.asmx?wsdl"));
+			services.put("homologacao-sp-ret-recepcao",
+					new Webservice("35", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+							"https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/nferetrecepcao2.asmx"));
+			services.put("homologacao-sp-status-servico",
+					new Webservice("35", "2.00", "NfeStatusServico2", "retConsStatServ",
+							"https://homologacao.nfe.fazenda.sp.gov.br/nfeweb/services/nfestatusservico2.asmx"));
+			services.put("homologacao-sp-evento", new Webservice("35", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://homologacao.nfe.fazenda.sp.gov.br/eventosWEB/services/RecepcaoEvento.asmx"));
+
+			services.put("producao-sp-cancelamento", new Webservice("35", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.fazenda.sp.gov.br/nfeweb/services/nfecancelamento2.asmx"));
+			services.put("producao-sp-consulta", new Webservice("35", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.fazenda.sp.gov.br/nfeweb/services/nfeconsulta2.asmx"));
+			services.put("producao-sp-inutilizacao", new Webservice("35", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.fazenda.sp.gov.br/nfeweb/services/nfeinutilizacao2.asmx"));
+			services.put("producao-sp-recepcao", new Webservice("35", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.fazenda.sp.gov.br/nfeweb/services/nferecepcao2.asmx?wsdl"));
+			services.put("producao-sp-ret-recepcao", new Webservice("35", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+					"https://nfe.fazenda.sp.gov.br/nfeweb/services/nferetrecepcao2.asmx"));
+			services.put("producao-sp-status-servico", new Webservice("35", "2.00", "NfeStatusServico2",
+					"retConsStatServ", "https://nfe.fazenda.sp.gov.br/nfeweb/services/nfestatusservico2.asmx"));
+			services.put("producao-sp-evento", new Webservice("35", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://nfe.fazenda.sp.gov.br/eventosWEB/services/RecepcaoEvento.asmx"));
+
+			services.put("homologacao-svan-cancelamento", new Webservice("svan", "2.00", "NfeCancelamento2",
+					"retCancNFe", "https://hom.sefazvirtual.fazenda.gov.br/NfeCancelamento2/NfeCancelamento2.asmx"));
+			services.put("homologacao-svan-consulta", new Webservice("svan", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://hom.sefazvirtual.fazenda.gov.br/NfeConsulta2/NfeConsulta2.asmx"));
+			services.put("homologacao-svan-inutilizacao", new Webservice("svan", "2.00", "NfeInutilizacao2",
+					"retInutNFe", "https://hom.sefazvirtual.fazenda.gov.br/NfeInutilizacao2/NfeInutilizacao2.asmx"));
+			services.put("homologacao-svan-recepcao", new Webservice("svan", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://hom.sefazvirtual.fazenda.gov.br/NfeRecepcao2/NfeRecepcao2.asmx?wsdl"));
+			services.put("homologacao-svan-ret-recepcao", new Webservice("svan", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://hom.sefazvirtual.fazenda.gov.br/NfeRetRecepcao2/NfeRetRecepcao2.asmx"));
+			services.put("homologacao-svan-status-servico",
+					new Webservice("svan", "2.00", "NfeStatusServico2", "retConsStatServ",
+							"https://hom.sefazvirtual.fazenda.gov.br/NfeStatusServico2/NfeStatusServico2.asmx"));
+			services.put("homologacao-svan-evento", new Webservice("svan", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://hom.sefazvirtual.fazenda.gov.br/RecepcaoEvento/RecepcaoEvento.asmx"));
+
+			services.put("producao-svan-cancelamento", new Webservice("svan", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://www.sefazvirtual.fazenda.gov.br/NfeCancelamento2/NfeCancelamento2.asmx"));
+			services.put("producao-svan-consulta", new Webservice("svan", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://www.sefazvirtual.fazenda.gov.br/NfeConsulta2/NfeConsulta2.asmx"));
+			services.put("producao-svan-inutilizacao", new Webservice("svan", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://www.sefazvirtual.fazenda.gov.br/NfeInutilizacao2/NfeInutilizacao2.asmx"));
+			services.put("producao-svan-recepcao", new Webservice("svan", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://www.sefazvirtual.fazenda.gov.br/NfeRecepcao2/NfeRecepcao2.asmx?wsdl"));
+			services.put("producao-svan-ret-recepcao", new Webservice("svan", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://www.sefazvirtual.fazenda.gov.br/NfeRetRecepcao2/NfeRetRecepcao2.asmx"));
+			services.put("producao-svan-status-servico",
+					new Webservice("svan", "2.00", "NfeStatusServico2", "retConsStatServ",
+							"https://www.sefazvirtual.fazenda.gov.br/NfeStatusServico2/NfeStatusServico2.asmx"));
+			services.put("producao-svan-evento", new Webservice("svan", "1.00", "RecepcaoEvento", "retEnvEvento",
+					"https://www.sefazvirtual.fazenda.gov.br/RecepcaoEvento/RecepcaoEvento.asmx"));
+
+			services.put("homologacao-svrs-cancelamento",
+					new Webservice("svrs", "2.00", "NfeCancelamento2", "retCancNFe",
+							"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/NfeCancelamento/NfeCancelamento2.asmx"));
+			services.put("homologacao-svrs-consulta", new Webservice("svrs", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/NfeConsulta/NfeConsulta2.asmx"));
+			services.put("homologacao-svrs-inutilizacao",
+					new Webservice("svrs", "2.00", "NfeInutilizacao2", "retInutNFe",
+							"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/nfeinutilizacao/nfeinutilizacao2.asmx"));
+			services.put("homologacao-svrs-recepcao", new Webservice("svrs", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/NfeRecepcao/NfeRecepcao2.asmx?wsdl"));
+			services.put("homologacao-svrs-ret-recepcao",
+					new Webservice("svrs", "2.00", "NfeRetRecepcao2", "retConsReciNFe",
+							"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/NfeRetRecepcao/NfeRetRecepcao2.asmx"));
+			services.put("homologacao-svrs-status-servico", new Webservice("svrs", "2.00", "NfeStatusServico2",
+					"retConsStatServ",
+					"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/NfeStatusServico/NfeStatusServico2.asmx"));
+			services.put("homologacao-svrs-evento", new Webservice("svrs", "1.00", "recepcaoevento", "retEnvEvento",
+					"https://homologacao.nfe.sefazvirtual.rs.gov.br/ws/recepcaoevento/recepcaoevento.asmx"));
+
+			services.put("producao-svrs-cancelamento", new Webservice("svrs", "2.00", "NfeCancelamento2", "retCancNFe",
+					"https://nfe.sefazvirtual.rs.gov.br/ws/NfeCancelamento/NfeCancelamento2.asmx"));
+			services.put("producao-svrs-consulta", new Webservice("svrs", "2.01", "NfeConsulta2", "retConsSitNFe",
+					"https://nfe.sefazvirtual.rs.gov.br/ws/NfeConsulta/NfeConsulta2.asmx"));
+			services.put("producao-svrs-inutilizacao", new Webservice("svrs", "2.00", "NfeInutilizacao2", "retInutNFe",
+					"https://nfe.sefazvirtual.rs.gov.br/ws/NfeInutilizacao/NfeInutilizacao2.asmx"));
+			services.put("producao-svrs-recepcao", new Webservice("svrs", "2.00", "NfeRecepcao2", "retEnviNFe",
+					"https://nfe.sefazvirtual.rs.gov.br/ws/NfeRecepcao/NfeRecepcao2.asmx?wsdl"));
+			services.put("producao-svrs-ret-recepcao", new Webservice("svrs", "2.00", "NfeRetRecepcao2",
+					"retConsReciNFe", "https://nfe.sefazvirtual.rs.gov.br/ws/NfeRetRecepcao/NfeRetRecepcao2.asmx"));
+			services.put("producao-svrs-status-servico",
+					new Webservice("svrs", "2.00", "NfeStatusServico2", "retConsStatServ",
+							"https://nfe.sefazvirtual.rs.gov.br/ws/NfeStatusServico/NfeStatusServico2.asmx"));
+			services.put("producao-svrs-evento", new Webservice("svrs", "1.00", "recepcaoevento", "retEnvEvento",
+					"https://nfe.sefazvirtual.rs.gov.br/ws/recepcaoevento/recepcaoevento.asmx"));
+		}
+		return services;
+	}
+
+	public static Webservice get(String ambiente, String uf, String servico) {
+		StringBuilder name = new StringBuilder();
+		if ("1".equals(ambiente)) {
+			name.append("producao-");
+		} else {
+			name.append("homologacao-");
+		}
+		name.append(uf);
+		name.append("-");
+		name.append(servico);
+
+		Webservice service = (Webservice) getServices().get(name.toString());
+
+		return service;
+	}
+
+	private Webservice() {
+	}
+
+	public String getAddress() {
+		return this.address;
+	}
+
+	public String getcUF() {
+		return this.cUF;
+	}
+
+	public String getMethod() {
+		return this.method;
+	}
+
+	public String getVersao() {
+		return this.versao;
+	}
+
+	public String getXmlRetorno() {
+		return this.xmlRetorno;
+	}
+
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Webservice other = (Webservice) obj;
+		if (this.cUF == null ? other.cUF != null : !this.cUF.equals(other.cUF)) {
+			return false;
+		}
+		if (this.versao == null ? other.versao != null : !this.versao.equals(other.versao)) {
+			return false;
+		}
+		if (this.method == null ? other.method != null : !this.method.equals(other.method)) {
+			return false;
+		}
+		if (this.address == null ? other.address != null : !this.address.equals(other.address)) {
+			return false;
+		}
+		return true;
+	}
+
+	public int hashCode() {
+		int hash = 3;
+		hash = 13 * hash + (this.cUF != null ? this.cUF.hashCode() : 0);
+		hash = 13 * hash + (this.versao != null ? this.versao.hashCode() : 0);
+		hash = 13 * hash + (this.method != null ? this.method.hashCode() : 0);
+		hash = 13 * hash + (this.address != null ? this.address.hashCode() : 0);
+		return hash;
+	}
+
+	public String toString() {
+		return "Service{cUF=" + this.cUF + ", versao=" + this.versao + ", method=" + this.method + ", address="
+				+ this.address + '}';
+	}
+
+	private Webservice(String cUF, String versao, String method, String xmlRetorno, String address) {
+		this.cUF = cUF;
+		this.versao = versao;
+		this.method = method;
+		this.address = address;
+		this.xmlRetorno = xmlRetorno;
+	}
+
+	private final String SOAP_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<S:Envelope xmlns:S=\"http://www.w3.org/2003/05/soap-envelope\"><S:Header><nfeCabecMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/\"><cUF>%2$s</cUF><versaoDados>%3$s</versaoDados></nfeCabecMsg></S:Header><S:Body><nfeDadosMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/%1$s\">%4$s</nfeDadosMsg></S:Body></S:Envelope>";
+	private final String SOAP_TEMPLATE_SCAN = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Header><nfeCabecMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/%1$s\"><cUF>%2$s</cUF><versaoDados>%3$s</versaoDados></nfeCabecMsg></soap:Header><soap:Body><nfeDadosMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/%1$s\">%4$s</nfeDadosMsg></soap:Body></soap:Envelope>";
+
+	public String call(String uf, String xml) {
+		String theUF;
+		if (uf == null) {
+			theUF = getcUF();
+		} else {
+			theUF = uf;
+		}
+		try {
+			String urlAddress = getAddress();
+
+			String envelope = String.format(
+					"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Header><nfeCabecMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/%1$s\"><cUF>%2$s</cUF><versaoDados>%3$s</versaoDados></nfeCabecMsg></soap:Header><soap:Body><nfeDadosMsg xmlns=\"http://www.portalfiscal.inf.br/nfe/wsdl/%1$s\">%4$s</nfeDadosMsg></soap:Body></soap:Envelope>",
+					new Object[] { getMethod(), theUF, getVersao(), xml });
+
+			MessageFactory factory = MessageFactory.newInstance("SOAP 1.2 Protocol");
+
+			MimeHeaders header = new MimeHeaders();
+			header.addHeader("Content-Type", "application/soap+xml");
+
+			SOAPMessage message = factory.createMessage(header, new ByteArrayInputStream(envelope.getBytes()));
+			SOAPConnection connection = SOAPConnectionFactory.newInstance().createConnection();
+			URL url = new URL(urlAddress);
+			
+			
+			String caminhoDoCertificadoDoCliente = "D:/NF-e/w.a.moreira.pfx";
+			String senhaDoCertificadoDoCliente = "1234";
+			String arquivoCacertsGeradoParaCadaEstado = "D:/NF-e/NFeCacerts";
+
+			/**
+			 * Colocar a Chave de Acesso da NF-e Aqui. Usado
+			 * ?????????????????????????????????????????? para ocultar o CNPJ.
+			 */
+			String chaveDaNFe = "41150978161254000189650010000000051000000054";
+
+			/**
+			 * Informações do Certificado Digital.
+			 */
+			System.setProperty("java.protocol.handler.pkgs", "com.sun.net.ssl.internal.www.protocol");
+			// Security.addProvider(new
+			// com.sun.net.ssl.internal.ssl.Provider());
+
+			System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
+
+			System.clearProperty("javax.net.ssl.keyStore");
+			System.clearProperty("javax.net.ssl.keyStorePassword");
+			System.clearProperty("javax.net.ssl.trustStore");
+
+			System.setProperty("javax.net.ssl.keyStore", caminhoDoCertificadoDoCliente);
+			System.setProperty("javax.net.ssl.keyStorePassword", senhaDoCertificadoDoCliente);
+
+			System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+			System.setProperty("javax.net.ssl.trustStore", arquivoCacertsGeradoParaCadaEstado);
+
+			
+			SOAPMessage res = connection.call(message, url);
+
+			ByteArrayOutputStream in = new ByteArrayOutputStream();
+			message.writeTo(in);
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			res.writeTo(out);
+
+			String fullResponse = out.toString();
+
+			return extractXMLFrom(fullResponse);
+		} catch (IOException ex) {
+			getLog().warn("UF - " + theUF, ex);
+		} catch (SOAPException ex) {
+			getLog().warn("UF - " + theUF, ex);
+		} catch (Exception e) {
+			getLog().warn("UF - " + theUF, e);
+		}
+		return null;
+	}
+
+	public String call(String xml) {
+		return call(null, xml);
+	}
+
+	public String extractXMLFrom(String xml) {
+		String expression = String.format("(<%1$s.*%1$s>)", new Object[] { getXmlRetorno() });
+		Pattern p = Pattern.compile(expression);
+		Matcher m = p.matcher(xml);
+		if (m.find()) {
+			return m.group(0);
+		}
+		return xml;
+	}
+
+	protected Log getLog() {
+		return LogFactory.getLog(getClass());
+	}
+}

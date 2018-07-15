@@ -1,0 +1,37 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Danilo
+ */
+public enum SituacaoCadastro {
+
+    ATIVO("Ativo"),
+    INATIVO("Inativo");
+    private String value;
+
+    private SituacaoCadastro(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static SituacaoCadastro getSituacaoCadastro(Integer value) {
+        switch (value) {
+            case 0:
+                return ATIVO;
+            case 1:
+                return INATIVO;
+            default:
+                return ATIVO;
+        }
+    }
+}

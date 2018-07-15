@@ -1,0 +1,101 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa Plano de Pagamentos</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<div class="ContainerIndent">
+				<p:panel>
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa
+						Planos de Pagamentos</div>
+					<div class="Separator"></div>
+					<div class="ui-fluid">
+						<p:panelGrid columns="4" columnClasses="col1,col2,col1,col2"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+
+							<p:outputLabel value="Código" />
+							<p:inputText size="10"
+								value="#{pesquisaPlanoPagamentoBean.filtro.idDe}" maxlength="6" />
+
+							<p:outputLabel value="até" />
+
+							<p:inputText size="10"
+								value="#{pesquisaPlanoPagamentoBean.filtro.idAte}" maxlength="6" />
+
+							<p:outputLabel value="Descrição" />
+							<p:inputText
+								value="#{pesquisaPlanoPagamentoBean.filtro.descricao}"
+								size="100" maxlength="100" />
+
+						</p:panelGrid>
+					</div>
+				</p:panel>
+
+
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:commandButton value="Pesquisar"
+							action="#{pesquisaPlanoPagamentoBean.pesquisar}" update="@form" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:button value="Novo" outcome="CadastroPlanoPagamento.xhtml" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:dataTable id="planoPagamentoTable" reflow="true"
+					value="#{pesquisaPlanoPagamentoBean.objetosFiltrados}"
+					var="planoPagamento" style="margin-top: 20px"
+					emptyMessage="Nenhum tipo de corte de cabelo encontrado." rows="20"
+					paginator="true" paginatorAlwaysVisible="false"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Código">
+						<h:outputText value="#{planoPagamento.id}" />
+					</p:column>
+
+					<p:column headerText="Descrição"
+						sortBy="#{planoPagamento.descricao}">
+						<h:outputText value="#{planoPagamento.descricao}" />
+					</p:column>
+
+					<p:column headerText="Qtd. Max. de Parcelas"
+						sortBy="#{planoPagamento.max_parcela}">
+						<h:outputText value="#{planoPagamento.max_parcela}" />
+					</p:column>
+
+					<p:column headerText="Opções">
+						<p:button outcome="/planoPagamento/CadastroPlanoPagamento"
+							icon="ui-icon-pencil" title="Editar">
+							<f:param name="planoPagamento" value="#{planoPagamento.id}" />
+						</p:button>
+						<p:commandButton icon="ui-icon-trash" title="Excluir"
+							oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+							update=":frmPesquisa:confirmacaoExclusaoDialog">
+							<f:setPropertyActionListener
+								target="#{pesquisaPlanoPagamentoBean.objetoSelecionado}"
+								value="#{planoPagamento}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:confirmDialog header="Exclusão do plano de pagamento"
+					message="Tem certeza que deseja excluir o plano de pagamento #{pesquisaPlanoPagamentoBean.objetoSelecionado.descricao}?"
+					widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+					<p:button value="Não"
+						onclick="PF('confirmacaoExclusao').hide(); return false;" />
+					<p:commandButton value="Sim"
+						oncomplete="PF('confirmacaoExclusao').hide();"
+						action="#{pesquisaPlanoPagamentoBean.excluir}" process="@this"
+						update=":frmPesquisa:planoPagamentoTable" />
+				</p:confirmDialog>
+			</div>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

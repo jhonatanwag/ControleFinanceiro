@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab title="Opcionais">
+		<ui:include src="/WEB-INF/template/produto/DlgProdutoOpcional.xhtml" />
+
+
+
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo" process="@this"
+					oncomplete="PF('DlgProdutoOpcional').show()"
+					action="#{cadastroProdutoBean.novoProdutoOpcional()}"
+					update=":form:tabView:painelProdutoOpcional" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable value="#{cadastroProdutoBean.objeto.produtoOpcionais}"
+			var="produtoOpcional" rowIndexVar="linha" id="tabelaOpcioanais">
+
+			<p:column id="Produto" headerText="Preço" style="width: 50%"
+				sortBy="#{produtoOpcional.produtoOpcional.descricaoReduzida}">
+				<h:outputText
+					value="#{produtoOpcional.produtoOpcional.descricaoReduzida}" />
+			</p:column>
+
+
+
+			<p:column style="width: 100px; text-align: center">
+				<p:commandButton icon="ui-icon-pencil"
+					action="#{cadastroProdutoBean.alterarPreco()}"
+					oncomplete="PF('DlgProdutoOpcional').show();" process="@this"
+					update=":form:tabView:painelProdutoOpcional"
+					title="#{msg['label.editar']} #{produtoOpcional.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroProdutoBean.produtoOpcionalSelecionado}"
+						value="#{produtoOpcional}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationOpcional').show()" process="@this"
+					title="#{msg['label.excluir']} #{produtoOpcional.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroProdutoBean.produtoOpcionalSelecionado}"
+						value="#{produtoOpcional}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogOpcional" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationOpcional">
+			<h:form>
+				<p:commandButton id="confirm" value="#{msg['confirma.sim']}"
+					update=":form:tabView:tabelaOpcioanais"
+					oncomplete="PF('confirmationOpcional').hide();" immediate="true"
+					actionListener="#{cadastroProdutoBean.excluirProdutoPreco()}">
+				</p:commandButton>
+				<p:commandButton id="decline" value="#{msg['confirma.nao']}"
+					onclick="PF('confirmationOpcional').hide();" ajax="false" />
+			</h:form>
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

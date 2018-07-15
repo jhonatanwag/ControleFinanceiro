@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:panelGrid columns="2" columnClasses="rotulo, campo">
+		
+		<p:outputLabel value="Empresa/Filial" for="empresaFilial" />
+		<p:selectOneMenu id="empresaFilial" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.filial}">
+			<f:selectItems var="empresaFilial"
+				itemLabel="#{empresaFilial.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+
+		<p:outputLabel value="Modelo" for="cfop" />
+		<p:selectOneMenu id="cfop" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+
+
+		<p:outputLabel value="Cód. Fornecedor" for="codCli" />
+		<h:panelGroup>
+			<p:inputText id="codCli" size="6" maxlength="6"
+				onkeyup="onlyNumbers(this)" style="text-align: right"
+				value="#{notaEntradaBean.pessoaSelecionada.id}">
+				<p:ajax event="change" process="@this"
+					listener="#{notaEntradaBean.pessoaPorId()}"
+					update="codCli, cliente" />
+			</p:inputText>
+
+			<p:commandButton icon="ui-icon-search" process="@this" update="@none"
+				action="#{pesquisaPessoaBean.abrirDialogo}">
+				<p:ajax event="dialogReturn"
+					listener="#{notaEntradaBean.pessoaSelecao}"
+					update="codCli, cliente" process="@this" />
+				<p:resetInput target="cliente, codCli" />
+			</p:commandButton>
+
+			<p:inputText id="cliente" size="100" maxlength="100" disabled="true"
+				value="#{notaEntradaBean.objeto.fornecedor.pessoa.nome}" />
+		</h:panelGroup>
+
+		<p:outputLabel value="Chave" for="chave" />
+
+		<h:panelGroup>
+			<p:inputText id="chave" size="46" maxlength="46"
+				onkeyup="onlyNumbers(this)" style="text-align: right;">
+			</p:inputText>
+
+			<p:outputLabel value="DV" for="dv" style="margin-left: 5px;" />
+			<p:inputText id="dv" size="1" maxlength="1"
+				onkeyup="onlyNumbers(this)"
+				style="text-align: right;margin-left: 5px;">
+			</p:inputText>
+
+			<p:outputLabel value="Número" for="numNota" style="margin-left: 5px;" />
+
+			<p:inputText id="numNota" size="6" maxlength="6"
+				onkeyup="onlyNumbers(this)"
+				style="text-align: right;margin-left: 5px;">
+			</p:inputText>
+
+			<p:outputLabel value="Série" for="serie" />
+			<p:inputText id="serie" size="4" maxlength="4"
+				onkeyup="onlyNumbers(this)" style="text-align: right">
+			</p:inputText>
+
+			<p:outputLabel value="Subserie" for="subserie" />
+			<p:inputText id="subserie" size="4" maxlength="4"
+				onkeyup="onlyNumbers(this)" style="text-align: right">
+			</p:inputText>
+
+			<p:outputLabel value="Especie" for="especie" />
+			<p:inputText id="especie" size="4" maxlength="4"
+				onkeyup="onlyNumbers(this)" style="text-align: right">
+			</p:inputText>
+
+
+			<p:outputLabel value="Data entrada" for="dataEntrada" />
+			<p:calendar id="dataEntrada" size="10" pattern="dd/MM/yyyy" />
+
+			<p:outputLabel value="Data emissão" for="dataEmissao" />
+			<p:calendar id="dataEmissao" size="10" pattern="dd/MM/yyyy" />
+		</h:panelGroup>
+	</p:panelGrid>
+
+	<p:panelGrid columns="12" style="margin-top: 0px; width:100%;">
+		<p:outputLabel value="Tipo de operação" for="tipoOperacao" />
+		<p:selectOneMenu id="tipoOperacao" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+
+		<p:outputLabel value="Tipo de operação" for="tipoOperacao2" />
+		<p:selectOneMenu id="tipoOperacao2" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+
+		<p:outputLabel value="Tipo de operação" for="tipoOperacao3" />
+		<p:selectOneMenu id="tipoOperacao3" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+		
+		<p:outputLabel value="Tipo de operação" for="tipoOperacao4" />
+		<p:selectOneMenu id="tipoOperacao4" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+		
+		<p:outputLabel value="Tipo de operação" for="tipoOperacao5" />
+		<p:selectOneMenu id="tipoOperacao5" required="true" filter="true"
+			filterMatchMode="startsWith" style="width:100%;"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+	</p:panelGrid>
+</ui:composition>

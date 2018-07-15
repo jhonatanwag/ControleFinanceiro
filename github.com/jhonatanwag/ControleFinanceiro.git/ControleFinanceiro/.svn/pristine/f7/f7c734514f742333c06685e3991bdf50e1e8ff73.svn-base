@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Agencia" widgetVar="DlgAgencia" modal="true" dynamic="true"
+		resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogAgencia">
+			<p:messages id="messagesAgencias" closable="true" autoUpdate="true" />
+			<p:panelGrid id="painelAgencia" columns="2" style="margin-top: 20px">
+
+				<p:outputLabel value="Num." for="desc" />
+				<p:inputText id="numAgencia" size="10" maxlength="10"
+					disabled="false" required="true"
+					value="#{cadastroBancoBean.agenciaSelecionada.numeroAgencia}" />
+
+				<p:outputLabel value="Nome Agência" for="desc" />
+				<p:inputText id="desc" size="60" maxlength="60" disabled="false"
+					required="true"
+					value="#{cadastroBancoBean.agenciaSelecionada.nome}" />
+				
+				<p:outputLabel value="Tipo de Logradouro:" for="tipoLogradouro" />
+				<p:selectOneMenu id="tipoLogradouro" required="true" filter="true"
+					filterMatchMode="startsWith"
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.tipoLogradouro}">
+					<f:selectItems var="tp" itemLabel="#{tp.abreviacao}"
+						itemValue="#{tp}"
+						value="#{cadastroBancoBean.todosTiposLogradouros}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Logradouro:" for="logradouro" />
+				<p:inputText
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.logradouro}"
+					id="logradouro" required="true" size="60" maxlength="80" />
+
+				<p:outputLabel value="Número:" for="numeroEnd" />
+				<p:inputText
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.numero}"
+					onkeyup="this.value = this.value.toUpperCase();" id="numeroEnd"
+					required="false" size="10" maxlength="10" />
+
+				<p:outputLabel value="Bairro:" for="bairro" />
+				<p:inputText
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.bairro}"
+					onkeyup="this.value = this.value.toUpperCase();" id="bairro"
+					required="false" size="60" maxlength="60" />
+
+
+				<p:outputLabel value="CEP:" for="cep" />
+				<p:inputMask mask="99999-999"
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.cep}"
+					id="cep" required="false" size="9" maxlength="9" />
+
+
+				<p:outputLabel value="Cidade" for="cid" />
+				<p:selectOneMenu id="cid" filter="true" filterMatchMode="startsWith"
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.cidade}"
+					required="true">
+					<f:selectItem itemLabel="Selecione a cidade" />
+					<f:selectItems value="#{cadastroBancoBean.todasCidades}"
+						var="cidade" itemValue="#{cidade}"
+						itemLabel="#{cidade.cidadeEstado}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Complemento:" for="complemento" />
+				<p:inputText
+					value="#{cadastroBancoBean.agenciaSelecionada.endereco.complemento}"
+					onkeyup="this.value = this.value.toUpperCase();" id="complemento"
+					required="false" size="60" maxlength="80" />
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{cadastroBancoBean.confirmarAgencia()}"
+					update=":formDialogAgencia, :form:tabView:tabelaAgencia"
+					oncomplete="if (!args.validationFailed) PF('DlgAgencia').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgAgencia').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

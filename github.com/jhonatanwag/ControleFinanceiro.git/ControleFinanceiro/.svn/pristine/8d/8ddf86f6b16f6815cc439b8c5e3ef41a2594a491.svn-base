@@ -1,0 +1,256 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+// @Table(name = "caixa_mov", uniqueConstraints = {
+// @UniqueConstraint(name = "uk_cx_mov_titulo", columnNames =
+// "parcelatitulo_id") })
+@Table(name = "caixa_mov")
+public class CaixaMovimentacao implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	@ManyToOne(targetEntity = Caixa.class, fetch = FetchType.LAZY, optional = false)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "caixa_id")
+	private Caixa caixa;
+	@OneToOne(targetEntity = Recebimento.class, fetch = FetchType.LAZY, optional = true)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "receb_id")
+	private Recebimento recebimento;
+	@OneToOne(targetEntity = LancFluxoCaixa.class, fetch = FetchType.LAZY, optional = true)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "lanc_id")
+	private LancFluxoCaixa lancFluxoCaixa;
+	@OneToOne(targetEntity = Venda.class, fetch = FetchType.LAZY, optional = true)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "venda_id")
+	private Venda venda;
+	@ManyToOne(targetEntity = TipoDespesa.class, fetch = FetchType.LAZY, optional = true)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "tipodespesa_id")
+	private TipoDespesa tipoDespesa;
+	@ManyToOne(targetEntity = Funcionario.class, fetch = FetchType.LAZY, optional = true)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "funcionario_id")
+	private Funcionario funcionario;
+	@Column(nullable = false)
+	private BigDecimal valorLancamento;
+	private BigDecimal valorDinheiro;
+	@Column(nullable = false)
+	private BigDecimal valorChequeVista;
+	@Column(nullable = false)
+	private BigDecimal valorChequePre;
+	@Column(nullable = false)
+	private BigDecimal valorCartao;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date dataLancamento = new Date();
+	@Column(length = 500)
+	private String historico;
+
+	public CaixaMovimentacao() {
+	}
+
+	public CaixaMovimentacao(Caixa caixa) {
+		this.caixa = caixa;
+	}
+
+	public CaixaMovimentacao(Caixa caixa, Recebimento recebimento) {
+		this.caixa = caixa;
+		this.recebimento = recebimento;		
+	}
+
+	public CaixaMovimentacao(Caixa caixa, Venda venda) {
+		this.caixa = caixa;
+		this.venda = venda;
+	}
+	
+	public CaixaMovimentacao(Caixa caixa, TipoDespesa tipoDespesa) {
+		this.caixa = caixa;
+		this.tipoDespesa = tipoDespesa;
+	}
+
+	
+	/*
+	 * public CaixaMovimentacao(Caixa caixa, TipoDespesa tipoDespesa,
+	 * Funcionario funcionario, BigDecimal valorDinheiro, BigDecimal
+	 * valorChequeVista, BigDecimal valorChequePre, BigDecimal valorCartao,
+	 * String observacao) { this.caixa = caixa; this.tipoDespesa = tipoDespesa;
+	 * this.historico = observacao.trim(); if
+	 * (tipoDespesa.getEntradaSaida().equals(EntradaSaida.E)) {
+	 * this.valorLancamento = valorDinheiro + valorChequeVista + valorChequePre
+	 * + valorCartao; this.valorDinheiro = valorDinheiro; this.valorChequeVista
+	 * = valorChequeVista; this.valorChequePre = valorChequePre;
+	 * this.valorCartao = valorCartao; this.funcionario = funcionario; } else {
+	 * this.valorLancamento = (valorDinheiro + valorChequeVista + valorChequePre
+	 * + valorCartao) * -1; this.valorDinheiro = (valorDinheiro * -1);
+	 * this.valorChequeVista = (valorChequeVista * -1); this.valorChequePre =
+	 * (valorChequePre * -1); this.valorCartao = (valorCartao * -1);
+	 * this.funcionario = funcionario; } // geraHistorico(); }
+	 */
+
+	public Caixa getCaixa() {
+		return caixa;
+	}
+
+	public void setCaixa(Caixa caixa) {
+		this.caixa = caixa;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public TipoDespesa getTipoDespesa() {
+		return tipoDespesa;
+	}
+
+	public void setTipoDespesa(TipoDespesa tipoDespesa) {
+		this.tipoDespesa = tipoDespesa;
+	}
+
+	public BigDecimal getValorLancamento() {
+		return valorLancamento;
+	}
+
+	public void setValorLancamento(BigDecimal valorLancamento) {
+		this.valorLancamento = valorLancamento;
+	}
+
+	// public TipoRecebimento getTipoRecebimento() {
+	// return tipoRecebimento;
+	// }
+	//
+	// public void setTipoRecebimento(TipoRecebimento tipoRecebimento) {
+	// this.tipoRecebimento = tipoRecebimento;
+	// }
+
+	public Recebimento getRecebimento() {
+		return recebimento;
+	}
+
+	public void setRecebimento(Recebimento recebimento) {
+		this.recebimento = recebimento;
+	}
+
+	public Date getDataLancamento() {
+		return dataLancamento;
+	}
+
+	public void setDataLancamento(Date dataLancamento) {
+		this.dataLancamento = dataLancamento;
+	}
+
+	public BigDecimal getValorCartao() {
+		return valorCartao;
+	}
+		
+	public LancFluxoCaixa getLancFluxoCaixa() {
+		return lancFluxoCaixa;
+	}
+
+	public void setLancFluxoCaixa(LancFluxoCaixa lancFluxoCaixa) {
+		this.lancFluxoCaixa = lancFluxoCaixa;
+	}
+
+	public void setValorCartao(BigDecimal valorCartao) {
+		this.valorCartao = valorCartao;
+	}
+
+	public BigDecimal getValorChequePre() {
+		return valorChequePre;
+	}
+
+	public void setValorChequePre(BigDecimal valorChequePre) {
+		this.valorChequePre = valorChequePre;
+	}
+
+	public BigDecimal getValorChequeVista() {
+		return valorChequeVista;
+	}
+
+	public void setValorChequeVista(BigDecimal valorChequeVista) {
+		this.valorChequeVista = valorChequeVista;
+	}
+
+	public BigDecimal getValorDinheiro() {
+		return valorDinheiro;
+	}
+
+	public void setValorDinheiro(BigDecimal valorDinheiro) {
+		this.valorDinheiro = valorDinheiro;
+	}
+
+	public Funcionario getFuncionario() {
+		return funcionario;
+	}
+
+	public void setFuncionario(Funcionario funcionario) {
+		this.funcionario = funcionario;
+	}
+
+	public String getHistorico() {
+		return historico;
+	}
+
+	public void setHistorico(String historico) {
+		this.historico = historico;
+	}
+
+	public Venda getVenda() {
+		return venda;
+	}
+
+	public void setVenda(Venda venda) {
+		this.venda = venda;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final CaixaMovimentacao other = (CaixaMovimentacao) obj;
+		if (!Objects.equals(this.id, other.id)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 29 * hash + Objects.hashCode(this.id);
+		return hash;
+	}
+}

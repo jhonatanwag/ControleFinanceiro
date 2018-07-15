@@ -1,0 +1,120 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+
+import br.com.sistemacomercial.enums.SituacaoCheque;
+import br.com.sistemacomercial.model.Cheque;
+import br.com.sistemacomercial.model.ChequeMovimentacao;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.repository.Cheques;
+import br.com.sistemacomercial.repository.filter.ChequeFilter;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.util.jpa.Transactional;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class GerenciadorChequeBean extends PesquisaBeanAbstrato<Cheque, ChequeFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private List<Cheque> chequesSelecionados = new ArrayList<>();
+	@Inject
+	private EntityManager manager;
+	@Inject
+	private Cheques cheques;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+	private SituacaoCheque situacaoChequeSelecioando;
+
+	public GerenciadorChequeBean() {
+		setFiltro(new ChequeFilter());
+	}
+
+	public void inicializar() {
+
+	}
+
+	@Override
+	public void excluir() {
+		cheques.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Cheque " + getObjetoSelecionado().getId() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(cheques.filtrados(getFiltro()));
+	}
+
+	public List<Cheque> getChequesSelecionados() {
+		return chequesSelecionados;
+	}
+
+	public void setChequesSelecionados(List<Cheque> chequesSelecionados) {
+		this.chequesSelecionados = chequesSelecionados;
+	}
+	
+	public BigDecimal getTotalCheques(){
+		BigDecimal totalCheques = BigDecimal.ZERO;
+		if(chequesSelecionados != null){
+			if(!chequesSelecionados.isEmpty()){
+				for(Cheque cheque : chequesSelecionados){
+					totalCheques = totalCheques.add(cheque.getValorCheque());
+				}
+				
+			}
+		}
+		return totalCheques;
+	}
+
+	
+	public SituacaoCheque[] getSituacaoCheques() {
+		return SituacaoCheque.values();
+	}
+	
+
+	public Cheque salvar(Cheque chq) {
+		return this.manager.merge(chq);
+	}
+	
+	
+	
+	public SituacaoCheque getSituacaoChequeSelecioando() {
+		return situacaoChequeSelecioando;
+	}
+
+	public void setSituacaoChequeSelecioando(SituacaoCheque situacaoChequeSelecioando) {
+		this.situacaoChequeSelecioando = situacaoChequeSelecioando;
+	}
+	
+	@Transactional
+	public void alterarStatus(){
+		if(chequesSelecionados != null){
+			if(!chequesSelecionados.isEmpty()){
+				for(Cheque cheque : chequesSelecionados){
+					Cheque chq = cheques.porId(cheque.getId());
+					ChequeMovimentacao chequeMovimentacao = new ChequeMovimentacao(chq);
+					chequeMovimentacao.setHistorico("Status do Cheque alterado de: "+chq.getSituacaoCheque()+" para: "+getSituacaoChequeSelecioando());
+					chequeMovimentacao.setDataLancamento(new Date());
+					chequeMovimentacao.setFuncionario(funcionarioLogado);
+					chequeMovimentacao.setSituacaoCheque(getSituacaoChequeSelecioando());					
+					chq.getChequeMovimentacoes().add(chequeMovimentacao);
+					chq.setSituacaoCheque(getSituacaoChequeSelecioando());
+					salvar(chq);
+				}
+				
+			}
+		}
+		pesquisar();
+	}
+}

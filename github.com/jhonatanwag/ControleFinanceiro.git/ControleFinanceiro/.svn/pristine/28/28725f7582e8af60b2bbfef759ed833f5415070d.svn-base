@@ -1,0 +1,107 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Estoque;
+import br.com.sistemacomercial.model.Grupo;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.ProdutoOpcional;
+import br.com.sistemacomercial.model.ProdutoPreco;
+import br.com.sistemacomercial.model.ProdutoSabor;
+import br.com.sistemacomercial.repository.filter.ProdutoFilter;
+
+public class Produtos extends RepositoryAbstrato<Produto> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Produtos() {
+		super(Produto.class);
+	}
+
+	@Override
+	public Produto salvar(Produto objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Produto> filtrados(ProdutoFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Produto.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		if (filtro.getDataCadastroInicio() != null && filtro.getDataCadastroFim() != null) {
+			criteria.add(
+					Restrictions.between("dataCadastro", filtro.getDataCadastroInicio(), filtro.getDataCadastroFim()));
+		}
+		
+		if (StringUtils.isNotBlank(filtro.getDescricaoCodigoProduto())){
+			criteria.add(Restrictions.ilike("descricaoCodigoProduto", filtro.getDescricaoCodigoProduto(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+	public Produto porEAN(String ean, Long id) {
+		try {
+			return manager.createQuery("from Produto where ean13 = :ean and id <> :id", Produto.class)
+					.setParameter("ean", ean).setParameter("id", (id == null ? -1 : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public Produto porNomeUnico(String descricao, Long id) {
+		try {
+			return manager.createQuery("from Produto where upper(descricao) = :descricao and id <> :id", Produto.class)
+					.setParameter("descricao", descricao.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<Produto> porNome(String descricao) {
+		return this.manager.createQuery("from Produto where upper(descricao) like :descricao", Produto.class)
+				.setParameter("descricao", descricao.toUpperCase() + "%").getResultList();
+	}
+	
+	public boolean validaExclusaoProdutoEstoque(Estoque estoque) {
+		return true;
+	}
+
+	public boolean validaExclusaoProdutoPreco(ProdutoPreco produtoPrecoSelecionado) {
+		return true;
+	}
+	
+	public boolean validaExclusaoProdutoOpcional(ProdutoOpcional produtoOpcional) {
+		return true;
+	}
+	
+	public boolean validaExclusaoProdutoSabor(ProdutoSabor produtoSabor) {
+		return true;
+	}
+	
+	public List<Produto> produtosPorGrupo(Grupo grupo){
+		return this.manager.createQuery("from Produto a  where a.subGrupo.grupo.id = :idGrupo order by a.descricao", Produto.class)
+				.setParameter("idGrupo",grupo.getId()).getResultList();
+		
+	}
+
+}

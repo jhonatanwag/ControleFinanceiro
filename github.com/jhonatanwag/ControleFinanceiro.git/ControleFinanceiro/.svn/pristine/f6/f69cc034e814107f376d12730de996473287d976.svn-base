@@ -1,0 +1,23 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">Relatório de contas à receber</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frm">
+			<p:messages autoUpdate="true" closable="true" />
+			<p:fileUpload fileUploadListener="#{uploadImagensBean.upload}"
+				fileLimit="2" fileLimitMessage="Excedido Limite de arquivos"
+				cancelLabel="Cancelar" label="Arquivo" uploadLabel="Enviar"
+				invalidFileMessage="Somente arquivos .jpg, .png ou .gif"
+				allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced"
+				skinSimple="true" />
+
+			<o:graphicImage value="#{uploadImagensBean.getImage('filename.ext')}" />			
+		</h:form>
+	</ui:define>
+</ui:composition>

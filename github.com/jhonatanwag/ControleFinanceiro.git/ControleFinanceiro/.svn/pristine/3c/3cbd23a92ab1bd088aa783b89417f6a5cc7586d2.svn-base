@@ -1,0 +1,72 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Danilo
+ */
+public enum CstIpi {
+    ENTRADA_COM_RECUPERACAO_DE_CREDITO("00 - Entrada com Recuperação de Crédito"),
+    ENTRADA_TRIBUTARIA_COM_ALIQUOTA_ZERO("01 - Entrada Tributada com Alíquota Zero"),
+    ENTRADA_ISENTA("02 - Entrada Isenta"),
+    ENTRADA_NAO_TRIBUTADA("03 - Entrada Não Tributada"),
+    ENTRADA_IMUNE("04 - Entrada Imune"),
+    ENTRADA_COM_SUSPENSAO("05 - Entrada Com Suspensão"),
+    OUTRAS_ENTRADAS("49 - Outras Entradas"),
+    SAIDA_TRIBUTADA("50 - Saída Tributada"),
+    SAIDA_TRIBUTADA_COM_ALIQUOTA_ZERO("51 - Saída Tributável com Alíquota Zero"),
+    SAIDA_ISENTA("52 - Saída Isenta"),
+    SAIDA_NAO_TRIBUTADA("53 - Saída Não Tributada"),
+    SAIDA_IMUNE("54 - Saída Imune"),
+    SAIDA_COM_SUSPENSAO("55 - Saída com Suspensão"),
+    OUTRAS_SAIDAS("99 - Outras saídas");
+    private String value;
+
+    private CstIpi(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static CstIpi getSituacaoDocumento(Integer value) {
+        switch (value) {
+            case 0:
+                return ENTRADA_COM_RECUPERACAO_DE_CREDITO;
+            case 1:
+                return ENTRADA_TRIBUTARIA_COM_ALIQUOTA_ZERO;
+            case 2:
+                return ENTRADA_ISENTA;
+            case 3:
+                return ENTRADA_NAO_TRIBUTADA;
+            case 4:
+                return ENTRADA_IMUNE;
+            case 5:
+                return ENTRADA_COM_SUSPENSAO;
+            case 49:
+                return OUTRAS_ENTRADAS;
+            case 50:
+                return SAIDA_TRIBUTADA;
+            case 51:
+                return SAIDA_TRIBUTADA_COM_ALIQUOTA_ZERO;
+            case 52:
+                return SAIDA_ISENTA;
+            case 53:
+                return SAIDA_NAO_TRIBUTADA;
+            case 54:
+                return SAIDA_IMUNE;
+            case 55:
+                return SAIDA_COM_SUSPENSAO;
+            case 99:
+                return OUTRAS_SAIDAS;                
+            default:
+                return OUTRAS_SAIDAS;
+        }
+    }
+}

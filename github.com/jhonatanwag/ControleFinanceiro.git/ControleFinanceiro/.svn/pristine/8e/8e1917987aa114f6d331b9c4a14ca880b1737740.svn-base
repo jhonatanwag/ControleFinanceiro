@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Produto Opcional" widgetVar="DlgProdutoOpcional" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<p:panelGrid id="painelProdutoOpcional" columns="2">
+
+			
+			<p:outputLabel value="Produto" for="prod" />
+			<p:selectOneMenu id="prod" required="false"
+				value="#{cadastroProdutoBean.produtoOpcionalSelecionado.produtoOpcional}">
+				<f:selectItems value="#{cadastroProdutoBean.todosProdutos}"
+					var="prod" itemValue="#{prod}"
+					itemLabel="#{prod.descricaoReduzida}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="#{msg['label.preco']}" for="prodOp" />
+			<p:inputText id="prodOp" size="10" maxlength="10" styleClass="moeda"
+				required="true"
+				value="#{cadastroProdutoBean.produtoOpcionalSelecionado.preco}">
+				<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+			</p:inputText>
+
+			<p:outputLabel for="dataFim" style="text-align:right"
+				value="#{msg['label.datafim']}" />
+			<p:calendar id="dataFimProdOpcional"
+				value="#{cadastroProdutoBean.produtoOpcionalSelecionado.dataFim}"
+				required="false">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</p:calendar>
+
+		</p:panelGrid>
+
+		<h:panelGrid rendered="true" columns="3" cellpadding="5"
+			style="margin: 0 auto;">
+			<p:commandButton id="bntConfirmarOpcional" value="Confirmar"
+				actionListener="#{cadastroProdutoBean.confirmarProdutoOpcional}"
+				update="painelProdutoOpcional, :form:tabView:tabelaOpcioanais"
+				oncomplete="if (!args.validationFailed) PF('DlgProdutoOpcional').hide();" />
+
+			<p:commandButton id="bntCancelarOpcional" value="Cancelar"
+				immediate="true" oncomplete="PF('DlgProdutoOpcional').hide();">
+			</p:commandButton>
+		</h:panelGrid>
+	</p:dialog>
+</ui:composition>

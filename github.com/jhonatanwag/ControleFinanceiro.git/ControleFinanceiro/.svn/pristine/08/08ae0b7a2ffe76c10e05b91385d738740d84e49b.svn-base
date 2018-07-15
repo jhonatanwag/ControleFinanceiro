@@ -1,0 +1,34 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import javax.inject.Inject;
+import br.com.sistemacomercial.model.Caixa;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CaixaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Caixas caixas;
+
+	@Transactional
+	public Caixa salvar(Caixa caixa) {
+		return caixas.salvar(caixa);
+	}
+	
+	/**
+	 * 
+	 * @param terminal
+	 * @return true se já existe caixa em aberto para o terminal informado
+	 */
+	public boolean existeCaixaAberto(Terminal terminal){
+		if (caixas.caixaAbertoPorTerminal(terminal) != null) {
+			return true;
+		}
+		return false;
+	}
+
+}

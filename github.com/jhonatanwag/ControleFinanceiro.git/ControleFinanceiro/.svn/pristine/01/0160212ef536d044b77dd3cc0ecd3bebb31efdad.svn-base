@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Marca;
+import br.com.sistemacomercial.repository.Marcas;
+import br.com.sistemacomercial.repository.filter.MarcaFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaMarcaBean extends PesquisaBeanAbstrato<Marca, MarcaFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Marcas marcas;
+
+	public PesquisaMarcaBean() {
+		setFiltro(new MarcaFilter());
+	}
+
+	@Override
+	public void excluir() {
+		marcas.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Marca " + getObjetoSelecionado().getDescricao() + " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(marcas.filtrados(getFiltro()));
+	}
+
+}

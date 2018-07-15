@@ -1,0 +1,43 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Douglas
+ */
+public enum TipoEmail {
+
+    COMERCIAL("Comercial"),
+    PESSOAL("Pessoal"),
+    MSN("MSN"),
+    NFE("Recepção NFE");
+    private String value;
+
+    private TipoEmail(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static TipoEmail getTipoEmail(Integer value) {
+        switch (value) {
+            case 0:
+                return COMERCIAL;
+            case 1:
+                return PESSOAL;
+            case 2:
+                return MSN;
+            case 3:
+                return NFE;
+            default:
+                return PESSOAL;
+        }
+    }
+}

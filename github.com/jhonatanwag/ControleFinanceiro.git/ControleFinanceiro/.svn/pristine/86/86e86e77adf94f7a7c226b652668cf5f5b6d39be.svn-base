@@ -1,0 +1,37 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Douglas
+ */
+public enum SituacaoConferencia {
+
+    CONFERIDO("Conferido"),
+    NAO_CONFERIDO("Não Conferido");
+    private String value;
+
+    private SituacaoConferencia(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static SituacaoConferencia getSituacaoDocumento(Integer value) {
+        switch (value) {
+            case 0:
+                return CONFERIDO;
+            case 1:
+                return NAO_CONFERIDO;
+            default:
+                return NAO_CONFERIDO;
+        }
+    }
+}

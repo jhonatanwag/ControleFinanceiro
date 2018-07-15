@@ -1,0 +1,44 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Administradora;
+import br.com.sistemacomercial.model.Rede;
+import br.com.sistemacomercial.repository.Redes;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroRedeService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Redes redes;
+
+	@Transactional
+	public Rede salvar(Rede rede) {
+		Rede redeExiste = redes.porNomeRedeUnico(rede.getNomeRede());
+
+		if (redeExiste != null && !redeExiste.equals(rede)) {
+			throw new NegocioException("Já existe uma rede cadastrado com o mesmo nome.");
+		}
+		
+		redeExiste = redes.porCodigoRedeUnico(rede.getCodigoRede());
+		
+		if (redeExiste != null && !redeExiste.equals(rede)) {
+			throw new NegocioException("Já existe um trfr cadastrado com o mesmo código");
+		}
+		
+		return redes.salvar(rede);
+	}
+
+	@Transactional
+	public void excluirAdministradora(Administradora adm) {
+//		if (!bancos.validaExclusaoEndereco(agencia)) {
+//			throw new NegocioException("Endereço não pode ser excluído.");
+//		}
+	}
+
+
+}

@@ -1,0 +1,67 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Etnia;
+import br.com.sistemacomercial.repository.filter.EtniaFilter;
+
+public class Etnias extends RepositoryAbstrato<Etnia> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Etnias() {
+		super(Etnia.class);
+	}
+
+	@Override
+	public Etnia salvar(Etnia objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Etnia> filtrados(EtniaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Etnia.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+
+	public Etnia porDescricaoUnico(String descricao, Long id) {
+		try {
+			return manager
+					.createQuery("from Etnia where upper(descricao) = :descricao and id <> :id",
+							Etnia.class)
+					.setParameter("descricao", descricao.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<Etnia> porNome(String descricao) {
+		return this.manager
+				.createQuery("from Etnia where upper(descricao) like :descricao",
+						Etnia.class)
+				.setParameter("descricao", descricao.toUpperCase() + "%").getResultList();
+	}
+
+}

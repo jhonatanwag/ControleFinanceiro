@@ -1,0 +1,76 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Danilo
+ */
+public enum CstIcms {
+//	Código 00 – Tributada integralmente.
+//	Código 10 – Tributada e com cobrança do CST ICMS por substituição tributária.
+//	Código 20 – Com redução de Base de Cálculo.
+//	Código 30 – Isenta ou não tributada e com cobrança do ICMS por substituição tributária.
+//	Código 40 – Isenta.
+//	Código 41 – Não tributada.
+//	Código 50 – Com suspensão.
+//	Código 51 – Com diferimento.
+//	Código 60 – ICMS cobrado anteriormente por substituição tributária.
+//	Código 70 – Com redução da Base de Cálculo e cobrança do ICMS por substituição tributária.
+//	Código 90 – Outras.
+	
+	TRIBURADA_INTEGRALMENTE("00 - Tributada integralmente"),
+    TRIBUTARIA_COM_COBRANCA_CST_ICMS_POR_SUBSTITUICAO_TRIBUTARIA("10 - Tributada e com cobrança do CST ICMS por substituição tributária."),
+    COM_REDUCAO_BASE_CALCULO("20 - Com redução de base cálculo."),
+    ISENTA_OU_NAO_TRIBUTADA_COM_COBRANCA_ICMS_POR_SUBSTITUICAO_TRIBUTARIA("30 - Isenta ou não tributada e com cobrança do ICMS por subs. tributária."),
+    ISENTA("40 - Isenta"),
+    NAO_TRIBUTADA("41 - Não Tributada"),
+    COM_SUSPENSAO("50 - Com Suspensão"),
+    COM_DIFERIMENTO("51 - Com Diferimento"),
+    ICMS_COBRADO_ANTERIORMENTE_POR_SUBSTITUICAO_TRIBUTARIA("60 - ICMS cobrado anteriormente por substituição tributária"),
+    COM_REDUCAO_BASE_CALCULO_E_COBRANCA_ICMS_POR_SUBSTITUICAO_TRIBUTARIA("70 - Com redução da Base de Cálculo e cobrança do ICMS por subs. tributária"),
+    OUTRAS("90 - Outras"),;
+    
+    private String value;
+
+    private CstIcms(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static CstIcms getSituacaoDocumento(Integer value) {
+        switch (value) {
+            case 0:
+                return TRIBURADA_INTEGRALMENTE;
+            case 10:
+                return TRIBUTARIA_COM_COBRANCA_CST_ICMS_POR_SUBSTITUICAO_TRIBUTARIA;
+            case 20:
+                return COM_REDUCAO_BASE_CALCULO;
+            case 30:
+                return ISENTA_OU_NAO_TRIBUTADA_COM_COBRANCA_ICMS_POR_SUBSTITUICAO_TRIBUTARIA;
+            case 40:
+                return ISENTA;
+            case 41:
+                return NAO_TRIBUTADA;
+            case 50:
+                return COM_SUSPENSAO;           
+            case 51:
+                return COM_DIFERIMENTO;
+            case 60:
+                return ICMS_COBRADO_ANTERIORMENTE_POR_SUBSTITUICAO_TRIBUTARIA;
+            case 70:
+                return COM_REDUCAO_BASE_CALCULO_E_COBRANCA_ICMS_POR_SUBSTITUICAO_TRIBUTARIA;
+            case 90:
+                return OUTRAS;              
+            default:
+                return OUTRAS;
+        }
+    }
+}

@@ -1,0 +1,160 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.persistence.PersistenceException;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import br.com.sistemacomercial.model.Caixa;
+import br.com.sistemacomercial.model.CaixaMovimentacao;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Recebimento;
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.model.TipoDespesa;
+import br.com.sistemacomercial.model.Venda;
+import br.com.sistemacomercial.repository.filter.CaixaFilter;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.service.NegocioException;
+import br.com.sistemacomercial.util.DataUtils;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class Caixas extends RepositoryAbstrato<Caixa> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+	
+	public Caixas() {
+		super(Caixa.class);
+	}
+		
+	
+    @Override
+	public Caixa salvar(Caixa caixa) {
+		return super.salvar(caixa);
+	}
+	
+	
+	@Transactional
+	public void criaMovimentoCaixa(Terminal terminal, Venda venda) {
+		try {
+			Caixa caixa = caixaAbertoPorTerminal(terminal);
+			CaixaMovimentacao caixaMovimentacao = new CaixaMovimentacao(caixa, venda);
+			caixaMovimentacao.setValorCartao(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequeVista(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequePre(BigDecimal.ZERO);
+			caixaMovimentacao.setValorDinheiro(BigDecimal.ZERO);
+			caixaMovimentacao.setValorLancamento(venda.getTotalLiquidoVenda());
+			caixaMovimentacao.setFuncionario(funcionarioLogado);
+			caixaMovimentacao
+					.setHistorico("Venda: " + venda.getId() + " Vendedor: " + venda.getVendedor().getPessoa().getNome()
+							+ " Dat./Hora: " + DataUtils.converteDataEmString(venda.getDataVenda(), "dd/MM/yyyy")
+							+ " Total:" + venda.getTotalLiquidoVenda());
+			caixa.getCaixaMovimentacaos().add(caixaMovimentacao);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação do caixa venda");
+		}
+	}
+	
+	@Transactional
+	public void criaMovimentoCaixa(Terminal terminal, Recebimento recebimento) {
+		try {
+			Caixa caixa = caixaAbertoPorTerminal(terminal);
+			CaixaMovimentacao caixaMovimentacao = new CaixaMovimentacao(caixa, recebimento);	
+			caixaMovimentacao.setValorCartao(recebimento.getValorCartao());
+			caixaMovimentacao.setValorChequeVista(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequePre(recebimento.getValorCheque());
+			caixaMovimentacao.setValorDinheiro(recebimento.getValorDinheiro());
+			caixaMovimentacao.setValorLancamento(recebimento.getValorTotalRecebimento());
+			caixaMovimentacao.setFuncionario(funcionarioLogado);
+			caixaMovimentacao
+					.setHistorico("Receb: " + recebimento.getId() + "Cli.: "+ recebimento.getCliente().getPessoa().getNome()+ " Func: " +funcionarioLogado.getPessoa().getNome()
+							+ " Dat./Hora: " + DataUtils.converteDataEmString(recebimento.getDataRecebimento(), "dd/MM/yyyy")
+							+ " Total:" + recebimento.getValorTotalRecebimento());
+			caixa.getCaixaMovimentacaos().add(caixaMovimentacao);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação do caixa recebimento");
+		}
+	}
+	
+	
+	@Transactional
+	public void criaMovimentoCaixa(Terminal terminal, TipoDespesa tipoDespesa) {
+		try {
+			Caixa caixa = caixaAbertoPorTerminal(terminal);
+			CaixaMovimentacao caixaMovimentacao = new CaixaMovimentacao(caixa, tipoDespesa);	
+			caixaMovimentacao.setValorCartao(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequeVista(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequePre(BigDecimal.ZERO);
+			caixaMovimentacao.setValorDinheiro(BigDecimal.ZERO);
+			caixaMovimentacao.setValorLancamento(BigDecimal.ZERO);
+			caixaMovimentacao.setFuncionario(funcionarioLogado);
+			caixaMovimentacao
+					.setHistorico("Lanc. Fluxo: ");
+			caixa.getCaixaMovimentacaos().add(caixaMovimentacao);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação do caixa lançamento em fluxo de caixa");
+		}
+	}
+	
+	
+	
+	@Transactional
+	public void estornoMovimentoCaixa(Terminal terminal, Venda venda) {
+		try {
+			Caixa caixa = caixaAbertoPorTerminal(terminal);
+			CaixaMovimentacao caixaMovimentacao = new CaixaMovimentacao(caixa, venda);
+			caixaMovimentacao.setValorCartao(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequeVista(BigDecimal.ZERO);
+			caixaMovimentacao.setValorChequePre(BigDecimal.ZERO);
+			caixaMovimentacao.setValorDinheiro(BigDecimal.ZERO);
+			BigDecimal valorEstornado = venda.getTotalLiquidoVenda().multiply(new BigDecimal("-1"));
+			caixaMovimentacao.setValorLancamento(valorEstornado);
+			caixaMovimentacao.setFuncionario(funcionarioLogado);
+			caixaMovimentacao
+					.setHistorico("(ESTORNO) Venda: " + venda.getId() + " Vendedor: " + venda.getVendedor().getPessoa().getNome()
+							+ " Dat./Hora: " + DataUtils.converteDataEmString(venda.getDataVenda(), "dd/MM/yyyy")
+							+ " Total:" + venda.getTotalLiquidoVenda());
+			caixa.getCaixaMovimentacaos().add(caixaMovimentacao);
+		} catch (PersistenceException e) {
+			throw new NegocioException("Problema ao criar a movimentação de estorno da venda");
+		}
+	}
+
+	
+
+	public Caixa caixaAbertoPorTerminal(Terminal terminal) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Caixa.class);
+		criteria.add(Restrictions.eq("terminalAbertura.id", terminal.getId()));
+		criteria.add(Restrictions.isNull("dataFechamento"));
+		return (Caixa) criteria.uniqueResult();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Caixa> filtrados(CaixaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Caixa.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (filtro.getDataAberturaIni() != null && filtro.getDataAberturaFim() != null) {
+			criteria.add(Restrictions.between("dataAbertura", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (filtro.getDataFechamentoIni() != null && filtro.getDataFechamentoFim() != null) {
+			criteria.add(Restrictions.between("dataFechamento", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		return criteria.addOrder(Order.asc("id")).list();
+	}
+
+}

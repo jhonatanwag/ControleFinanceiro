@@ -1,0 +1,40 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.TipoCorteCabelo;
+import br.com.sistemacomercial.repository.TipoCorteCabelos;
+import br.com.sistemacomercial.repository.filter.TipoCorteCabeloFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaTipoCorteCabeloBean extends PesquisaBeanAbstrato<TipoCorteCabelo, TipoCorteCabeloFilter>
+		implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TipoCorteCabelos tipoCorteCabelos;
+
+	public PesquisaTipoCorteCabeloBean() {
+		setFiltro(new TipoCorteCabeloFilter());
+	}
+
+	@Override
+	public void excluir() {
+		tipoCorteCabelos.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("TipoCorteCabelo " + getObjetoSelecionado().getDescricao() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(tipoCorteCabelos.filtrados(getFiltro()));
+	}
+
+}

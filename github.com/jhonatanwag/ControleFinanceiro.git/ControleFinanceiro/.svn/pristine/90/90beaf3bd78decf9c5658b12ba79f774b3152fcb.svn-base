@@ -1,0 +1,45 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
+import br.com.sistemacomercial.model.SubGrupo;
+import br.com.sistemacomercial.repository.Grupos;
+
+@FacesConverter(forClass = SubGrupo.class)
+public class SubGrupoConverter implements Converter {
+	@Inject
+	private Grupos subGrupos;
+	
+//	public SubGrupoConverter() {
+//		subGrupos = CDIServiceLocator.getBean(Grupos.class);
+//	}
+	
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		SubGrupo retorno = null;
+		
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = subGrupos.porIdSubGrupo(id);
+		}
+		
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value != null) {
+			SubGrupo subGrupo = (SubGrupo) value;
+			return subGrupo.getId() == null ? null : subGrupo.getId().toString();
+		}
+		
+		return "";
+	}
+
+}

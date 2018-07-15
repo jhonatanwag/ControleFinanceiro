@@ -1,0 +1,9 @@
+package nfe;
+
+import java.io.InputStream;
+
+public abstract interface CertificadoDigital {
+	public abstract InputStream getCertificado();
+
+	public abstract String getSenha();
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Seleção de pessoas</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</h:head>
+<h:body>
+
+	<h:form id="formListar">
+
+		<div class="ContainerIndent">
+			<p:panel>
+				<p:focus for="nome" />
+				<p:panel>
+					<div class="ui-fluid">
+						<p:panelGrid columns="2" columnClasses="col1,col2,col1,col2"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+
+							<p:outputLabel value="Código" />
+							<p:inputText value="#{pesquisaPessoaBean.filtro.idDe}"
+								maxlength="6" />
+
+							<p:outputLabel value="até" />
+							<p:inputText value="#{pesquisaPessoaBean.filtro.idAte}"
+								maxlength="6" />
+
+
+							<!-- 							<p:outputLabel value="Data do cadastro" /> -->
+							<!-- 							<p:calendar size="10" pattern="dd/MM/yyyy" -->
+							<!-- 								value="{pesquisaPessoaBean.filtro.dataCadastroInicio}" /> -->
+							<!-- 							<p:outputLabel value="até" /> -->
+							<!-- 							<p:calendar size="10" pattern="dd/MM/yyyy" -->
+							<!-- 								value="{pesquisaPessoaBean.filtro.dataCadastroFim}" /> -->
+
+							<p:outputLabel value="Nome" />
+							<p:inputText id="nome" value="#{pesquisaPessoaBean.filtro.nome}"
+								maxlength="100" />
+
+						</p:panelGrid>
+					</div>
+				</p:panel>
+
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:commandButton value="Pesquisar"
+							action="#{pesquisaPessoaBean.pesquisar}" update="@form" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+
+				<p:growl id="messages" showDetail="true" autoUpdate="true"
+					sticky="true" />
+
+
+
+				<p:dataTable id="dataTablePessoa" reflow="true"
+					value="#{pesquisaPessoaBean.objetosFiltrados}" var="pessoa"
+					style="margin-top: 20px" emptyMessage="Nenhuma pessoa encontrado."
+					rows="20" paginator="true" paginatorAlwaysVisible="false"
+					paginatorPosition="bottom">
+
+					<p:column id="idpessoa" headerText="Código" sortBy="#{pessoa.id}">
+						<h:outputText value="#{pessoa.id}" />
+					</p:column>
+
+					<p:column id="tipoPessoa" headerText="Tipo Pessoa"
+						sortBy="#{pessoa.tipoPessoa}">
+						<h:outputText value="#{pessoa.tipoPessoa.toString()}" />
+					</p:column>
+
+					<p:column id="dataCadastro" headerText="Data do Cadastro"
+						sortBy="#{pessoa.dataCadastro}">
+						<h:outputText value="#{pessoa.dataCadastro}">
+							<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column id="nome" headerText="Nome/Nome Fantasia"
+						sortBy="#{pessoa.nome}">
+						<h:outputText value="#{pessoa.nome}" />
+					</p:column>
+
+					<p:column id="abreviacaologradouro" headerText="Razão Social"
+						sortBy="#{pessoa.razaoSocial}">
+						<h:outputText value="#{pessoa.razaoSocial}" />
+					</p:column>
+
+					<p:column id="documentoFederal" headerText="CPF/CNPJ"
+						sortBy="#{pessoa.documentoFederal}">
+						<h:outputText value="#{pessoa.documentoFederal}" />
+					</p:column>
+
+					<p:column>
+						<p:commandButton icon="ui-icon-check" title="Selecionar"
+							action="#{pesquisaPessoaBean.selecionar(pessoa)}" process="@this" />
+					</p:column>
+
+
+				</p:dataTable>
+
+			</p:panel>
+		</div>
+
+	</h:form>
+</h:body>
+</html>

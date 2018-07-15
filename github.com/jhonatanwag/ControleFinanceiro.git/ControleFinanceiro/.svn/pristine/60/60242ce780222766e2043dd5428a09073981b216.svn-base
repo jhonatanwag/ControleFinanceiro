@@ -1,0 +1,88 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.NoResultException;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Empresa;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.repository.filter.EmpresaFilter;
+
+public class Empresas extends RepositoryAbstrato<Empresa> implements Serializable {
+
+	public Empresas() {
+		super(Empresa.class);
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public Empresa salvar(Empresa objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Empresa> filtrados(EmpresaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Empresa.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getNomeFantasia())) {
+			criteria.add(Restrictions.ilike("nomeFantasia", filtro.getNomeFantasia(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getRazaoSocial())) {
+			criteria.add(Restrictions.ilike("razaoSocial", filtro.getRazaoSocial(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("nomeFantasia")).list();
+	}
+
+	public Filial porIdFilial(Long id) {
+		return manager.find(Filial.class, id);
+	}
+
+	public List<Filial> subFilialPorEmpresa(Empresa empresa) {
+		return manager.createQuery("from Filial where empresa.id = :empresa_id", Filial.class)
+				.setParameter("empresa_id", empresa.getId()).getResultList();
+	}
+
+	public List<Filial> todasFiliais() {
+		return manager.createQuery("from Filial", Filial.class).getResultList();
+	}
+	
+	public Empresa porRazaoSocialUnico(String razao, Long id) {
+		try {
+			return manager.createQuery("from Empresa where upper(razaoSocial) = :razao and id <> :id", Empresa.class)
+					.setParameter("razao", razao.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public Empresa porNomeFantasiaUnico(String fantasia, Long id) {
+		try {
+			return manager
+					.createQuery("from Empresa where upper(nomeFantasia) = :fantasia and id <> :id", Empresa.class)
+					.setParameter("fantasia", fantasia.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public boolean validaExclusaoFilial(Filial filialSelecionada) {
+		return true;
+	}
+
+}

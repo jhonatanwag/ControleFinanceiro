@@ -1,0 +1,22 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Renegociação" widgetVar="DlgRenegociacao" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<p:panelGrid id="painelRenegociacao" columns="2">
+
+
+		</p:panelGrid>
+
+		<h:panelGrid rendered="true" columns="3" cellpadding="5"
+			style="margin: 0 auto;">
+			<p:commandButton value="Fechar" immediate="true"
+				oncomplete="PF('DlgRenegociacao').hide();">
+			</p:commandButton>
+		</h:panelGrid>
+	</p:dialog>
+</ui:composition>

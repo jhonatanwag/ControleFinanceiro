@@ -1,0 +1,415 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import javax.enterprise.inject.Produces;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.enums.Sexo;
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+import br.com.sistemacomercial.enums.TipoBloqueioAviso;
+import br.com.sistemacomercial.enums.TipoEmail;
+import br.com.sistemacomercial.enums.TipoEndereco;
+import br.com.sistemacomercial.enums.TipoPessoa;
+import br.com.sistemacomercial.enums.TipoTelefone;
+import br.com.sistemacomercial.model.Agencia;
+import br.com.sistemacomercial.model.Cidade;
+import br.com.sistemacomercial.model.Cliente;
+import br.com.sistemacomercial.model.ClienteBloqueioAviso;
+import br.com.sistemacomercial.model.Email;
+import br.com.sistemacomercial.model.Enderecos;
+import br.com.sistemacomercial.model.EstadoCivil;
+import br.com.sistemacomercial.model.Etnia;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.InformacoesBancaria;
+import br.com.sistemacomercial.model.InformacoesPessoais;
+import br.com.sistemacomercial.model.MotivoBloqueio;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.Telefone;
+import br.com.sistemacomercial.model.TipoLogradouro;
+import br.com.sistemacomercial.repository.Bancos;
+import br.com.sistemacomercial.repository.Cidades;
+import br.com.sistemacomercial.repository.EstadoCivis;
+import br.com.sistemacomercial.repository.Etnias;
+import br.com.sistemacomercial.repository.MotivoBloqueios;
+import br.com.sistemacomercial.repository.TipoLogradouros;
+import br.com.sistemacomercial.repository.filter.CidadeFilter;
+import br.com.sistemacomercial.repository.filter.EstadoCivilFilter;
+import br.com.sistemacomercial.repository.filter.EtniaFilter;
+import br.com.sistemacomercial.repository.filter.MotivoBloqueioFilter;
+import br.com.sistemacomercial.repository.filter.TipoLogradouroFilter;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.service.CadastroPessoaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroPessoaBean extends BeanAbstrato<Pessoa>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private EstadoCivis estadoCivis;
+	@Inject
+	private TipoLogradouros tipoLogradouros;
+	@Inject
+	private Cidades cidades;
+	@Inject
+	private Bancos bancos;
+	@Inject
+	private CadastroPessoaService cadastroPessoaService;
+	@Inject
+	EnvioEmailPessoaBean envioEmailPessoaBean;
+	@Inject
+	private Etnias etnias; 
+	@Inject
+	private MotivoBloqueios motivoBloqueios;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+	
+	private List<EstadoCivil> todosEstadosCivis;
+	private List<TipoLogradouro> todosTiposLogradouros;
+	private List<Cidade> todasCidades;
+	private List<Agencia> todasAgencias;
+	private List<Etnia> todasEtnias;
+	private List<MotivoBloqueio> todosMotivosBloqueios;
+	private String mascaraTipoPessoa;
+	private Enderecos enderecoSelecionado;
+	private Email emailSelecionado;
+	private Telefone telefoneSelecionado;
+	private InformacoesBancaria informacoesBancariaSelecionada;
+	private ClienteBloqueioAviso clienteBloqueioAvisoSelecionado;
+	private Boolean editandoEndereco;
+	private Boolean editandoEmail;
+	private Boolean editandoTelefone;
+	private Boolean editandoInfBancaria;
+	private Boolean editandoCliBloqAviso;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		todosEstadosCivis = estadoCivis.filtrados(new EstadoCivilFilter());
+		todosTiposLogradouros = tipoLogradouros.filtrados(new TipoLogradouroFilter());
+		todasCidades = cidades.filtrados(new CidadeFilter());
+		todasAgencias = bancos.TodasAgencias();
+		todasEtnias = etnias.filtrados(new EtniaFilter());
+		todosMotivosBloqueios = motivoBloqueios.filtrados(new MotivoBloqueioFilter());
+	}
+
+	@Override
+	public void setObjeto(Pessoa objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Produces
+	@PessoaEdicao
+	@Override
+	public Pessoa getObjeto() {
+		// TODO Auto-generated method stub
+		return super.getObjeto();
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Pessoa());
+		getObjeto().setDataCadastro(new Date());
+		getObjeto().setTipoPessoa(TipoPessoa.FISICA);
+		InformacoesPessoais informacoesPessoais = new InformacoesPessoais(getObjeto());		 
+		getObjeto().setInformacoesPessoais(informacoesPessoais);
+		getObjeto().setCliente(true);
+		getObjeto().setClientePessoa(new Cliente(getObjeto()));
+		this.mascaraTipoPessoa = "999.999.999-99";
+		getObjeto().setFuncionario(false);
+		getObjeto().setFornecedor(false);
+		// this.todasCidades = new ArrayList<>();
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroPessoaService.salvar(getObjeto()));
+		//envioEmailPessoaBean.enviarEmail();
+		limpar();
+		FacesUtil.addInfoMessage("Pessoa salvo com sucesso!");
+	}
+
+	public List<EstadoCivil> getTodosEstadosCivis() {
+		return todosEstadosCivis;
+	}
+	
+	public List<Etnia> getTodosEtnias() {
+		return todasEtnias;
+	}
+	
+	
+
+	public List<MotivoBloqueio> getTodosMotivosBloqueios() {
+		return todosMotivosBloqueios;
+	}
+
+	public List<TipoLogradouro> getTodosTiposLogradouros() {
+		return todosTiposLogradouros;
+	}
+
+	public List<Cidade> getTodasCidades() {
+		return todasCidades;
+	}
+
+	public List<Agencia> getTodasAgencias() {
+		return todasAgencias;
+	}
+
+	public Enderecos getEnderecoSelecionado() {
+		return enderecoSelecionado;
+	}
+
+	public void setEnderecoSelecionado(Enderecos enderecoSelecionado) {
+		this.enderecoSelecionado = enderecoSelecionado;
+	}
+
+	public Email getEmailSelecionado() {
+		return emailSelecionado;
+	}
+
+	public void setEmailSelecionado(Email emailSelecionado) {
+		this.emailSelecionado = emailSelecionado;
+	}
+
+	public Telefone getTelefoneSelecionado() {
+		return telefoneSelecionado;
+	}
+
+	public void setTelefoneSelecionado(Telefone telefoneSelecionado) {
+		this.telefoneSelecionado = telefoneSelecionado;
+	}
+
+	public InformacoesBancaria getInformacoesBancariaSelecionada() {
+		return informacoesBancariaSelecionada;
+	}
+
+	public void setInformacoesBancariaSelecionada(InformacoesBancaria informacoesBancariaSelecionada) {
+		this.informacoesBancariaSelecionada = informacoesBancariaSelecionada;
+	}
+		
+	public ClienteBloqueioAviso getClienteBloqueioAvisoSelecionado() {
+		return clienteBloqueioAvisoSelecionado;
+	}
+
+	public void setClienteBloqueioAvisoSelecionado(ClienteBloqueioAviso clienteBloqueioAvisoSelecionado) {
+		this.clienteBloqueioAvisoSelecionado = clienteBloqueioAvisoSelecionado;
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public TipoPessoa[] getTipoPessoas() {
+		return TipoPessoa.values();
+	}
+
+	public Sexo[] getSexo() {
+		return Sexo.values();
+	}
+
+	public TipoEndereco[] getTipoEnderecos() {
+		return TipoEndereco.values();
+	}
+
+	public TipoEmail[] getTipoEmails() {
+		return TipoEmail.values();
+	}
+
+	public TipoTelefone[] getTipoTelefones() {
+		return TipoTelefone.values();
+	}
+	
+	public TipoBloqueioAviso[] getTipoBloqueioAvisos() {
+		return TipoBloqueioAviso.values();
+	}
+
+	public void defineTipoPessoa() {
+		if (getObjeto().getTipoPessoa() != null) {
+			if (getObjeto().getTipoPessoa().equals(TipoPessoa.FISICA)) {
+				this.mascaraTipoPessoa = "999.999.999-99";
+				if (!isEditando()) {
+					getObjeto().setInformacoesPessoais(new InformacoesPessoais(getObjeto()));
+					getObjeto().setRazaoSocial(null);
+				}
+			} else {
+				this.mascaraTipoPessoa = "99.999.999/9999-99";
+				if (!isEditando()) {
+					getObjeto().setInformacoesPessoais(null);
+				}
+
+			}
+		}
+	}
+
+	public void defineFuncionario() {
+		if (getObjeto().isFuncionario()) {
+			getObjeto().setFuncionarioPessoa(new Funcionario(getObjeto()));
+		} else {
+			getObjeto().setFuncionarioPessoa(null);
+		}
+
+	}
+
+	public String getMascaraTipoPessoa() {
+		return mascaraTipoPessoa;
+	}
+
+	/* Endereço - inicio */
+
+	public void novoEndereco() {
+		setEnderecoSelecionado(new Enderecos());
+		getEnderecoSelecionado().setPessoa(getObjeto());
+		editandoEndereco = false;
+	}
+
+	public void alterarEndereco() {
+		this.editandoEndereco = true;
+	}
+
+	public void confirmarEndereco() {
+		int i = 0;
+		if (!editandoEndereco) {
+			getObjeto().getEnderecos().add(getEnderecoSelecionado());
+		}
+		for (Enderecos enderecos : getObjeto().getEnderecos()) {
+			enderecos.setSequencia(++i);
+		}
+
+	}
+
+	public void excluirEndereco() {
+		cadastroPessoaService.excluirEndereco(getEnderecoSelecionado());
+		getObjeto().getEnderecos().remove(getEnderecoSelecionado());
+	}
+
+	/* Endereco - fim */
+
+	/* Email - inicio */
+
+	public void novoEmail() {
+		setEmailSelecionado(new Email());
+		getEmailSelecionado().setPessoa(getObjeto());
+		editandoEmail = false;
+	}
+
+	public void alterarEmail() {
+		this.editandoEmail = true;
+	}
+
+	public void confirmarEmail() {
+		int i = 0;
+		if (!editandoEmail) {
+			getObjeto().getEmails().add(getEmailSelecionado());
+		}
+		for (Email emails : getObjeto().getEmails()) {
+			emails.setSequencia(++i);
+		}
+
+	}
+
+	public void excluirEmail() {
+		cadastroPessoaService.excluirEmail(getEmailSelecionado());
+		getObjeto().getEmails().remove(getEmailSelecionado());
+	}
+
+	/* Email - fim */
+
+	/* Telefone - inicio */
+
+	public void novoTelefone() {
+		setTelefoneSelecionado(new Telefone());
+		getTelefoneSelecionado().setPessoa(getObjeto());
+		editandoTelefone = false;
+	}
+
+	public void alterarTelefone() {
+		this.editandoTelefone = true;
+	}
+
+	public void confirmarTelefone() {
+		int i = 0;
+		if (!editandoTelefone) {
+			getObjeto().getTelefones().add(getTelefoneSelecionado());
+		}
+		for (Telefone telefones : getObjeto().getTelefones()) {
+			telefones.setSequencia(++i);
+		}
+
+	}
+
+	public void excluirTelefone() {
+		cadastroPessoaService.excluirTelefone(getTelefoneSelecionado());
+		getObjeto().getTelefones().remove(getTelefoneSelecionado());
+	}
+
+	/* Telefone - fim */
+
+	/* Inf. Bancaria - inicio */
+
+	public void novaInfBancaria() {
+		setInformacoesBancariaSelecionada(new InformacoesBancaria(getObjeto()));
+		editandoInfBancaria = false;
+	}
+
+	public void alterarInfBancaria() {
+		this.editandoInfBancaria = true;
+	}
+
+	public void confirmarInfBancaria() {
+		if (!editandoInfBancaria) {
+			getObjeto().getInformacoesBancarias().add(getInformacoesBancariaSelecionada());
+		}
+	}
+
+	public void excluirInfBancaria() {
+		cadastroPessoaService.excluirInfBancaria(getInformacoesBancariaSelecionada());
+		getObjeto().getInformacoesBancarias().remove(getInformacoesBancariaSelecionada());
+	}
+
+	/* Inf. Bancaria - fim */
+	
+	
+	public void novoBloqAviso() {
+		setClienteBloqueioAvisoSelecionado(new ClienteBloqueioAviso());
+		getClienteBloqueioAvisoSelecionado().setCliente(getObjeto().getClientePessoa());
+		getClienteBloqueioAvisoSelecionado().setFuncionarioBloqueioAviso(funcionarioLogado);
+		getClienteBloqueioAvisoSelecionado().setTipoBloqueioAviso(TipoBloqueioAviso.AVISO);
+		//Aqui da concorrencia
+		/*for(MotivoBloqueio motivoBloqueio : this.todosMotivosBloqueios){
+			if(motivoBloqueio.getSituacaoCadastro().equals(SituacaoCadastro.INATIVO)){
+				this.todosMotivosBloqueios.remove(motivoBloqueio);
+			}
+		}*/
+		editandoCliBloqAviso = false;
+	}
+
+	public void alterarBloqAviso() {
+		this.editandoCliBloqAviso = true;
+	}
+
+	public void confirmarBloqAviso() {		
+		if (!editandoCliBloqAviso) {
+			getObjeto().getClientePessoa().getClienteBloqueios().add(getClienteBloqueioAvisoSelecionado());
+		}
+		
+	}
+
+	public void encerrarBloqAviso() {
+		getClienteBloqueioAvisoSelecionado().setDataFim(new Date());
+		getClienteBloqueioAvisoSelecionado().setFuncionarioFim(funcionarioLogado);		
+	}
+
+
+}

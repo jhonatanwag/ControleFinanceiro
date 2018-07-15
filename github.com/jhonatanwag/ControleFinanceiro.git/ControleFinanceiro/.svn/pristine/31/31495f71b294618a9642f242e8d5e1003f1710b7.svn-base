@@ -1,0 +1,75 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{notaEntradaBean.editando ? 'Edição da nota fiscal de entrada' : 'Nova entrada de nota fiscal'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="notaEntrada" value="#{notaEntradaBean.objeto}" />
+			<f:viewAction action="#{notaEntradaBean.inicializar}" />
+		</f:metadata>
+
+		<h:form id="form">
+			<div class="ContainerIndent">
+				<p:panel>
+					<h1>
+						<div class="FontBold Fs18 hardblue">
+							#{cadastroCorBean.editando ? 'Edição da nota fiscal de entrada' :
+							'Nova entrada de nota fiscal'}</div>
+					</h1>
+					<p:messages autoUpdate="true" closable="true" />
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:button value="Novo" outcome="/notaEntrada/NotaEntrada" />
+							<p:commandButton value="Salvar" id="botaoSalvar"
+								action="#{notaEntradaBean.salvar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Pesquisa"
+								outcome="/notaEntrada/PesquisaNotaEntrada" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:tabView style="margin-top: 5px;" id="tabViewPrincipal">
+						<p:tab title="Nota entrada">
+							<p:panel>
+								<ui:include
+									src="/WEB-INF/template/notaEntrada/DadosPrincipais.xhtml" />
+							</p:panel>
+						</p:tab>
+						<p:tab title="Itens">
+							
+								<p:tabView style="margin-top: 5px;" id="tabTotais">
+									<p:tab title="Totais">
+										<p:panel>
+											<ui:include
+												src="/WEB-INF/template/notaEntrada/TotaisNota.xhtml" />
+										</p:panel>
+									</p:tab>
+								</p:tabView>
+								<p:tabView id="tabViewItem">
+									<p:tab title="Produtos/Serviços" id="tabItemNota">
+										<p:panel>
+											<ui:include
+												src="/WEB-INF/template/notaEntrada/ItemNota.xhtml" />
+										</p:panel>
+									</p:tab>
+								</p:tabView>
+								
+						</p:tab>
+
+					</p:tabView>
+
+				</p:panel>
+			</div>
+		</h:form>
+
+		<ui:include
+			src="/WEB-INF/template/notaEntrada/DlgItemNotaEntrada.xhtml" />
+	</ui:define>
+</ui:composition>

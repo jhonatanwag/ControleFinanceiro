@@ -1,0 +1,37 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.ObjetoSistema;
+import br.com.sistemacomercial.model.ObjetoOpcao;
+import br.com.sistemacomercial.repository.ObjetoSistemas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroObjetoSistemaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private ObjetoSistemas objetoSistemas;
+
+	@Transactional
+	public ObjetoSistema salvar(ObjetoSistema grupo) {
+		ObjetoSistema objetoSistemaExiste = objetoSistemas.porDescricaoUnico(grupo.getDescricao(), grupo.getId());
+
+		if (objetoSistemaExiste != null && !objetoSistemaExiste.equals(grupo)) {
+			throw new NegocioException("Já existe uma objeto do sistema com a mesma descrição cadastrada.");
+		}
+
+		return objetoSistemas.salvar(grupo);
+	}
+
+	public void excluirSubObjetoSistema(ObjetoOpcao objetoOpcao) {
+		if (!objetoSistemas.validaExclusaoSubObjetoSistema(objetoOpcao)) {
+			throw new NegocioException("Objeto do sistema não pode ser excluído.");
+		}
+
+	}
+
+}

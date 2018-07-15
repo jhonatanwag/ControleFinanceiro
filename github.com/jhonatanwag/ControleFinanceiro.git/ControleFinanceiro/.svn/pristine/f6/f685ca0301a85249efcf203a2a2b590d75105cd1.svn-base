@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.EstadoCivil;
+import br.com.sistemacomercial.service.CadastroEstadoCivilService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroEstadoCivilBean extends BeanAbstrato<EstadoCivil>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroEstadoCivilService cadastroEstadoCivilService;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new EstadoCivil());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroEstadoCivilService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Estado civil salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+}

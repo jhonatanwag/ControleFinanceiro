@@ -1,0 +1,36 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+/**
+ *
+ * @author Danilo
+ */
+public enum TipoMovimentacao {
+
+    ENTRADA("Entrada"),
+    SAIDA("Saída");   
+    private String value;
+
+    private TipoMovimentacao(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static TipoMovimentacao getTipoMovimentacao(Integer value) {
+        switch (value) {
+            case 0:
+                return ENTRADA;
+            case 1:
+                return SAIDA;                  
+            default:
+                return null;
+        }
+    }
+}

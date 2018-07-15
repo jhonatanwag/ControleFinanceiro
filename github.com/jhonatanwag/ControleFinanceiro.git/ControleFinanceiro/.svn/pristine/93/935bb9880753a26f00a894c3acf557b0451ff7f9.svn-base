@@ -1,0 +1,46 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.service.CadastroTerminalService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroTerminalBean extends BeanAbstrato<Terminal>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroTerminalService cadastroTerminalService;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Terminal());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroTerminalService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Terminal salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+}

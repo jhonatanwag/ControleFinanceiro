@@ -1,0 +1,23 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import javax.inject.Inject;
+import br.com.sistemacomercial.model.NotaEntrada;
+import br.com.sistemacomercial.repository.NotaEntradas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class NotaEntradaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private NotaEntradas notaEntradas;
+
+	@Transactional
+	public NotaEntrada salvar(NotaEntrada notaEntrada) {
+		if (notaEntrada.isNovo()) {
+		}
+		return notaEntradas.salvar(notaEntrada);
+	}
+
+}

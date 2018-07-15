@@ -1,0 +1,91 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de nota de entrada</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<div class="ContainerIndent">
+				<p:panel>
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa
+						de nota de entrada</div>
+					<div class="Separator"></div>
+					<div class="ui-fluid">
+						<p:panelGrid columns="4" columnClasses="col1,col2,col1,col2"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+							<p:inputText value="#{pesquisaNotaEntradaBean.filtro.idDe}"
+								maxlength="6" />
+							<p:outputLabel value="até" />
+							<p:inputText value="#{pesquisaNotaEntradaBean.filtro.idAte}"
+								maxlength="6" />
+						</p:panelGrid>
+					</div>
+				</p:panel>
+
+				<p:toolbar style="margin-top: 20px">
+					<p:toolbarGroup>
+						<p:commandButton value="Pesquisar"
+							action="#{pesquisaNotaEntradaBean.pesquisar}" update="@form" />
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:button value="Novo" outcome="NotaEntrada.xhtml" />
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:dataTable id="notaEntradaTable"
+					value="#{pesquisaNotaEntradaBean.objetosFiltrados}"
+					var="notaEntrada" style="margin-top: 20px"
+					emptyMessage="Nenhuma marca encontrado." rows="20" paginator="true"
+					paginatorAlwaysVisible="false" paginatorPosition="bottom">
+
+					<p:column headerText="Código"
+						style="text-align: center; width: 70px">
+						<h:outputText value="#{notaEntrada.id}" />
+					</p:column>
+
+
+					<p:column headerText="Fornecedor"
+						sortBy="#{notaEntrada.fornecedor.pessoa.nome}">
+						<h:outputText value="#{notaEntrada.fornecedor.pessoa.nome}" />
+					</p:column>
+
+					<p:column headerText="Sit. Conferencia"
+						sortBy="#{notaEntrada.situacaoConferencia}">
+						<h:outputText value="#{notaEntrada.situacaoConferencia}" />
+					</p:column>
+
+					<p:column style="width: 100px; text-align: center">
+						<p:button outcome="/notaEntrada/NotaEntrada" icon="ui-icon-pencil"
+							title="Editar">
+							<f:param name="notaEntrada" value="#{notaEntrada.id}" />
+						</p:button>
+						<p:commandButton icon="ui-icon-trash" title="Excluir"
+							oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+							update=":frmPesquisa:confirmacaoExclusaoDialog">
+							<f:setPropertyActionListener
+								target="#{pesquisaNotaEntradaBean.objetoSelecionado}"
+								value="#{notaEntrada}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:confirmDialog header="Exclusão da nota de entrada?"
+					message="Tem certeza que deseja excluir a marca #{pesquisaNotaEntradaBean.objetoSelecionado.id}?"
+					widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+					<p:button value="Não"
+						onclick="PF('confirmacaoExclusao').hide(); return false;" />
+					<p:commandButton value="Sim"
+						oncomplete="PF('confirmacaoExclusao').hide();"
+						action="#{pesquisaNotaEntradaBean.excluir}" process="@this"
+						update=":frmPesquisa:notaEntradaTable" />
+				</p:confirmDialog>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

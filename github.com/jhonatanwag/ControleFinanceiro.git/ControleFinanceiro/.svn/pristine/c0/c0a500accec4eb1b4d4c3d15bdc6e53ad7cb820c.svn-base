@@ -1,0 +1,225 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ps="http://primefaces.org/sentinel"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:form>
+
+		<div id="layout-menubar" class="Unselectable fontRegular">
+			<div class="layout-menubarinner-box" id="buttonArea">
+				<a href="#" id="layout-menubar-resize" class="BordRad3"
+					title="Menu Resize"><i class="icon-th-list-2"></i></a> <a href="#"
+					id="layout-menubar-resize2" class="BordRad3" title="Open Menu"><i
+					class="icon-menu"></i></a>
+			</div>
+
+			<!-- 			<div class="layout-menubarinner-box" id="searchArea"> -->
+			<!-- 				<i class="icon-search floatLeft gray"></i> <input type="text" -->
+			<!-- 					class="layout-menubar-search floatLeft Animated05" -->
+			<!-- 					placeholder="Search Here" /> -->
+			<!-- 			</div> -->
+
+			<ps:menu id="sm_leftmenu">
+				<p:menuitem id="sm_dashboard" value="#{msg['label.menu.principal']}"
+					icon="icon-home-outline" url="/DashBoard.xhtml"
+					containerStyleClass="layout-menubar-active" />
+
+				<p:separator />
+				<p:submenu id="smCadastratos" label="#{msg['label.menu.cadastros']}"
+					icon="icon-folder-open">
+					<p:submenu id="smCadFiscais"
+						label="#{msg['label.menu.cadastros.fiscal']}"
+						icon="icon-eye-outline">
+						<p:menuitem id="smLnkModDocFis"
+							value="#{msg['label.menu.cadastros.fiscal.modelo']}"
+							outcome="/modeloDctoFiscal/PesquisaModeloDctoFiscal"
+							icon="icon-doc-text-inv" />
+					</p:submenu>
+
+					<p:separator />
+
+					<p:submenu id="smCadPessoa"
+						label="#{msg['label.menu.cadastros.pessoas']}" icon="icon-users">
+						<p:menuitem id="smLnkPessoa"
+							value="#{msg['label.menu.cadastros.pessoas.pessoa']}"
+							outcome="/pessoa/PesquisaPessoa" icon="icon-users-2" />
+						<p:menuitem value="#{msg['label.menu.cadastros.pessoas.etinia']}"
+							outcome="/etnia/PesquisaEtnia" icon=" icon-looped-square-outline" />
+					</p:submenu>
+
+					<p:separator />
+
+					<p:submenu label="#{msg['label.menu.cadastros.localizacoes']}"
+						icon="icon-globe">
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.pais']}"
+							outcome="/pais/PesquisaPais" icon="icon-location-outline" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.estado']}"
+							outcome="/estado/PesquisaEstado" icon="icon-location-1" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.cidade']}"
+							outcome="/cidade/PesquisaCidade" icon="icon-location-2" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.localizacoes.logradouro']}"
+							outcome="/tipoLogradouro/PesquisaTipoLogradouro"
+							icon="icon-location" />
+					</p:submenu>
+
+					<p:separator />
+
+					<p:submenu label="#{msg['label.menu.cadastros.produtos']}"
+						icon="icon-tags">
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.produtos.produto']}"
+							outcome="/produto/PesquisaProduto" icon="icon-tag" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.produtos.deposito']}"
+							outcome="/deposito/PesquisaDeposito" icon=" icon-inbox-1" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.produtos.gruposubgrupo']}"
+							outcome="/grupo/PesquisaGrupo" icon="icon-th-large" />
+
+						<p:menuitem value="#{msg['label.menu.cadastros.produtos.marca']}"
+							outcome="/marca/PesquisaMarca" icon="icon-slack" />
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.produtos.unimedida']}"
+							outcome="/unidadeMedida/PesquisaUnidadeMedida"
+							icon="icon-list-numbered" />
+						<p:menuitem value="#{msg['label.menu.cadastros.produtos.cor']}"
+							outcome="/cor/PesquisaCor" icon="icon-color-adjust" />
+						<p:menuitem value="#{msg['label.menu.cadastros.produtos.cor']}"
+							outcome="/sabor/PesquisaSabor" icon="icon-color-adjust" />
+					</p:submenu>
+
+					<p:separator />
+
+					<p:submenu label="#{msg['label.menu.cadastros.diversos']}"
+						icon="icon-th-outline">
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.diversos.estadocivil']}"
+							outcome="/estadoCivil/PesquisaEstadoCivil" icon="icon-doc-text-1" />
+					<p:separator />		
+							<p:menuitem
+							value="Usuários"
+							outcome="/usuario/PesquisaUsuario" icon="icon-users" />
+					</p:submenu>
+
+					<p:separator />
+
+					<p:submenu label="#{msg['label.menu.cadastros.empresas']}"
+						icon="icon-home">
+						<p:menuitem
+							value="#{msg['label.menu.cadastros.empresas.empresa']}"
+							outcome="/empresa/PesquisaEmpresa" icon="icon-home-1" />
+					</p:submenu>
+				</p:submenu>
+
+				<p:submenu label="#{msg['label.menu.movimentacoes.entrada']}"
+					icon="icon-export-outline">
+					<p:menuitem
+						value="#{msg['label.menu.movimentacoes.entrada.entradaDocumentos']}"
+						outcome="/notaEntrada/PesquisaNotaEntrada" icon="icon-docs" />
+				</p:submenu>
+
+				<p:submenu label="#{msg['label.menu.movimentacoes.estoque']}"
+					icon="icon-box">
+					<p:menuitem
+						value="#{msg['label.menu.movimentacoes.estoque.inventario']}"
+						outcome="/inventario/GerenciadorInventario" icon="icon-edit-1" />
+				</p:submenu>
+
+				<p:submenu label="#{msg['label.menu.financeiro']}" icon="icon-money">
+					<p:submenu label="#{msg['label.menu.financeiro.cadastro']}"
+						icon="icon-folder-open">
+						<p:menuitem
+							value="#{msg['label.menu.financeiro.cadastro.contaCorrente']}"
+							outcome="/contaCorrente/PesquisaContaCorrente"
+							icon="icon-folder-1" />
+
+						<p:separator />
+
+						<p:menuitem
+							value="#{msg['label.menu.financeiro.cadastro.talaoCheque']}"
+							outcome="/talao/PesquisaTalaoCheque" icon="icon-folder-add" />
+
+						<p:separator />
+
+						<p:menuitem
+							value="#{msg['label.menu.financeiro.cadastro.tipoDespesa']}"
+							outcome="/tipoDespesa/PesquisaTipoDespesa"
+							icon=" icon-folder-delete" />
+					</p:submenu>
+
+					<p:separator />
+
+					<p:menuitem value="#{msg['label.menu.financeiro.banco']}"
+						outcome="/banco/PesquisaBanco" icon="icon-bank" />
+
+					<p:separator />
+
+					<p:menuitem value="#{msg['label.menu.financeiro.recebimento']}"
+						outcome="/recebimento/Recebimento" icon="icon-check-1" />
+
+					<p:separator />
+
+					<p:menuitem
+						value="#{msg['label.menu.financeiro.gerenciadorCheque']}"
+						outcome="/gerenciadorCheque/GerenciadorCheque"
+						icon="icon-indent-right" />
+
+					<p:menuitem
+						value="#{msg['label.menu.financeiro.gerenciadorCartao']}"
+						outcome="/gerenciadorCartao/GerenciadorCartao"
+						icon="icon-indent-right" />
+
+					<p:separator />
+
+					<p:submenu label="#{msg['label.menu.financeiro.relatorios']}"
+						icon="icon-print">
+						<p:menuitem
+							value="#{msg['label.menu.financeiro.relatorios.contasReceber']}"
+							outcome="/relatorios/RelatorioContasReceber"
+							icon=" icon-plus-squared" />
+
+					</p:submenu>
+				</p:submenu>
+
+				<p:submenu label="#{msg['label.menu.venda']}" icon="icon-basket">
+					<p:menuitem value="#{msg['label.menu.venda.venda']}"
+						outcome="/venda/Venda5" icon="icon-basket-1" />
+					<p:separator />
+					<p:menuitem value="#{msg['label.menu.venda.gerenciador']}"
+						outcome="/gerenciadorVenda/GerenciadorVenda"
+						icon="icon-thumbs-up-alt" />
+				</p:submenu>
+
+				<p:submenu label="#{msg['label.menu.caixa']}" icon="icon-sitemap"
+					rendered="#{dashBoardBean.terminalLogado.caixa}">
+					<p:menuitem value="#{msg['label.menu.caixa.gerenciadorcaixa']}"
+						outcome="/caixa/Caixa" icon="icon-paper-plane" />
+
+					<p:menuitem value="#{msg['label.menu.caixa.fluxoCaixa']}"
+						outcome="/lancFluxoCaixa/PesquisaLancFluxoCaixa"
+						icon=" icon-paper-plane-empty" />
+				</p:submenu>
+
+				<p:submenu label="#{msg['label.menu.utilitarios']}"
+					icon="icon-cog-alt">
+					<p:menuitem value="#{msg['label.menu.utilitarios.terminal']}"
+						outcome="/terminal/PesquisaTerminal" icon="icon-monitor" />
+					<p:separator />
+					<p:menuitem value="#{msg['label.menu.utilitarios.objetos']}"
+						outcome="/objetoSistema/PesquisaObjetoSistema"
+						icon=" icon-dot-circled" />
+				</p:submenu>
+
+
+			</ps:menu>
+
+		</div>
+	</h:form>
+
+</ui:composition>

@@ -1,0 +1,52 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+
+/**
+ *
+ * @author Danilo
+ */
+public enum TipoEndereco {
+
+    RESIDENCIAL("Residencial"),
+    COMERCIAL("Comercial"),
+    ENTREGA("Entrega"),
+    COBRANCA("Cobrança"),
+    VIZINHO("Vizinho"),
+    PROP_RURAL("Propriedade Rural"),
+    OUTRO("Outro");
+    private String value;
+
+    private TipoEndereco(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static TipoEndereco getTipoEndereco(Integer value) {
+        switch (value) {
+            case 0:
+                return RESIDENCIAL;
+            case 1:
+                return COMERCIAL;
+            case 2:
+                return ENTREGA;
+            case 3:
+                return COBRANCA;
+            case 4:
+                return VIZINHO;
+            case 5:
+                return PROP_RURAL;
+            case 6:
+                return OUTRO;
+             default:
+                return RESIDENCIAL;
+        }
+    }
+}

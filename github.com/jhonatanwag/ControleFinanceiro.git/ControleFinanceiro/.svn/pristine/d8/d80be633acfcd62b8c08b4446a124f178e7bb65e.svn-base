@@ -1,0 +1,191 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.event.SelectEvent;
+
+import br.com.sistemacomercial.enums.CstIcms;
+import br.com.sistemacomercial.enums.CstIpi;
+import br.com.sistemacomercial.model.ModeloDocumentoFiscal;
+import br.com.sistemacomercial.model.NotaEntrada;
+import br.com.sistemacomercial.model.NotaEntradaItem;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.repository.ModeloDocumentoFiscais;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.repository.UnidadeMedidas;
+import br.com.sistemacomercial.repository.filter.ModeloDocumentoFiscalFilter;
+import br.com.sistemacomercial.repository.filter.UnidadeMedidaFilter;
+import br.com.sistemacomercial.service.NotaEntradaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class NotaEntradaBean extends BeanAbstrato<NotaEntrada>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private UnidadeMedidas unidadeMedidaService;
+	@Inject
+	private ModeloDocumentoFiscais modeloDocumentoFiscais;
+	@Inject
+	private Produtos produtos;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	private NotaEntradaService notaEntradaService;
+	private Pessoa pessoaSelecionada;
+	private Produto produtoSelecionado;
+	private NotaEntradaItem notaEntradaItem;
+	private Integer quantidade = 1;
+	private List<ModeloDocumentoFiscal> modeloDocumentoFiscals;
+	private List<UnidadeMedida> unidadeMedidas;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		modeloDocumentoFiscals = modeloDocumentoFiscais.filtrados(new ModeloDocumentoFiscalFilter());
+		unidadeMedidas = unidadeMedidaService.filtrados(new UnidadeMedidaFilter());
+	}
+
+	@Override
+	public void setObjeto(NotaEntrada objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new NotaEntrada());
+		setPessoaSelecionada(new Pessoa());
+
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(notaEntradaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Nota entrada salva com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	/* Item venda Inicio */
+
+	public Integer getQuantidade() {
+		return quantidade;
+	}
+
+	public void setQuantidade(Integer quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public NotaEntradaItem getNotaEntradaItem() {
+		return notaEntradaItem;
+	}
+
+	public void setNotaEntradaItem(NotaEntradaItem notaEntradaItem) {
+		this.notaEntradaItem = notaEntradaItem;
+	}
+
+	public void excluirItemVenda() {
+		// getObjeto().getItensVenda().remove(getItemVendaSelecionado());
+	}
+	/* Item venda Fim */
+
+	/* Pessoa Inicio */
+	public Pessoa getPessoaSelecionada() {
+		return pessoaSelecionada;
+	}
+
+	public void setPessoaSelecionada(Pessoa pessoaSelecionada) {
+		this.pessoaSelecionada = pessoaSelecionada;
+	}
+
+	public void pessoaPorId() {
+		Pessoa pessoa = pessoas.porId((getPessoaSelecionada().getId() == null ? -1 : getPessoaSelecionada().getId()));
+		if (pessoa != null) {
+			setPessoaSelecionada(pessoa);
+			getObjeto().setFornecedor(pessoa.getFornecedorPessoa());
+		} else {
+			setPessoaSelecionada(new Pessoa());
+			getObjeto().setFornecedor(null);
+			FacesUtil.addErrorMessage("Fornecedor não encontrada para o código informado!");
+		}
+	}
+
+	public void pessoaSelecao(SelectEvent event) {
+		Pessoa pessoa = (Pessoa) event.getObject();
+		this.pessoaSelecionada = pessoa;
+		getObjeto().setFornecedor(pessoa.getFornecedorPessoa());
+	}
+
+	/* Pessoa Fim */
+
+	public List<UnidadeMedida> getUnidadeMedidas() {
+		return unidadeMedidas;
+	}
+
+	/* Produto inicio */
+	public Produto getProdutoSelecionado() {
+		return produtoSelecionado;
+	}
+
+	public void setProdutoSelecionado(Produto produtoSelecionado) {
+		this.produtoSelecionado = produtoSelecionado;
+	}
+
+	public void produtoSelecao(SelectEvent event) {
+		Produto produto = (Produto) event.getObject();
+		this.produtoSelecionado = produto;
+		getNotaEntradaItem().setProduto(produto);
+	}
+
+	public List<ModeloDocumentoFiscal> getDocumentosFiscais() {
+		return modeloDocumentoFiscals;
+	}
+
+	public void novoItem() {
+		setNotaEntradaItem(new NotaEntradaItem());
+		getNotaEntradaItem().setNotaEntrada(getObjeto());
+		setProdutoSelecionado(null);
+		// editandoEndereco = false;
+	}
+
+	public void confirmarNovoItem() {
+		getObjeto().getNotaEntradaItems().add(getNotaEntradaItem());
+	}
+
+	public void alterarItem() {
+
+	}
+
+	public void excluirItem() {
+
+	}
+
+	/* Produto Fim */
+
+	public CstIpi[] getCstIpis() {
+		return CstIpi.values();
+	}
+	
+	public CstIcms[] getCstIcmses() {
+		return CstIcms.values();
+	}
+
+
+}

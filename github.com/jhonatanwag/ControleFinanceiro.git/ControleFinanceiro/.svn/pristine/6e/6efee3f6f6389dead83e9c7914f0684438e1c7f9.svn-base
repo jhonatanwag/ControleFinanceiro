@@ -1,0 +1,82 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Pais;
+import br.com.sistemacomercial.repository.filter.PaisFilter;
+
+public class Paises extends RepositoryAbstrato<Pais> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	public Paises() {
+		super(Pais.class);
+	}
+	
+	@Override
+	public Pais salvar(Pais objeto) {
+		return super.salvar(objeto);
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public List<Pais> filtrados(PaisFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Pais.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (filtro.getCodigoIbgeDe() != null && filtro.getCodigoIbgeAte() != null) {
+			criteria.add(Restrictions.between("codigoIbge", filtro.getCodigoIbgeDe(), filtro.getCodigoIbgeAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getNome())) {
+			criteria.add(Restrictions.ilike("nome", filtro.getNome(), MatchMode.ANYWHERE));
+		}
+
+		if (filtro.getDataCadastroInicio() != null && filtro.getDataCadastroFim() != null) {
+			criteria.add(
+					Restrictions.between("dataCadastro", filtro.getDataCadastroInicio(), filtro.getDataCadastroFim()));
+		}
+
+		return criteria.addOrder(Order.asc("nome")).list();
+	}
+
+
+
+	public Pais porCodigoIbge(Long codigoIbge) {
+		try {
+			return manager.createQuery("from Pais where codigoIbge = :codigoIbge", Pais.class)
+					.setParameter("codigoIbge", codigoIbge).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public Pais porNomeUnico(String nome) {
+		try {
+			return manager.createQuery("from Pais where upper(nome) = :nome", Pais.class)
+					.setParameter("nome", nome.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<Pais> porNome(String nome) {
+		return this.manager.createQuery("from Pais where upper(nome) like :nome", Pais.class)
+				.setParameter("nome", nome.toUpperCase() + "%").getResultList();
+	}
+
+}

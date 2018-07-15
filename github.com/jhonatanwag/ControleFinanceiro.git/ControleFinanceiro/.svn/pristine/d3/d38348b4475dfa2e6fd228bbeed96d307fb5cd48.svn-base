@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog header="Fechar caixa" widgetVar="DlgFecharCaixa" modal="true"
+		dynamic="true" resizable="true" appendTo="@(boby)">
+		<h:form id="formDlgFecharCaixa" >
+			<p:panelGrid id="painelFecharCaixa" columns="2">
+				<p:outputLabel value="Dinheiro" for="valEmDinheiro" />
+				<p:inputText id="valEmDinheiro" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorFechDinheiro}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cartão" for="valEmCartao" />
+				<p:inputText id="valEmCartao" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorFechCartao}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cheque à vista" for="valChqVista" />
+				<p:inputText id="valChqVista" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorFechChequeVista}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cheque pré-datado" for="valChqPre" />
+				<p:inputText id="valChqPre" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorFechChequePre}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+			</p:panelGrid>
+			
+			Troco(Valores irão para o novo caixa!):
+			
+			<p:panelGrid id="painelTroco" columns="2">
+				<p:outputLabel value="Dinheiro" for="valTranspEmDinheiro" />
+				<p:inputText id="valTranspEmDinheiro" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorTransporteDinheiro}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cartão" for="valTranspCartao" />
+				<p:inputText id="valTranspCartao" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorTransporteCartao}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+								
+				<p:outputLabel value="Cheque à vista" for="valTranspChqVista" />
+				<p:inputText id="valTranspChqVista" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorTransporteChequeVista}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+				
+				<p:outputLabel value="Cheque pré-datado" for="valTransChqPre" />
+				<p:inputText id="valTransChqPre" size="15" maxlength="10"
+					styleClass="moeda" style="text-align: right"
+					value="#{caixaBean.objeto.valorTransporteChequePre}">
+					<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+				</p:inputText>
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton value="Confirmar" styleClass="botaoConfirmar"
+					actionListener="#{caixaBean.confirmarFechCaixa}" update=":formDlgFecharCaixa, :formCaixa"
+					oncomplete="PF('DlgFecharCaixa').hide();">
+				</p:commandButton>
+				<p:commandButton value="Cancelar" immediate="true"
+					oncomplete="PF('DlgFecharCaixa').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

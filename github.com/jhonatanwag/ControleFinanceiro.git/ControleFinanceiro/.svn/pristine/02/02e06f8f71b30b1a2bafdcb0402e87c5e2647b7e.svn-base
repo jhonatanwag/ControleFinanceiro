@@ -1,0 +1,159 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import br.com.sistemacomercial.enums.Sexo;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name = "inf_pessoais")
+public class InformacoesPessoais implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(generator = "foreign")
+	@GenericGenerator(name = "foreign", strategy = "foreign", parameters = {
+			@Parameter(name = "property", value = "pessoa") })
+	@Column(name = "informacoespessoais_id")
+	private Long id;
+	@OneToOne(targetEntity = Pessoa.class, optional = false)
+	@PrimaryKeyJoinColumn
+	@Cascade(CascadeType.ALL)
+	private Pessoa pessoa;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_nascimento")
+	private Date dataNascimento;
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "est_civil_id")
+	private EstadoCivil estadoCivil;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "sexo", length = 9)
+	private Sexo sexo;
+	@Column(name = "nome_pai", length = 80)
+	private String nomePai;
+	@Column(name = "nome_mae", length = 80)
+	private String nomeMae;
+	@Column(name = "orgao_exped_rg", length = 10)
+	private String orgaoExpedidorRG;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "data_emissao_rg")
+	private Date dataEmissaoRG;
+
+	public InformacoesPessoais() {
+	}
+
+	public InformacoesPessoais(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public InformacoesPessoais(Date dataNascimento, EstadoCivil estadoCivil, Sexo sexo, String nomePai, String nomeMae,
+			String orgaoExpedidorRG, Date dataEmissaoRG) {
+		this.dataNascimento = dataNascimento;
+		this.estadoCivil = estadoCivil;
+		this.sexo = sexo;
+		this.nomePai = nomePai;
+		this.nomeMae = nomeMae;
+		this.orgaoExpedidorRG = orgaoExpedidorRG;
+		this.dataEmissaoRG = dataEmissaoRG;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
+
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public Date getDataEmissaoRG() {
+		return dataEmissaoRG;
+	}
+
+	public void setDataEmissaoRG(Date dataEmissaoRG) {
+		this.dataEmissaoRG = dataEmissaoRG;
+	}
+
+	public String getOrgaoExpedidorRG() {
+		return orgaoExpedidorRG;
+	}
+
+	public void setOrgaoExpedidorRG(String orgaoExpedidorRG) {
+		this.orgaoExpedidorRG = orgaoExpedidorRG;
+	}
+
+	public Date getDataNascimento() {
+		return dataNascimento;
+	}
+
+	public void setDataNascimento(Date dataNascimento) {
+		this.dataNascimento = dataNascimento;
+	}
+
+	public EstadoCivil getEstadoCivil() {
+		return estadoCivil;
+	}
+
+	public void setEstadoCivil(EstadoCivil estadoCivil) {
+		this.estadoCivil = estadoCivil;
+	}
+
+	public String getNomeMae() {
+		return nomeMae;
+	}
+
+	public void setNomeMae(String nomeMae) {
+		this.nomeMae = nomeMae;
+	}
+
+	public String getNomePai() {
+		return nomePai;
+	}
+
+	public void setNomePai(String nomePai) {
+		this.nomePai = nomePai;
+	}
+
+	public Sexo getSexo() {
+		return sexo;
+	}
+
+	public void setSexo(Sexo sexo) {
+		this.sexo = sexo;
+	}
+
+}

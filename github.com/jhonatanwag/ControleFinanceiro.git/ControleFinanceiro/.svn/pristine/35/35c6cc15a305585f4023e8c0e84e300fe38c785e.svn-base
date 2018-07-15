@@ -1,0 +1,179 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">Venda Touch</ui:define>
+
+	<ui:define name="corpo">
+
+		<f:metadata>
+			<o:viewParam name="venda" value="#{vendaBeanTouch.objeto}" />
+			<f:event listener="#{vendaBeanTouch.inicializar}"
+				type="preRenderView" />
+		</f:metadata>
+
+		<h:form id="formVendaGourmet">
+
+
+			<div class="Container100 ui-fluid">
+				<div class="ContainerIndent">
+					<p:toolbar style="margin-top: 10px">
+
+						<p:messages autoUpdate="true" closable="true" />
+
+						<p:toolbarGroup align="right">
+							<p:commandButton value="Finalizar Venda" process="@this"
+								oncomplete="PF('DlgFecharVenda').show();"
+								actionListener="#{vendaBeanTouch.finalizarVenda()}"
+								title="Finalizar" icon="ui-icon-disk" />
+						</p:toolbarGroup>
+					</p:toolbar>
+				</div>
+			</div>
+
+
+			<div class="Container100 BorBotLeaden ui-fluid">
+				<div class="ContainerIndent">
+
+
+					<div class="Container60 Responsive60">
+						<div class="ContainerIndent">
+
+							<div class="Container100 Responsive Fs20">
+
+								<p:tabView value="#{vendaBeanTouch.grupo}" var="tabItem">
+									<p:ajax event="tabChange"
+										listener="#{vendaBeanTouch.onTabChange}" update="@this" />
+
+									<p:tab title="#{tabItem.descricao}">
+										<h:outputText value="#{tabItem.descricao}" />
+
+
+										<p:dataGrid var="prod" value="#{vendaBeanTouch.produtosTab}"
+											columns="3" layout="grid" rows="12" id="cars" reflow="true">
+
+
+											<p:panel header="#{prod.descricaoComPrecoAtual}"
+												style="text-align:center">
+												<h:panelGrid columns="1" style="width:100%">
+
+													<h:outputText value="#{prod.observacao}" />
+													<p:commandButton value="Adcionar" icon="ui-icon-add"
+														process="@this"
+														action="#{vendaBeanTouch.incluirItemVenda()}"
+														title="#{msg['label.excluir']} #{prod.id}"
+														style="margin-top: 20px"
+														update=":formVendaGourmet:dataTableItem">
+														<f:setPropertyActionListener
+															target="#{vendaBeanTouch.produtoSelecionado}"
+															value="#{prod}" />
+													</p:commandButton>
+
+
+													<p:commandButton value="Opcionais" icon="ui-icon-add"
+														rendered="#{prod.isOpcional()}" process="@this"
+														title="#{msg['label.excluir']} #{prod.id}"
+														oncomplete="PF('DlgOpcionais').show();"
+														update=":formDialogOpcionais"
+														action="#{vendaBeanTouch.opcionais}"
+														style="margin-top: 20px">
+														<f:setPropertyActionListener
+															target="#{vendaBeanTouch.produtoSelecionado}"
+															value="#{prod}" />
+													</p:commandButton>
+												</h:panelGrid>
+											</p:panel>
+
+										</p:dataGrid>
+									</p:tab>
+								</p:tabView>
+
+
+							</div>
+
+						</div>
+					</div>
+
+					<div class="Container40 Responsive40">
+						<div class="ContainerIndent">
+
+							<div class="Container100 Responsive Fs20">
+								<p:dataTable id="dataTableItem" reflow="true"
+									resizableColumns="true"
+									value="#{vendaBeanTouch.objeto.itensVenda}" var="item"
+									rowKey="#{item.id}" scrollable="true" style="margin-top: 10px">
+
+									
+									<p:column id="qtd" headerText="Qtd." style="text-align: right;">
+										<p:spinner id="mySpinner" stepFactor="1" min="1"
+											style="text-align: right" value="#{item.quantidade}" size="3">
+											<p:ajax update="dataTableItem" />
+										</p:spinner>
+									</p:column>
+
+									<p:column id="descricao" headerText="Descrição">
+										<h:outputText value="#{item.produto.descricao}" />
+									</p:column>
+
+
+
+									<p:column id="unitario" headerText="Val. Unit."
+										style="text-align: right;">
+										<h:outputText value="#{item.valorUnitario}">
+											<f:convertNumber type="currency" />
+										</h:outputText>
+									</p:column>
+
+									<p:column id="bruto" headerText="Val. Bruto"
+										style="text-align: right;">
+										<h:outputText value="#{item.valorBruto}">
+											<f:convertNumber type="currency" />
+										</h:outputText>
+									</p:column>
+
+									<p:column style="text-align: center">
+
+										<p:commandButton icon="ui-icon-edit" title="Alterar"
+											process="@this" update=":formDialogOpcionais"
+											oncomplete="PF('DlgOpcionais').show();" rendered="#{item.itemVendaOpcionals.size() > 0}"
+											action="#{vendaBeanTouch.alterarOpcionais()}">
+											<f:setPropertyActionListener
+												target="#{vendaBeanTouch.itemVendaSelecionada}"
+												value="#{item}" />
+										</p:commandButton>
+
+										<p:commandButton icon="ui-icon-trash" title="Excluir"
+											process="@this" update="dataTableItem"
+											action="#{vendaBeanTouch.excluirItemVenda()}">
+											<f:setPropertyActionListener
+												target="#{vendaBeanTouch.itemVendaSelecionada}"
+												value="#{item}" />
+										</p:commandButton>
+									</p:column>
+
+									<p:columnGroup type="footer">
+										<p:row>
+											<p:column colspan="5" style="text-align:right"
+												footerText="Totals:" />
+											<p:column footerText="#2$" />
+										</p:row>
+									</p:columnGroup>
+								</p:dataTable>
+
+
+							</div>
+
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</h:form>
+		<ui:include src="/WEB-INF/template/vendaTouch/DlgFecharVenda.xhtml" />
+		<ui:include src="/WEB-INF/template/vendaTouch/DlgOpcionais.xhtml" />
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Etnia;
+import br.com.sistemacomercial.repository.Etnias;
+import br.com.sistemacomercial.repository.filter.EtniaFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaEtniaBean extends PesquisaBeanAbstrato<Etnia, EtniaFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Etnias modelos;
+
+	public PesquisaEtniaBean() {
+		setFiltro(new EtniaFilter());
+	}
+	
+	@Override
+	public void excluir() {
+		modelos.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Etnia " + getObjetoSelecionado().getDescricao() + " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(modelos.filtrados(getFiltro()));
+	}
+
+}

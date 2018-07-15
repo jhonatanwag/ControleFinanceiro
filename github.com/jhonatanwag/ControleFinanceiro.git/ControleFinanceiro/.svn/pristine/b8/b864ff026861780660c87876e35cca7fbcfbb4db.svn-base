@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab id="tabClienteMensagens" title="Bloqueios/Avisos"
+		style="width:50%, text-align:center;">
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo" oncomplete="PF('DlgBloqAviso').show()"
+					action="#{cadastroPessoaBean.novoBloqAviso()}"
+					update=":formDlgBloqAviso"
+					process="@this" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable id="dataTableMensagens" rows="10"
+			paginatorPosition="bottom"
+			value="#{cadastroPessoaBean.objeto.clientePessoa.clienteBloqueios}" var="msgBloq"
+			paginator="true" style="text-align:center, width: 50%;" reflow="true">
+
+			<p:column id="tipoAvisoBloqueio" headerText="Tipo"
+				sortBy="#{msgBloq.tipoBloqueioAviso.toString()}">
+				<h:outputText value="#{msgBloq.tipoBloqueioAviso.toString()}" />
+			</p:column>
+			
+			<p:column id="motivoBloqueio" headerText="Motivo Bloqueio"
+				sortBy="#{msgBloq.motivoBloqueio.descricao}">
+				<h:outputText value="#{msgBloq.motivoBloqueio.descricao}" />
+			</p:column>
+			
+			<p:column id="avis" headerText="Aviso"
+				sortBy="#{msgBloq.aviso}">
+				<h:outputText value="#{msgBloq.aviso}" />
+			</p:column>
+			
+			
+		</p:dataTable>
+
+	</p:tab>
+</ui:composition>

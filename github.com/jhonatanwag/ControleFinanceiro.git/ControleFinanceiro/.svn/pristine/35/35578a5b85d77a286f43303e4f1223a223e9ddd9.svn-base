@@ -1,0 +1,33 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.Agenda;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.repository.Agendas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class AgendaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Agendas agendas;
+	
+
+	@Transactional
+	public Agenda salvar(Agenda receb) {
+		return agendas.salvar(receb);
+	}
+
+
+	public List<Agenda> buscarAgenda(Funcionario funcionarioSelecionado) throws Exception {
+		return agendas.buscarAgenda(funcionarioSelecionado);
+	}
+	
+	
+
+}

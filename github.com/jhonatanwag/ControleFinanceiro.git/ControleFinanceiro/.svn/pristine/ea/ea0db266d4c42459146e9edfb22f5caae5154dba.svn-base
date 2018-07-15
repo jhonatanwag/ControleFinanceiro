@@ -1,0 +1,56 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.NoResultException;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import br.com.sistemacomercial.model.Agencia;
+import br.com.sistemacomercial.model.ContaCorrente;
+import br.com.sistemacomercial.repository.filter.ContaCorrenteFilter;
+
+public class ContaCorrentes extends RepositoryAbstrato<ContaCorrente> implements Serializable {
+
+	public ContaCorrentes() {
+		super(ContaCorrente.class);
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public ContaCorrente salvar(ContaCorrente objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ContaCorrente> filtrados(ContaCorrenteFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(ContaCorrente.class);
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+		return criteria.addOrder(Order.asc("dataCadastro")).list();
+	}
+
+	/**
+	 * 
+	 * @param uf
+	 * @param id
+	 * @return O ContaCorrente verificando
+	 */
+	public ContaCorrente porNumeroContaUnico(Agencia agencia, String numeroConta, Long id) {
+		try {
+			return manager
+					.createQuery(
+							"from ContaCorrente where upper(numeroConta) = :numeroConta and id <> :id and agencia.id = :agenciaId",
+							ContaCorrente.class)
+					.setParameter("numeroConta", numeroConta.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.setParameter("agenciaId", agencia.getId()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+}

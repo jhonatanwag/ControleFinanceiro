@@ -1,0 +1,75 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.TipoLogradouro;
+import br.com.sistemacomercial.repository.filter.TipoLogradouroFilter;
+
+public class TipoLogradouros extends RepositoryAbstrato<TipoLogradouro> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public TipoLogradouros() {
+		super(TipoLogradouro.class);
+	}
+
+	@Override
+	public TipoLogradouro salvar(TipoLogradouro objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TipoLogradouro> filtrados(TipoLogradouroFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(TipoLogradouro.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getAbreviacao())) {
+			criteria.add(Restrictions.ilike("abreviacao", filtro.getAbreviacao(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+	public TipoLogradouro porDescricaoUnico(String descricao) {
+		try {
+			return manager.createQuery("from TipoLogradouro where upper(descricao) = :descricao", TipoLogradouro.class)
+					.setParameter("descricao", descricao.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public TipoLogradouro porAbreviacaoUnico(String abrev) {
+		try {
+			return manager
+					.createQuery("from TipoLogradouro where upper(abreviacao) = :abreviacao", TipoLogradouro.class)
+					.setParameter("abreviacao", abrev.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<TipoLogradouro> porNome(String nome) {
+		return this.manager.createQuery("from TipoLogradouro where upper(nome) like :nome", TipoLogradouro.class)
+				.setParameter("nome", nome.toUpperCase() + "%").getResultList();
+	}
+
+}

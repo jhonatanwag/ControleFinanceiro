@@ -1,0 +1,61 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.Session;
+
+import br.com.sistemacomercial.model.Caixa;
+import br.com.sistemacomercial.repository.Caixas;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+import br.com.sistemacomercial.util.report.ExecutorRelatorio;
+
+@Named
+@RequestScoped
+public class RelatorioPosicaoCaixaBean extends RelatorioAbstrato implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Caixas caixas;
+	private Caixa caixaSelecionado;
+
+	@Override
+	public void emitir() {
+		Map<String, Object> parametros = new HashMap<>();
+		parametros.put("SUBREPORT_DIR", "/br/com/sistemacomercial/relatorios/");
+		ArrayList<Caixa> lista = new ArrayList<>();
+		caixaSelecionado = caixas.porId(caixaSelecionado.getId());
+		caixaSelecionado.carregaTotaisRecebimentos();
+		lista.add(caixaSelecionado);
+		ExecutorRelatorio executor = new ExecutorRelatorio(
+				"/br/com/sistemacomercial/relatorios/RelatorioPosicaoCaixa.jasper", this.response, parametros, lista,
+				"RelPosicaoCaixa.pdf");
+
+		Session session = manager.unwrap(Session.class);
+		session.doWork(executor);
+
+		if (executor.isRelatorioGerado()) {
+			facesContext.responseComplete();
+		} else {
+			FacesUtil.addErrorMessage("A execução do relatório não retornou dados.");
+		}
+	}
+
+	@NotNull
+	public Caixa getCaixaSelecionado() {
+		return caixaSelecionado;
+	}
+
+	public void setCaixaSelecionado(Caixa caixaSelecionado) {
+		this.caixaSelecionado = caixaSelecionado;
+	}
+
+}

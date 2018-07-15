@@ -1,0 +1,98 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de unidade de medidas</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+
+			<div class="ContainerIndent">
+				<p:panel>
+					<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa
+						de unidade de medidas</div>
+					<div class="Separator"></div>
+					<div class="ui-fluid">
+						<p:panelGrid columns="4" columnClasses="col1,col2,col1,col2"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+							<p:inputText size="10"
+								value="#{pesquisaUnidadeMedidaBean.filtro.idDe}" maxlength="6" />
+							<p:outputLabel value="até" />
+							<p:inputText value="#{pesquisaUnidadeMedidaBean.filtro.idAte}"
+								maxlength="6" />
+							<p:outputLabel value="Sigla" />
+							<p:inputText value="#{pesquisaUnidadeMedidaBean.filtro.sigla}"
+								maxlength="100" />
+							<p:outputLabel value="Descrição" />
+							<p:inputText
+								value="#{pesquisaUnidadeMedidaBean.filtro.descricao}"
+								maxlength="100" />
+						</p:panelGrid>
+					</div>
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:commandButton value="Pesquisar"
+								action="#{pesquisaUnidadeMedidaBean.pesquisar}" update="@form" />
+							<p:button value="Limpar" outcome="PesquisaUnidadeMedida.xhtml" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Novo" outcome="CadastroUnidadeMedida.xhtml" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:dataTable id="unidadeMedidaTable"
+						value="#{pesquisaUnidadeMedidaBean.objetosFiltrados}"
+						var="unidadeMedida" style="margin-top: 20px" reflow="true"
+						emptyMessage="Nenhuma unidade de medida encontrada." rows="20"
+						paginator="true" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom">
+
+						<p:column headerText="Código" sortBy="#{unidadeMedida.id}">
+							<h:outputText value="#{unidadeMedida.id}" />
+						</p:column>
+
+						<p:column headerText="Sigla" sortBy="#{unidadeMedida.sigla}">
+							<h:outputText value="#{unidadeMedida.sigla}" />
+						</p:column>
+
+						<p:column headerText="Descrição"
+							sortBy="#{unidadeMedida.descricao}">
+							<h:outputText value="#{unidadeMedida.descricao}" />
+						</p:column>
+
+						<p:column headerText="Opções">
+							<p:button outcome="/unidadeMedida/CadastroUnidadeMedida"
+								icon="ui-icon-pencil" title="Editar">
+								<f:param name="unidadeMedida" value="#{unidadeMedida.id}" />
+							</p:button>
+							<p:commandButton icon="ui-icon-trash" title="Excluir"
+								oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+								update=":frmPesquisa:confirmacaoExclusaoDialog">
+								<f:setPropertyActionListener
+									target="#{pesquisaUnidadeMedidaBean.objetoSelecionado}"
+									value="#{unidadeMedida}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+					<p:confirmDialog header="Exclusão da unidade de medida"
+						message="Tem certeza que deseja excluir a undidade de medida: #{pesquisaUnidadeMedidaBean.objetoSelecionado.descricao}?"
+						widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+						<p:button value="Não"
+							onclick="PF('confirmacaoExclusao').hide(); return false;" />
+						<p:commandButton value="Sim"
+							oncomplete="PF('confirmacaoExclusao').hide();"
+							action="#{pesquisaUnidadeMedidaBean.excluir}" process="@this"
+							update=":frmPesquisa:unidadeMedidaTable" />
+					</p:confirmDialog>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

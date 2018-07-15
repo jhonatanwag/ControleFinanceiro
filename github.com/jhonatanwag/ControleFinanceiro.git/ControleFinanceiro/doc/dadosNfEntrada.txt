@@ -1,0 +1,118 @@
+codigoempresa	integer
+chavelctofisent	number(10)
+codigoestab	integer
+codigopessoa	integer
+numeronf	integer
+especienf	varchar2(4)
+datalctofis	date
+dataemissao	date
+valorcontabil	number(16,2)
+basecalculoipi	number(16,2)
+valoripi	number(16,2)
+isentasipi	number(16,2)
+outrasipi	number(16,2)
+basecalculofunrural	number(16,2)
+aliqfunrural	number(7,2)
+valorfunrural	number(16,2)
+siglaestadoorigem	char(2)
+codigohistfis	integer
+complhist	varchar2(150)
+codigotipodctosintegra	integer
+emitentenf	char(1)
+modalidadefrete	integer
+adicionaliss	varchar2(50)
+cancelada	char(1)
+conciliada	char(1)
+codigousuario	integer
+datahoralctofis	date
+origemdado	integer
+chaveorigem	varchar2(25)
+vlrdesc	number(17,2)
+vlrabatntrib	number(17,2)
+vlrfrete	number(17,2)
+vlrseguro	number(17,2)
+vlroutrdesp	number(17,2)
+cdmodelo	varchar2(2)
+chavenfeent	varchar2(44)
+chavenfeentref	varchar2(44)
+cdsituacao	integer
+indpagto	varchar2(1)
+serienf	varchar2(4)
+subserienf	varchar2(3);
+
+
+codigoempresa	integer
+chavelctofisent	number(10)
+seq	integer
+codigoestab	integer
+datalctofis	date
+codigoproduto	number(15)
+codigosituacaotribut	integer
+unidademedida	varchar2(10)
+quantidade	number(21,6)
+valorunitario	number(16,2)
+valortotal	number(16,2)
+
+basecalculoicms	number(16,2)
+aliqicms	number(7,2)
+valoricms	number(16,2)
+isentasicms	number(16,2)
+outrasicms	number(16,2)
+
+basecalculoipi	number(16,2)
+aliqipi	number(7,2)
+valoripi	number(16,2)
+isentasipi	number(16,2)
+outrasipi	number(16,2)
+
+basecalculoiss	number(16,2)
+aliqiss	number(7,2)
+valoriss	number(16,2)
+isentasiss	number(16,2)
+outrasiss	number(16,2)
+
+basecalculosubtribut	number(16,2)
+aliqsubtribut	number(7,2)
+valorsubtribut	number(16,2)
+outrassubtrib	number(16,2)
+isentassubtrib	number(16,2)
+
+cstipi	integer
+cstiss	integer
+cststicms	integer
+
+
+abatnaotrib	number(17,2)
+valordesconto	number(16,2)
+valordespesa	number(16,2)
+vlrfrete	number(17,2)
+vlrseguro	number(17,2)
+
+
+tipoestoque	integer
+codigocfop	integer
+
+qtdeseloipi	integer
+
+
+indmov	char(1)
+indnatfrt	integer
+
+--PIS E COFINS
+codigoempresa	integer
+chavelctofisent	number(10)
+codigoproduto	number(15)
+codigoestab	integer
+datalctofis	date
+receitapiscofins	number(16,2)
+basecalculopiscofins	number(16,2)
+quantidade	number(18,4)
+valorpis	number(16,2)
+valorcofins	number(16,2)
+aliqpis	number(11,4)
+aliqcofins	number(11,4)
+codigocfop	integer
+cdsituatributpis	integer
+cdsituatributcofins	integer
+seq	integer
+tipocredito	varchar2(20)

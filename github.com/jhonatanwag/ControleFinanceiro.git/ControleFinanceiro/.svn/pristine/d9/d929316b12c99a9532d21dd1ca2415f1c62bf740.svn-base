@@ -1,0 +1,145 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.sistemacomercial.enums.SituacaoInventario;
+
+/**
+ * 
+ * @author Danilo
+ */
+@Entity
+@Table(name = "inventario")
+public class Inventario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue
+	@Column(name = "iventario_id")
+	private Long id;
+	@ManyToOne
+	@JoinColumn(name = "filial_id")
+	private Filial filial;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data_abertura", nullable = false)
+	private Date dataAbertura = new Date();
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data_fechamento", nullable = true)
+	private Date dataFechamento;
+	@ManyToOne(targetEntity = Funcionario.class, fetch = FetchType.LAZY, optional = false)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "func_abert_id")
+	private Funcionario funcionarioAbertura;
+	@ManyToOne(targetEntity = Funcionario.class, fetch = FetchType.LAZY, optional = true)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "func_encerr_id")
+	private Funcionario funcionarioEncerramento;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "situacao_inventario", nullable = false)
+	private SituacaoInventario situacaoInventario = SituacaoInventario.CRIADO;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "inventario", orphanRemoval = true)
+	private List<ItemInventario> itemInventarios = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	
+	public Filial getFilial() {
+		return filial;
+	}
+
+	public void setFilial(Filial filial) {
+		this.filial = filial;
+	}
+
+	public Date getDataAbertura() {
+		return dataAbertura;
+	}
+
+	public void setDataAbertura(Date dataAbertura) {
+		this.dataAbertura = dataAbertura;
+	}
+
+	public Date getDataFechamento() {
+		return dataFechamento;
+	}
+
+	public void setDataFechamento(Date dataFechamento) {
+		this.dataFechamento = dataFechamento;
+	}
+
+	public Funcionario getFuncionarioAbertura() {
+		return funcionarioAbertura;
+	}
+
+	public void setFuncionarioAbertura(Funcionario funcionarioAbertura) {
+		this.funcionarioAbertura = funcionarioAbertura;
+	}
+
+	public Funcionario getFuncionarioEncerramento() {
+		return funcionarioEncerramento;
+	}
+
+	public void setFuncionarioEncerramento(Funcionario funcionarioEncerramento) {
+		this.funcionarioEncerramento = funcionarioEncerramento;
+	}
+
+	public SituacaoInventario getSituacaoInventario() {
+		return situacaoInventario;
+	}
+
+	public void setSituacaoInventario(SituacaoInventario situacaoInventario) {
+		this.situacaoInventario = situacaoInventario;
+	}
+
+	public List<ItemInventario> getItemInventarios() {
+		return itemInventarios;
+	}
+
+	public void setItemInventarios(List<ItemInventario> itemInventarios) {
+		this.itemInventarios = itemInventarios;
+	}
+	
+	public boolean isCancelado(){
+		return this.situacaoInventario.equals(SituacaoInventario.CANCELADO);
+	}
+	
+	public boolean isCriado(){
+		return this.situacaoInventario.equals(SituacaoInventario.CRIADO);
+	}
+	
+	public boolean isFinalizado(){
+		return this.situacaoInventario.equals(SituacaoInventario.FINALIZADO);
+	}
+
+}

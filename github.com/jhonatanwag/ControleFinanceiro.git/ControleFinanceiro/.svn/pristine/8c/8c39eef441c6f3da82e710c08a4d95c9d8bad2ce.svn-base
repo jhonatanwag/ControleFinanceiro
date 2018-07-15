@@ -1,0 +1,43 @@
+package br.com.sistemacomercial.controle;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
+
+import org.primefaces.model.chart.ChartSeries;
+import org.primefaces.model.chart.LineChartModel;
+
+@Named
+@RequestScoped
+public class GraficoContasReceber {
+
+	private LineChartModel model;
+
+	public void preRender() {
+		this.model = new LineChartModel();		
+		this.model.setTitle("Contas a Receber");
+		this.model.setLegendPosition("e");
+		//this.model.setExtender("skinChart");
+		this.model.setAnimate(true);
+		//lineModel.setExtender("skinChart");
+		adicionarSerie("Todos os Pedidos");
+		adicionarSerie("Meus Pedidos");
+	}
+	
+
+	private void adicionarSerie(String rotulo) {
+      ChartSeries series = new ChartSeries(rotulo);
+      series.set("1", Math.random() * 1000);
+      series.set("2", Math.random() * 1000);
+      series.set("3", Math.random() * 1000);
+      series.set("4", Math.random() * 1000);
+      series.set("5", Math.random() * 1000);
+      this.model.addSeries(series);
+      
+	}
+
+
+	public LineChartModel getModel() {
+		return model;
+	}
+
+}

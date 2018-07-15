@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Bematech>
+  <Sistema>
+    <LogLevel>9</LogLevel>
+    <PathLog>C:\</PathLog>
+    <PathNFCe>C:\NFCE\NEW\</PathNFCe>
+    <DatabaseFile>C:\NFCE\nfce.db</DatabaseFile>
+    <TimeoutWebservice>30</TimeoutWebservice>
+    <!--Em segundos-->
+  </Sistema>
+  <NFCe>
+    <mXML_UF_B02>41</mXML_UF_B02>
+    <mXML_tpAmb_B24>2</mXML_tpAmb_B24>
+    <mXML_procEmi_B26>0</mXML_procEmi_B26>
+    <mXML_verProc_B27>1.0.0.0</mXML_verProc_B27>
+    <mXML_CRT_C21>1</mXML_CRT_C21>
+    <Fuso>-03:00</Fuso>
+    <Serie>001</Serie>
+    <NumeroInicialNFCe>10</NumeroInicialNFCe>
+  </NFCe>
+  <Emissor>
+    <CNPJ>82373077000171</CNPJ>
+    <Nome>W A Moreira  Moreira LTDA</Nome>
+    <NomeFantasia>Panificadora e Confeitaria Moreia</NomeFantasia>
+    <Endereco>Av. Minas Gerais</Endereco>
+    <Numero>668</Numero>
+    <Bairro>Jd Americas</Bairro>
+    <CodigoIBGE>4127304</CodigoIBGE>
+    <Cidade>Manaus</Cidade>
+    <UF>PR</UF>
+    <CEP>87890000</CEP>
+    <CodigoPais>55</CodigoPais>
+    <Pais>Brasil</Pais>
+    <Telefone>4434411426</Telefone>
+    <InscricaoEstadual>048000485</InscricaoEstadual>
+    <InscricaoEstadualSubstitutoTributario>
+    </InscricaoEstadualSubstitutoTributario>
+    <InscricaoMunicipal>
+    </InscricaoMunicipal>
+  </Emissor>
+</Bematech>

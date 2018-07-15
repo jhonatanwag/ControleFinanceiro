@@ -1,0 +1,33 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.TalaoCheque;
+import br.com.sistemacomercial.repository.TalaoCheques;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroTalaoChequeService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TalaoCheques talaoCheques;
+
+	@Transactional
+	public TalaoCheque salvar(TalaoCheque TalaoCheque) {
+//		TalaoCheque TalaoChequeExiste = talaoCheques.porNumeroContaUnico(TalaoCheque.getAgencia(), TalaoCheque.getNumeroConta().toString().trim(), TalaoCheque.getId());
+//
+//		if (TalaoChequeExiste != null && !TalaoChequeExiste.equals(TalaoCheque)) {
+//			throw new NegocioException("Já existe uma conta corrente com o mesmo número para cadastrada para a mesma agência selecionada!");
+//		}
+		
+		
+		return talaoCheques.salvar(TalaoCheque);
+	}
+
+
+
+
+}

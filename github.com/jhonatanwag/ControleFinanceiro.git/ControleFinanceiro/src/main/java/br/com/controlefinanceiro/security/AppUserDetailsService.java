@@ -1,0 +1,54 @@
+package br.com.controlefinanceiro.security;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import br.com.controlefinanceiro.model.Usuario;
+import br.com.controlefinanceiro.repository.Usuarios;
+import br.com.controlefinanceiro.util.cdi.CDIServiceLocator;
+import br.com.controlefinanceiro.util.jpa.Transactional;
+
+public class AppUserDetailsService implements UserDetailsService {
+
+	private Usuarios usuarios = CDIServiceLocator.getBean(Usuarios.class);
+	@Override
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		
+		Usuario usuario = usuarios.porLogin(email);
+
+		UsuarioSistema user = null;
+
+		if (usuario != null) {
+			user = new UsuarioSistema(usuario, getGrupos(usuario));
+			registroAcesso(usuario);
+		}
+
+		return user;
+	}
+	
+	private void registroAcesso(Usuario usuario) {
+		usuario.setDataUltAcesso(new Date());
+		usuarios.salvar(usuario);
+	}
+
+	private Collection<? extends GrantedAuthority> getGrupos(Usuario usuario) {
+		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+		// for (Grupo grupo : usuario.getGrupos()) {
+		// authorities.add(new
+		// SimpleGrantedAuthority(grupo.getNome().toUpperCase()));
+		// }
+		authorities.add(new SimpleGrantedAuthority("ADMINISTRADORES"));
+
+		return authorities;
+	}
+
+}

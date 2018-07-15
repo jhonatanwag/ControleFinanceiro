@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.Terminais;
+import br.com.sistemacomercial.repository.filter.TerminalFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaTerminalBean extends PesquisaBeanAbstrato<Terminal, TerminalFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Terminais terminais;
+
+	public PesquisaTerminalBean() {
+		setFiltro(new TerminalFilter());
+	}
+
+	@Override
+	public void excluir() {
+		terminais.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Terminal " + getObjetoSelecionado().getUsuarioSO() + " excluída com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(terminais.filtrados(getFiltro()));
+	}
+
+}

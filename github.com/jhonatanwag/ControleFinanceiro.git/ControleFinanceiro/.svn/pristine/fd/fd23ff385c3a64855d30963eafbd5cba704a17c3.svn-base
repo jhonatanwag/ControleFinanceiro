@@ -1,0 +1,127 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="titulo">Pesquisa de tipo de despesa</ui:define>
+
+	<ui:define name="corpo">
+		<h:form id="frmPesquisa">
+			<div class="ContainerIndent ui-fluid">
+				<div class="ContainerIndent">
+					<p:panel>
+						<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Pesquisa de tipo de despesa</div>
+						<div class="Separator"></div>
+						<p:panelGrid columns="4"
+							columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+
+							<p:inputText size="10"
+								value="#{pesquisaTipoDespesaBean.filtro.idDe}" maxlength="6" />
+	    			a
+	    			<p:inputText size="10"
+								value="#{pesquisaTipoDespesaBean.filtro.idAte}" maxlength="6" />
+
+
+							<p:outputLabel value="Descrição" />
+							<p:inputText value="#{pesquisaTipoDespesaBean.filtro.descricao}"
+								size="100" maxlength="100" />
+
+						</p:panelGrid>
+					</p:panel>
+
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:commandButton value="Pesquisar"
+								action="#{pesquisaTipoDespesaBean.pesquisar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Novo" outcome="CadastroTipoDespesa.xhtml" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:dataTable id="tipoDespesaTable" reflow="true"
+						value="#{pesquisaTipoDespesaBean.objetosFiltrados}"
+						var="tipoDespesa" style="margin-top: 20px"
+						emptyMessage="Nenhum tipo de despesa encontrado." rows="20"
+						paginator="true" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom">
+
+						<p:column headerText="Código"
+							style="text-align: center">
+							<h:outputText value="#{tipoDespesa.id}" />
+						</p:column>
+
+
+						<p:column headerText="Descrição" sortBy="#{tipoDespesa.descricao}"
+							style="text-align: left">
+							<h:outputText value="#{tipoDespesa.descricao}" />
+						</p:column>
+
+						<p:column headerText="Entrada/Saída"
+							sortBy="#{tipoDespesa.entradaSaida}" style="text-align: center;">
+							<h:outputText value="#{tipoDespesa.entradaSaida.toString()}" />
+						</p:column>
+
+						<p:column headerText="Débito/Crédito"
+							sortBy="#{tipoDespesa.tipoCreditoDebito}"
+							style="text-align: center;">
+							<h:outputText value="#{tipoDespesa.tipoCreditoDebito.toString()}" />
+						</p:column>
+
+						<p:column headerText="Inf. Pessoa"
+							sortBy="#{tipoDespesa.informaPessoa}" style="text-align: center;">
+							<h:selectBooleanCheckbox value="#{tipoDespesa.informaPessoa}"
+								disabled="true" />
+						</p:column>
+
+						<p:column headerText="Mov. Caixa" sortBy="#{tipoDespesa.caixa}"
+							style="text-align: center;">
+							<h:selectBooleanCheckbox value="#{tipoDespesa.caixa}"
+								disabled="true" />
+						</p:column>
+						
+						
+						<p:column headerText="Situação"
+							sortBy="#{tipoDespesa.situacaoCadastro}"
+							style="text-align: center;">
+							<h:outputText value="#{tipoDespesa.situacaoCadastro}" />
+						</p:column>
+
+
+
+						<p:column style="width: 100px; text-align: center">
+							<p:button outcome="/tipoDespesa/CadastroTipoDespesa"
+								icon="ui-icon-pencil" title="Editar">
+								<f:param name="tipoDespesa" value="#{tipoDespesa.id}" />
+							</p:button>
+							<p:commandButton icon="ui-icon-trash" title="Excluir"
+								oncomplete="PF('confirmacaoExclusao').show()" process="@this"
+								update=":frmPesquisa:confirmacaoExclusaoDialog">
+								<f:setPropertyActionListener
+									target="#{pesquisaTipoDespesaBean.objetoSelecionado}"
+									value="#{tipoDespesa}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+					<p:confirmDialog header="Exclusão do tipo de despesa"
+						message="Tem certeza que deseja excluir o tipo de logradouro #{pesquisaTipoDespesaBean.objetoSelecionado.descricao}?"
+						widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+						<p:button value="Não"
+							onclick="PF('confirmacaoExclusao').hide(); return false;" />
+						<p:commandButton value="Sim"
+							oncomplete="PF('confirmacaoExclusao').hide();"
+							action="#{pesquisaTipoDespesaBean.excluir}" process="@this"
+							update=":frmPesquisa:tipoDespesaTable" />
+					</p:confirmDialog>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

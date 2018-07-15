@@ -1,0 +1,83 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Administradora;
+import br.com.sistemacomercial.model.Rede;
+import br.com.sistemacomercial.repository.filter.RedeFilter;
+
+public class Redes extends RepositoryAbstrato<Rede> implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	public Redes() {
+		super(Rede.class);
+	}
+
+	@Override
+	public Rede salvar(Rede objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Rede> filtrados(RedeFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Rede.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getNomeRede())) {
+			criteria.add(Restrictions.ilike("nomeRede", filtro.getNomeRede(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("nomeRede")).list();
+	}
+
+	public Administradora porIdAdministradora(Long id) {
+		return manager.find(Administradora.class, id);
+	}
+
+	public List<Administradora> admnistradorasDaRede(Rede banco) {
+		return manager.createQuery("from Administradora where rede.id = :rede_id", Administradora.class)
+				.setParameter("rede_id", banco.getId()).getResultList();
+	}
+
+	public List<Administradora> TodasAdmnistradoras() {
+		return manager.createQuery("from Administradora", Administradora.class).getResultList();
+	}
+
+	public Rede porNomeRedeUnico(String nomeRede) {
+		try {
+			return manager.createQuery("from Rede where upper(nomeRede) = :nomeRede", Rede.class)
+					.setParameter("nomeRede", nomeRede.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public Rede porCodigoRedeUnico(String codigoRede) {
+		try {
+			return manager.createQuery("from Rede where upper(codigoRede) = :codigoRede", Rede.class)
+					.setParameter("codigoRede", codigoRede.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<Rede> porNome(String descricao) {
+		return this.manager.createQuery("from Rede where upper(nome) like :descricao", Rede.class)
+				.setParameter("descricao", descricao.toUpperCase() + "%").getResultList();
+	}
+
+}

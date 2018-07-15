@@ -1,0 +1,38 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import br.com.sistemacomercial.model.Deposito;
+import br.com.sistemacomercial.repository.Depositos;
+import br.com.sistemacomercial.repository.filter.DepositoFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaDepositoBean extends PesquisaBeanAbstrato<Deposito, DepositoFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Depositos depositos;
+
+	public PesquisaDepositoBean() {
+		setFiltro(new DepositoFilter());
+	}
+
+	@Override
+	public void excluir() {
+		depositos.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Depósito " + getObjetoSelecionado().getDescricaoDeposito() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(depositos.filtrados(getFiltro()));
+	}
+
+}

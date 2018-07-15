@@ -1,0 +1,49 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Agenda;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.repository.filter.AgendaFilter;
+
+public class Agendas extends RepositoryAbstrato<Agenda> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public Agendas() {
+		super(Agenda.class);
+	}
+
+	@Override
+	public Agenda salvar(Agenda objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Agenda> filtrados(AgendaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Agenda.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		return criteria.addOrder(Order.asc("dataInicio")).list();
+	}
+	
+	public List<Agenda> buscarAgenda(Funcionario funcionario)
+			throws Exception {
+		return  manager.createQuery("from Agenda a where a.funcionario.id = :id", Agenda.class)
+				.setParameter("id", (funcionario.getId() == null ? -1 : funcionario.getId()))
+				.getResultList();
+	}
+
+
+}

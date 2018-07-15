@@ -1,0 +1,115 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.enums.TipoEndereco;
+import br.com.sistemacomercial.model.Agencia;
+import br.com.sistemacomercial.model.Banco;
+import br.com.sistemacomercial.model.Cidade;
+import br.com.sistemacomercial.model.TipoLogradouro;
+import br.com.sistemacomercial.repository.Cidades;
+import br.com.sistemacomercial.repository.TipoLogradouros;
+import br.com.sistemacomercial.repository.filter.CidadeFilter;
+import br.com.sistemacomercial.repository.filter.TipoLogradouroFilter;
+import br.com.sistemacomercial.service.CadastroBancoService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroBancoBean extends BeanAbstrato<Banco> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroBancoService cadastroBancoService;
+	@Inject
+	private TipoLogradouros tipoLogradouros;
+	@Inject
+	private Cidades cidades;
+	private Agencia agenciaSelecionada;
+	private Boolean editandoAgencia = false;
+	private List<TipoLogradouro> todosTiposLogradouros;
+	private List<Cidade> todasCidades;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}		
+		todosTiposLogradouros = tipoLogradouros.filtrados(new TipoLogradouroFilter());
+		todasCidades = cidades.filtrados(new CidadeFilter());
+
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Banco());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroBancoService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Banco salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	/* Inicio agencia */
+
+	public void novaAgencia() {
+		setAgenciaSelecionada(new Agencia());
+		getAgenciaSelecionada().setBanco(getObjeto());
+		this.editandoAgencia = false;
+	}
+
+	public Agencia getAgenciaSelecionada() {
+		return agenciaSelecionada;
+	}
+
+	public void setAgenciaSelecionada(Agencia agenciaSelecionada) {
+		this.agenciaSelecionada = agenciaSelecionada;
+	}
+
+	public void alterarAgencia() {
+		this.editandoAgencia = true;
+		if (getObjeto() != null) {
+		}
+	}
+
+	public void confirmarAgencia() {
+		if (!this.editandoAgencia) {
+			getAgenciaSelecionada().setBanco(getObjeto());
+			getObjeto().getAgencias().add(getAgenciaSelecionada());
+		}
+	}
+
+	public void excluirAgencia() {
+		cadastroBancoService.excluirAgencia(getAgenciaSelecionada());
+		getObjeto().getAgencias().remove(getAgenciaSelecionada());
+	}
+	
+	public List<TipoLogradouro> getTodosTiposLogradouros() {
+		return todosTiposLogradouros;
+	}
+
+	public List<Cidade> getTodasCidades() {
+		return todasCidades;
+	}
+	
+	public TipoEndereco[] getTipoEnderecos() {
+		return TipoEndereco.values();
+	}
+
+
+	/* Agencia - fim */
+
+}

@@ -1,0 +1,38 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.ContaCorrente;
+import br.com.sistemacomercial.repository.ContaCorrentes;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroContaCorrenteService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private ContaCorrentes contaCorrentes;
+
+	@Transactional
+	public ContaCorrente salvar(ContaCorrente contaCorrente) {
+		ContaCorrente ContaCorrenteExiste = contaCorrentes.porNumeroContaUnico(contaCorrente.getAgencia(), contaCorrente.getNumeroConta().toString().trim(), contaCorrente.getId());
+
+		if (ContaCorrenteExiste != null && !ContaCorrenteExiste.equals(contaCorrente)) {
+			throw new NegocioException("Já existe uma conta corrente com o mesmo número para cadastrada para a mesma agência selecionada!");
+		}
+		
+		
+		return contaCorrentes.salvar(contaCorrente);
+	}
+
+//	@Transactional
+//	public void excluirAgencia(Agencia agencia) {
+//		if (!ContaCorrentes.validaExclusaoAgencia(agencia)) {
+//			throw new NegocioException("Agência não pode ser excluída.");
+//		}
+//	}
+
+
+}

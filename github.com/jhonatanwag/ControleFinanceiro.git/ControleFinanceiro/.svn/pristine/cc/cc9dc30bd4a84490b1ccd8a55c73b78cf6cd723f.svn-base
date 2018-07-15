@@ -1,0 +1,201 @@
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import br.com.sistemacomercial.enums.SituacaoVenda;
+import br.com.sistemacomercial.enums.TipoVenda;
+
+@Entity
+@Table(name = "venda")
+public class Venda implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue
+	@Column(name = "venda_id")
+	private Long id;
+	@NotNull(message = "O filial deve ser infomado.")
+	@ManyToOne
+	@JoinColumn(name = "filial_id")
+	private Filial filial;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data_venda", nullable = false)
+	private Date dataVenda;
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "tipo_venda", nullable = false)
+	private TipoVenda tipoVenda;	
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "sit_venda", nullable = true)
+	private SituacaoVenda situacaoVenda = SituacaoVenda.N;	
+	@ManyToOne
+	@JoinColumn(nullable = true, name = "cliente_id")
+	private Cliente cliente;
+	@Column(name = "cnf_cnpj", length = 20)
+	private String cnfCnpj;
+	@OneToOne(optional = true)
+	@JoinColumn(name = "terminal_id")
+	private Terminal terminal;
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "funcionario_id")
+	private Funcionario vendedor;
+	@OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<ItemVenda> itensVenda = new ArrayList<>();
+	@OneToOne(targetEntity = Titulo.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "titulo_id")
+	private Titulo titulo;
+
+	public boolean isNovo() {
+		return this.id == null;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	
+	public Filial getFilial() {
+		return filial;
+	}
+
+	public void setFilial(Filial filial) {
+		this.filial = filial;
+	}
+
+	public Date getDataVenda() {
+		return dataVenda;
+	}
+
+	public void setDataVenda(Date dataVenda) {
+		this.dataVenda = dataVenda;
+	}
+
+	public TipoVenda getTipoVenda() {
+		return tipoVenda;
+	}
+
+	public void setTipoVenda(TipoVenda tipoVenda) {
+		this.tipoVenda = tipoVenda;
+	}
+		
+	public SituacaoVenda getSituacaoVenda() {
+		return situacaoVenda;
+	}
+
+	public void setSituacaoVenda(SituacaoVenda situacaoVenda) {
+		this.situacaoVenda = situacaoVenda;
+	}
+
+	public String getCnfCnpj() {
+		if (cliente != null) {
+			return cliente.getPessoa().getDocumentoFederal();
+		}
+		return cnfCnpj;
+	}
+
+	public void setCnfCnpj(String cnfCnpj) {
+		this.cnfCnpj = cnfCnpj;
+	}
+
+	public Terminal getTerminal() {
+		return terminal;
+	}
+
+	public void setTerminal(Terminal terminal) {
+		this.terminal = terminal;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public List<ItemVenda> getItensVenda() {
+		return itensVenda;
+	}
+
+	public void setItensVenda(List<ItemVenda> itensVenda) {
+		this.itensVenda = itensVenda;
+	}
+
+	public Funcionario getVendedor() {
+		return vendedor;
+	}
+
+	public void setVendedor(Funcionario vendedor) {
+		this.vendedor = vendedor;
+	}
+
+	public Titulo getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(Titulo titulo) {
+		this.titulo = titulo;
+	}
+
+	public Integer getQuantidadeTotal() {
+		Integer qtd = 0;
+		for (ItemVenda itemVenda : this.itensVenda) {
+			qtd = qtd + itemVenda.getQuantidade().intValue();
+		}
+		return qtd;
+	}
+
+	public BigDecimal getTotalLiquidoVenda() {
+		BigDecimal valorTotal = BigDecimal.ZERO;
+		if (!itensVenda.isEmpty()) {
+			for (ItemVenda itemVenda : itensVenda) {
+				itemVenda.atualizarValores();
+				valorTotal = valorTotal.add(itemVenda.getValorLiquido());
+			}
+		}
+		return valorTotal;
+	}
+	
+	public ItemVenda produtoExistente(Produto produto){
+		for(ItemVenda item : itensVenda){
+			if(item.getProduto().equals(produto)){
+				return item;
+			}
+		}
+		return null;
+	}
+
+	public void atualizarTotais() {
+	
+	}
+
+}

@@ -1,0 +1,341 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Deposito;
+import br.com.sistemacomercial.model.Estoque;
+import br.com.sistemacomercial.model.Grupo;
+import br.com.sistemacomercial.model.Marca;
+import br.com.sistemacomercial.model.Produto;
+import br.com.sistemacomercial.model.ProdutoOpcional;
+import br.com.sistemacomercial.model.ProdutoPreco;
+import br.com.sistemacomercial.model.ProdutoSabor;
+import br.com.sistemacomercial.model.Sabor;
+import br.com.sistemacomercial.model.SubGrupo;
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.repository.Depositos;
+import br.com.sistemacomercial.repository.Grupos;
+import br.com.sistemacomercial.repository.Marcas;
+import br.com.sistemacomercial.repository.Produtos;
+import br.com.sistemacomercial.repository.Sabores;
+import br.com.sistemacomercial.repository.UnidadeMedidas;
+import br.com.sistemacomercial.repository.filter.DepositoFilter;
+import br.com.sistemacomercial.repository.filter.GrupoFilter;
+import br.com.sistemacomercial.repository.filter.MarcaFilter;
+import br.com.sistemacomercial.repository.filter.ProdutoFilter;
+import br.com.sistemacomercial.repository.filter.SaborFilter;
+import br.com.sistemacomercial.repository.filter.UnidadeMedidaFilter;
+import br.com.sistemacomercial.service.CadastroProdutoService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroProdutoBean extends BeanAbstrato<Produto> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Inject
+	private Grupos grupos;
+	@Inject
+	private Marcas marcas;
+	@Inject
+	private UnidadeMedidas unidadeMedidas;
+	@Inject
+	private CadastroProdutoService cadastroProdutoService;
+	@Inject
+	private Sabores sabores;
+	@Inject
+	private Produtos produtos;
+	@Inject
+	private Depositos depositos;
+	private Grupo grupo;
+	private Sabor sabor;
+	private List<Grupo> todosGrupos;
+	private List<Marca> todasMarcas;
+	private List<UnidadeMedida> todasUnidadeMedidas;
+	private List<SubGrupo> subGrupos;
+	private List<Sabor> todosSabores;
+	private List<Produto> todosProdutos;
+	private List<Deposito> todosDepositos;
+	private ProdutoPreco produtoPrecoSelecionado;
+	private ProdutoOpcional produtoOpcionalSelecionado;
+	private Estoque produtoEstoqueSelecionado;
+	private ProdutoSabor produtoSaborSelecionado;
+	private Boolean editandoProdutoPreco = false;
+	private Boolean editandoProdutoEstoque = false;
+	private Boolean editandoProdutoOpcional = false;
+	private Boolean editandoProdutoSabor = false;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+		getObjeto().setDataCadastro(new Date());
+		todosGrupos = grupos.filtrados(new GrupoFilter());
+		todasMarcas = marcas.filtrados(new MarcaFilter());
+		todasUnidadeMedidas = unidadeMedidas.filtrados(new UnidadeMedidaFilter());
+		todosSabores = sabores.filtrados(new SaborFilter());
+		todosProdutos = produtos.filtrados(new ProdutoFilter());
+		todosDepositos = depositos.filtrados(new DepositoFilter());
+		novoProdutoSabores();
+		if (this.grupo != null) {
+			carregarSubGrupos();
+		}
+
+	}
+
+	@Override
+	public void setObjeto(Produto objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+			if (getObjeto().getSubGrupo() != null) {
+				this.grupo = getObjeto().getSubGrupo().getGrupo();
+			}
+		}
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Produto());
+		this.grupo = null;
+		this.subGrupos = new ArrayList<>();
+		this.sabor = null;
+	}
+
+	public Sabores getSabores() {
+		return sabores;
+	}
+
+	public void setSabores(Sabores sabores) {
+		this.sabores = sabores;
+	}
+
+	public Sabor getSabor() {
+		return sabor;
+	}
+
+	public void setSabor(Sabor sabor) {
+		this.sabor = sabor;
+	}
+
+	public List<Sabor> getTodosSabores() {
+		return todosSabores;
+	}
+
+	public void setTodosSabores(List<Sabor> todosSabores) {
+		this.todosSabores = todosSabores;
+	}
+
+	public List<Produto> getTodosProdutos() {
+		return todosProdutos;
+	}
+
+	public void setTodosProdutos(List<Produto> todosProdutos) {
+		this.todosProdutos = todosProdutos;
+	}
+		
+	public List<Deposito> getTodosDepositos() {
+		return todosDepositos;
+	}
+
+	public void setTodosDepositos(List<Deposito> todosDepositos) {
+		this.todosDepositos = todosDepositos;
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroProdutoService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Produto salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public void carregarSubGrupos() {
+		subGrupos = grupos.subGruposDe(grupo);
+	}
+
+	public List<Grupo> getTodosGrupos() {
+		return todosGrupos;
+	}
+
+	public Grupo getGrupo() {
+		return grupo;
+	}
+
+	public void setGrupo(Grupo grupo) {
+		this.grupo = grupo;
+	}
+
+	public List<Marca> getTodasMarcas() {
+		return todasMarcas;
+	}
+
+	public List<SubGrupo> getSubGrupos() {
+		return subGrupos;
+	}
+
+	public List<UnidadeMedida> getTodasUnidadeMedidas() {
+		return todasUnidadeMedidas;
+	}
+
+	public ProdutoPreco getProdutoPrecoSelecionado() {
+		return produtoPrecoSelecionado;
+	}
+
+	public void setProdutoPrecoSelecionado(ProdutoPreco produtoPrecoSelecionado) {
+		this.produtoPrecoSelecionado = produtoPrecoSelecionado;
+	}
+	
+	public Estoque getProdutoEstoqueSelecionado() {
+		return produtoEstoqueSelecionado;
+	}
+
+	public void setProdutoEstoqueSelecionado(Estoque produtoEstoqueSelecionado) {
+		this.produtoEstoqueSelecionado = produtoEstoqueSelecionado;
+	}
+
+	/* Produto preço - início */
+
+	
+
+	public void novoPreco() {
+		setProdutoPrecoSelecionado(new ProdutoPreco());
+		getProdutoPrecoSelecionado().setProduto(getObjeto());
+		getProdutoPrecoSelecionado().setDataIni(new Date());
+		this.editandoProdutoPreco = false;
+	}
+
+	public void alterarPreco() {
+		this.editandoProdutoPreco = true;
+	}
+
+	public void confirmarProdutoPreco() {
+		if (!this.editandoProdutoPreco) {
+			getProdutoPrecoSelecionado().setProduto(getObjeto());
+			getObjeto().getProdutoPrecos().add(getProdutoPrecoSelecionado());
+		}
+		log.info("ConfirmarProdutoPreco");
+	}
+
+	public void excluirProdutoPreco() {
+		cadastroProdutoService.excluirProdutoPreco(getProdutoPrecoSelecionado());
+		getObjeto().getProdutoPrecos().remove(getProdutoPrecoSelecionado());
+	}
+
+	/* Produto preço - fim */
+	
+	
+	/* Produto estoque - início */
+
+	public void novoEstoque() {
+		setProdutoEstoqueSelecionado(new Estoque());
+		getProdutoEstoqueSelecionado().setProduto(getObjeto());
+		getProdutoEstoqueSelecionado().setSaldo(new BigDecimal("0"));
+		getProdutoEstoqueSelecionado().setQtdMinimo(new BigDecimal("0"));
+		getProdutoEstoqueSelecionado().setQtdMaximo(new BigDecimal("0"));
+		this.editandoProdutoEstoque = false;
+	}
+
+	public void alterarEstoque() {
+		this.editandoProdutoEstoque = true;
+	}
+
+	public void confirmarProdutoEstoque() {
+		if (!this.editandoProdutoEstoque) {
+			getProdutoEstoqueSelecionado().setProduto(getObjeto());
+			getObjeto().getProdutoEstoques().add(getProdutoEstoqueSelecionado());
+		}
+		log.info("ConfirmarProdutoEstoque");
+	}
+
+	public void excluirProdutoEstoque() {
+		cadastroProdutoService.excluirProdutoEstoque(getProdutoEstoqueSelecionado());
+		getObjeto().getProdutoEstoques().remove(getProdutoEstoqueSelecionado());
+	}
+
+	/* Produto estoque - fim */
+
+	/* Produto Opcional - início */
+
+	public ProdutoOpcional getProdutoOpcionalSelecionado() {
+		return produtoOpcionalSelecionado;
+	}
+
+	public void setProdutoOpcionalSelecionado(ProdutoOpcional produtoOpcionalSelecionado) {
+		this.produtoOpcionalSelecionado = produtoOpcionalSelecionado;
+	}
+
+	public void novoProdutoOpcional() {
+		setProdutoOpcionalSelecionado(new ProdutoOpcional());
+		getProdutoOpcionalSelecionado().setProduto(getObjeto());
+		this.editandoProdutoOpcional = false;
+	}
+
+	public void alterarProdutoOpcional() {
+		this.editandoProdutoOpcional = true;
+	}
+
+	public void confirmarProdutoOpcional() {
+		if (!this.editandoProdutoOpcional) {
+			getProdutoOpcionalSelecionado().setProduto(getObjeto());	
+			System.out.println("###########produto="+getProdutoOpcionalSelecionado().getProduto().getDescricao().toString());
+			System.out.println("###########produto opcional="+getProdutoOpcionalSelecionado().getProdutoOpcional().getDescricao());
+			getObjeto().getProdutoOpcionais().add(getProdutoOpcionalSelecionado());
+		}
+		log.info("ConfirmarProdutoOpcional");
+	}
+
+	public void excluirProdutoOpcional() {
+		cadastroProdutoService.excluirProdutoOpcional(getProdutoOpcionalSelecionado());
+		getObjeto().getProdutoOpcionais().remove(getProdutoOpcionalSelecionado());
+	}
+
+	/* Produto Opcional - fim */
+
+	/* Produto Sabores - início */
+	public ProdutoSabor getProdutoSaborSelecionado() {
+		return produtoSaborSelecionado;
+	}
+
+	public void setProdutoSaborSelecionado(ProdutoSabor produtoSaborSelecionado) {
+		this.produtoSaborSelecionado = produtoSaborSelecionado;
+	}
+
+	public void novoProdutoSabores() {
+		setProdutoSaborSelecionado(new ProdutoSabor());
+		getProdutoSaborSelecionado().setProduto(getObjeto());		
+		this.editandoProdutoSabor = false;
+	}
+
+	public void alterarProdutoSabor() {
+		this.editandoProdutoSabor = true;
+	}
+
+	public void confirmarProdutoSabor() {
+		if (!this.editandoProdutoSabor) {
+			getProdutoSaborSelecionado().setProduto(getObjeto());
+			getObjeto().getProdutoSabores().add(getProdutoSaborSelecionado());
+		}
+		log.info("ConfirmarProdutoSabores");
+	}
+
+	public void excluirProdutoSabor() {
+		cadastroProdutoService.excluirProdutoSabor(getProdutoSaborSelecionado());
+		getObjeto().getProdutoSabores().remove(getProdutoSaborSelecionado());
+	}
+
+	/* Produto Sabores- fim */
+
+}

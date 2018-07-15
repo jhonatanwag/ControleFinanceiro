@@ -1,0 +1,29 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.TipoDespesa;
+import br.com.sistemacomercial.repository.TipoDespesas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroTipoDespesaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TipoDespesas tipoDespesas;
+
+	@Transactional
+	public TipoDespesa salvar(TipoDespesa tipoDespesa) {
+		TipoDespesa tipoLogradouroExiste = tipoDespesas.porDescricaoUnico(tipoDespesa.getDescricao());
+
+		if (tipoLogradouroExiste != null && !tipoLogradouroExiste.equals(tipoDespesa)) {
+			throw new NegocioException("Já existe um tipo de despesa com o mesma descrição cadastrado.");
+		}
+
+		return tipoDespesas.salvar(tipoDespesa);
+	}
+
+}

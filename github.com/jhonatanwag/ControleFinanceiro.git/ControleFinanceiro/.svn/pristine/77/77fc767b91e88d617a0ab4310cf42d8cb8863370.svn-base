@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Hello JQM</title>
+	<h:outputStylesheet library="skin"
+		name="css/jquery.mobile-1.4.5.min.css" />
+	<h:outputScript library="skin" name="js/jquery.min.js" />
+	<h:outputScript library="skin" name="js/jquery.mobile-1.4.5.min.js" />
+</h:head>
+<h:body>
+	<div id="pagina1" data-role="page">
+		<div data-role="header">
+			<h1>Exemplo jQuery Mobile com JSF 2.2.</h1>
+		</div>
+		<div role="main" class="ui-content">
+			<form data-ajax="false" jsf:id="form" jsf:prependId="false">
+				<input placeholder="Texto..." type="text" name="texto"
+					jsf:value="#{jqueryManagedBean.texto}" jsf:id="texto" />
+				<button jsf:action="#{jqueryManagedBean.irPagina2}">Envia</button>
+			</form>
+		</div>
+	</div>
+</h:body>
+</html>

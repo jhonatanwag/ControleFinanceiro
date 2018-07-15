@@ -1,0 +1,226 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">Venda(s)/Orçamento(s)</ui:define>
+
+	<ui:define name="corpo">
+
+
+		<h:outputScript library="js" name="navegacao_venda.js" />
+
+
+		<f:metadata>
+			<o:viewParam name="venda" value="#{vendaBean.objeto}" />
+			<f:viewAction action="#{vendaBean.inicializar}" />
+		</f:metadata>
+
+		<h:form id="form">
+
+			<p:focus for="dataTableItem:codigo" />
+
+
+			<div class="Container100 ui-fluid">
+				<div class="ContainerIndent" tabindex="1" id="table_div">
+					<p:panel>
+						<p:toolbar style="margin-top: 10px">
+
+
+							<p:toolbarGroup>
+								<p:commandButton id="botao2" widgetVar="botao2"
+									icon="ui-icon-search" process="@this"
+									action="#{pesquisaProdutoBean.abrirDialog}">
+									<p:ajax event="dialogReturn"
+										listener="#{vendaBean.produtoSelecao}" update="dataTableItem"
+										process="@this" />
+								</p:commandButton>
+								<h:outputText value=" Consultar produtos/Serviços: [F9]"
+									style="color: black;" />
+							</p:toolbarGroup>
+
+							<p:toolbarGroup align="right">
+								<p:commandButton value="Finalizar"
+									oncomplete="PF('DlgFecharVenda').show();" process="@this"
+									actionListener="#{vendaBean.finalizarVenda()}"
+									update=":formDialogFecharVenda" title="Finalizar"
+									icon="ui-icon-disk" />
+							</p:toolbarGroup>
+						</p:toolbar>
+						<div class="Separator"></div>
+
+						<p:messages autoUpdate="true" closable="true" />
+
+
+						<p:dataTable value="#{vendaBean.objeto.itensVenda}"
+							selectionMode="single"
+							selection="#{vendaBean.itemVendaSelecionado}" var="item"
+							widgetVar="table" id="dataTableItem" rowKey="#{item.produto.id}"
+							scrollable="true" scrollHeight="250" style="margin-top: 10px">
+
+
+							<p:column id="codigo" headerText="Código"
+								style="text-align: right; width: 150px;">
+								<p:inputText id="codigoProduto"
+									value="#{vendaBean.produtoSelecionado.id}"
+									style="margin-right: 100px text-align: right" size="6" maxlength="6"
+									onkeyup="onlyNumbers(this)">
+									<p:ajax event="change" process="@this"
+										listener="#{vendaBean.produtoPorCodigo()}"
+										/>
+	
+								</p:inputText>
+
+								<p:commandButton id="botao" widgetVar="botao"
+									style="display:none" icon="ui-icon-search" process="@this"
+									update="@none" action="#{pesquisaProdutoBean.abrirDialog}">
+									<p:ajax event="dialogReturn"
+										listener="#{vendaBean.produtoSelecao}" update="dataTableItem"
+										process="@this" />
+									<p:resetInput target="descricao" />
+								</p:commandButton>
+
+							</p:column>
+
+							<p:column id="qtd" headerText="Qtd."
+								style="text-align: right; width: 100px">
+								<p:spinner id="mySpinner" stepFactor="1" min="1"
+									style="text-align: right" value="#{item.quantidade}" size="3">
+									<p:ajax update="dataTableItem" />
+								</p:spinner>
+							</p:column>
+
+							<p:column id="unidade" headerText="Unid"
+								style="text-align: right; width: 70px">
+								<h:outputText value="#{item.produto.unidadeMedida.sigla}" />
+							</p:column>
+
+							<p:column id="descricao" headerText="Descrição">
+								<h:outputText value="#{item.produto.descricao}" />
+							</p:column>
+
+
+
+							<p:column id="unitario" headerText="Val. Unit."
+								style="text-align: right; width: 70px">
+								<h:outputText value="#{item.valorUnitario}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</p:column>
+
+							<p:column id="bruto" headerText="Val. Bruto"
+								style="text-align: right; width: 70px">
+								<h:outputText value="#{item.valorBruto}">
+									<f:convertNumber type="currency" />
+								</h:outputText>
+							</p:column>
+
+							<p:column style="width: 100px; text-align: center">
+								<p:commandButton icon="ui-icon-trash" title="Excluir"
+									process="@this" update="dataTableItem"
+									action="#{vendaBean.excluirItemVenda()}">
+									<f:setPropertyActionListener
+										target="#{vendaBean.itemVendaSelecionado}" value="#{item}" />
+								</p:commandButton>
+							</p:column>
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column colspan="5" style="text-align:right"
+										footerText="Totals:" />
+									<p:column footerText="#2$" />
+								</p:row>
+							</p:columnGroup>
+						</p:dataTable>
+
+					</p:panel>
+				</div>
+			</div>
+
+			<div class="Container100 BorBotLeaden ui-fluid">
+				<div class="ContainerIndent">
+					<div class="Container60 Responsive">
+						<div class="ContainerIndent">
+							<p:panel>
+
+								<div class="Container100">
+									<i class="icon-chart-bar"></i> Desconto [ALT + W] <i
+										class="icon-reply"></i> Devolução [F9] <i class="icon-edit"></i>
+									Trocar Nome [F2]
+								</div>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="Container100 BorBotLeaden ui-fluid">
+				<div class="ContainerIndent">
+					<div class="EmptyBox10"></div>
+
+					<div class="Container60 Responsive">
+						<div class="ContainerIndent">
+							<p:panel style="min-height:70px;">
+								<div class="Container100 Responsive Fs20">
+									<i class="icon-chart-bar"></i> Produto Selecionado
+								</div>
+								<div class="Container100"></div>
+							</p:panel>
+						</div>
+					</div>
+
+					<div class="Container40 Responsive100 ui-fluid">
+						<div class="ContainerIndent">
+							<p:panel style="min-height:70px;">
+								<div class="Container">
+									<div class="Container50 Responsive Fs20">Estoque:</div>
+									<div class="Container50 Responsive Fs12">Compra:</div>
+									<div class="Container50 Responsive Fs12">Venda:</div>
+									<div class="EmptyBox10"></div>
+								</div>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="Container100 leaden-back BorBotLeaden">
+				<div class="ContainerIndent">
+					<div class="EmptyBox10"></div>
+
+					<div class="Container100 Responsive100 ui-fluid">
+						<div class="ContainerIndent">
+							<p:panel>
+								<div class="Container50 Responsive Fs20">Total de Itens:
+									#{vendaBean.objeto.quantidadeTotal}</div>
+
+								<div class="Container50 Responsive Fs20">
+									Valor Total Venda:
+									<h:outputText value="#{vendaBean.objeto.totalLiquidoVenda}">
+										<f:convertNumber type="currency" />
+									</h:outputText>
+								</div>
+								<div class="EmptyBox10"></div>
+
+							</p:panel>
+						</div>
+					</div>
+
+					<div class="EmptyBox10"></div>
+				</div>
+			</div>
+
+			<p:remoteCommand name="atualizaDialogDesconto"
+				update=":formDialogDescontoVenda" />
+
+		</h:form>
+
+
+
+
+
+		<ui:include src="/WEB-INF/template/venda/DlgFecharVenda.xhtml" />
+		<ui:include src="/WEB-INF/template/venda/DlgDescontoVenda.xhtml" />
+	</ui:define>
+</ui:composition>

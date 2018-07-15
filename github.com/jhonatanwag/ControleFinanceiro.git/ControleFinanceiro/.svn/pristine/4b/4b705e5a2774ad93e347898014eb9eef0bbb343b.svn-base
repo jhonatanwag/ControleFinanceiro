@@ -1,0 +1,62 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.enums.EntradaSaida;
+import br.com.sistemacomercial.enums.SituacaoCadastro;
+import br.com.sistemacomercial.enums.TipoCreditoDebito;
+import br.com.sistemacomercial.model.TipoDespesa;
+import br.com.sistemacomercial.service.CadastroTipoDespesaService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroTipoDespesaBean extends BeanAbstrato<TipoDespesa>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroTipoDespesaService cadastroTipoDespesaService;
+
+	@Override
+	public void inicializar() {
+		if (this.getObjeto() == null) {
+			limpar();
+		}
+
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new TipoDespesa());
+	}
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroTipoDespesaService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Tipo de despesa salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	public SituacaoCadastro[] getSituacaoCadastro() {
+		return SituacaoCadastro.values();
+	}
+
+	public EntradaSaida[] getEntradaSaida() {
+		return EntradaSaida.values();
+	}
+
+	public TipoCreditoDebito[] getTipoCreditoDebito() {
+		return TipoCreditoDebito.values();
+	}
+
+}

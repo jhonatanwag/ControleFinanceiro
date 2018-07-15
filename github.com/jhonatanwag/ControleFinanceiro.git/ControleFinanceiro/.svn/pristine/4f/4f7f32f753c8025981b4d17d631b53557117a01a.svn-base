@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.enums;
+
+public enum TipoBloqueioAviso {
+	BLOQUEIO("Bloqueio"), 
+	AVISO("Aviso"), 
+	DESBLOQUEIO("Desbloqueio");
+	private String value;
+
+	private TipoBloqueioAviso(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return this.value;
+	}
+
+	public static TipoBloqueioAviso getTipoBloqueio(Integer value) {
+		switch (value) {
+		case 0:
+			return BLOQUEIO;
+		case 1:
+			return DESBLOQUEIO;
+		default:
+			return null;
+		}
+	}
+
+	public static Integer getTipoBloqueio(TipoBloqueioAviso tipoBloqueio) {
+		switch (tipoBloqueio) {
+		case BLOQUEIO:
+			return 0;
+		case DESBLOQUEIO:
+			return 1;
+		default:
+			return null;
+		}
+	}
+}

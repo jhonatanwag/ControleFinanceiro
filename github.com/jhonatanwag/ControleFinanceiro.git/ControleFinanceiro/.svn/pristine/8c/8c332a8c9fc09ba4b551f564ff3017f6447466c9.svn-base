@@ -1,0 +1,61 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.primefaces.context.RequestContext;
+
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.repository.filter.PessoaFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaPessoaBean extends PesquisaBeanAbstrato<Pessoa, PessoaFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Pessoas pessoas;
+
+	public PesquisaPessoaBean() {
+		setFiltro(new PessoaFilter());
+	}
+
+	@Override
+	public void excluir() {
+		pessoas.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Pessoa " + getObjetoSelecionado().getNome() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(pessoas.filtrados(getFiltro()));
+	}
+
+	public void abrirDialogo() {
+		Map<String, Object> opcoes = new HashMap<>();
+		opcoes.put("modal", true);
+		opcoes.put("resizable", true);
+		opcoes.put("responsive", true);
+		opcoes.put("dynamic", true);
+		opcoes.put("draggable", false);		
+		//opcoes.put("contentHeight", 550);
+		//opcoes.put("contentWidth", 770);		
+		RequestContext.getCurrentInstance().openDialog("/pessoa/DlgPesquisaPessoa.xhtml", opcoes, null);
+		//RequestContext.getCurrentInstance().openDialog("/webapp/pessoa/DlgPesquisaPessoa.xhtml", opcoes, null);
+		//RequestContext.getCurrentInstance().openDialog("/WEB-INF/template/pessoa/DlgPesquisaPessoa.xhtml", opcoes, null);
+	}
+
+	public void selecionar(Pessoa pessoa) {
+		RequestContext.getCurrentInstance().closeDialog(pessoa);
+	}
+
+}

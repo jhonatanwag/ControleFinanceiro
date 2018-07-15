@@ -1,0 +1,40 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import br.com.sistemacomercial.enums.SituacaoInventario;
+
+public class InventarioFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private SituacaoInventario situacaoInventario;
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public SituacaoInventario getSituacaoInventario() {
+		return situacaoInventario;
+	}
+
+	public void setSituacaoInventario(SituacaoInventario situacaoInventario) {
+		this.situacaoInventario = situacaoInventario;
+	}
+
+}

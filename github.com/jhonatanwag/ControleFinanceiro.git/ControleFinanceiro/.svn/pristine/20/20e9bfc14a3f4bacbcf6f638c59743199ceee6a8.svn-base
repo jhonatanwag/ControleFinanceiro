@@ -1,0 +1,29 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+
+import br.com.sistemacomercial.model.TipoCorteCabelo;
+import br.com.sistemacomercial.repository.TipoCorteCabelos;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroTipoCorteCabeloService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private TipoCorteCabelos tipoCorteCabelos;
+
+	@Transactional
+	public TipoCorteCabelo salvar(TipoCorteCabelo tipoCorteCabelo) {
+		TipoCorteCabelo tipoCorteCabeloExiste = tipoCorteCabelos.porDescricaoUnico(tipoCorteCabelo.getDescricao());
+
+		if (tipoCorteCabeloExiste != null && !tipoCorteCabeloExiste.equals(tipoCorteCabelo)) {
+			throw new NegocioException("Já existe um tipo de corte de cabelo com o mesma descrição cadastrado.");
+		}
+
+		return tipoCorteCabelos.salvar(tipoCorteCabelo);
+	}
+
+}

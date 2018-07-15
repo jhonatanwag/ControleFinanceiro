@@ -1,0 +1,37 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+import br.com.sistemacomercial.model.Deposito;
+import br.com.sistemacomercial.repository.Depositos;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroDepositoService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Depositos depositos;
+
+	@Transactional
+	public Deposito salvar(Deposito dep) {
+		Deposito depExiste = depositos.porDescricaoUnico(dep.getDescricaoDeposito(), dep.getId());
+
+		if (depExiste != null && !depExiste.equals(dep)) {
+			throw new NegocioException("Já existe uma depósito cadastrado com a mesma descrição.");
+		}
+		
+		depExiste = depositos.porCodidoDeposito(dep.getCodigoDeposito());
+		
+		if (depExiste != null && !depExiste.equals(dep)) {
+			throw new NegocioException("Já existe um depósito cadastrado com o mesmo código");
+		}
+		
+		return depositos.salvar(dep);
+	}
+
+
+
+
+}

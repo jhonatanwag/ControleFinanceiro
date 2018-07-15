@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<ui:composition template="/testBootStrap/template_initial.xhtml">
+	<ui:define name="nav_bar">
+		<ui:include src="top_bar.xhtml" />
+
+
+
+		<ui:include src="search_bar.xhtml" />
+	</ui:define>
+
+	<!--      https://gilbertoastolfi.wordpress.com/2014/03/11/desenvolvendo-uma-aplicacao-java-web-jsf-criando-templates-parte-2/ -->
+
+	<ui:define name="container">
+		<div class="row">
+			<span>#{index.message}</span>
+		</div>
+
+		<div id="div-carousel" class="carousel slide">
+			<div class="carousel-inner">
+				<!-- Divs com efeito de transição. -->
+				<div class="item active">Conteúdo da DIV 1.</div>
+				<div class="item">Conteúdo da DIV 2.</div>
+			</div>
+		</div>
+		<div class="row">
+			<!-- Botões de navegação -->
+			<div id="div-1" class="span2">
+				<a id="a-1" class="btn" href="#div-carousel" data-slide="prev"><i
+					class="icon-chevron-left"></i>Voltar para DIV 1</a>
+			</div>
+			<div id="div-2" class="span2">
+				<a id="a-2" class="btn" href="#div-carousel" data-slide="next">Avançar
+					para DIV 2<i class="icon-chevron-right"></i>
+				</a>
+			</div>
+		</div>
+				
+	</ui:define>
+	<ui:define name="title">        
+            Bem-vindo ao MyImage.com        
+    </ui:define>
+
+</ui:composition>
+</html>

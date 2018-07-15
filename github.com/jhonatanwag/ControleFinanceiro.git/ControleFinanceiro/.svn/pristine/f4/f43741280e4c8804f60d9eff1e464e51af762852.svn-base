@@ -1,0 +1,58 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Agencia;
+import br.com.sistemacomercial.model.TalaoCheque;
+import br.com.sistemacomercial.repository.filter.TalaoChequeFilter;
+
+public class TalaoCheques extends RepositoryAbstrato<TalaoCheque> implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	public TalaoCheques() {
+		super(TalaoCheque.class);
+	}
+
+	@Override
+	public TalaoCheque salvar(TalaoCheque objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TalaoCheque> filtrados(TalaoChequeFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(TalaoCheque.class);
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+		return criteria.addOrder(Order.asc("numeroInicial")).list();
+	}
+
+	/**
+	 * 
+	 * @param uf
+	 * @param id
+	 * @return O TalaoCheque verificando
+	 */
+	public TalaoCheque validaIntervalorInicioFim(Agencia agencia, String numeroConta, Long id) {
+		try {
+			return manager
+					.createQuery(
+							"from TalaoCheque where upper(numeroConta) = :numeroConta and id <> :id and agencia.id = :agenciaId",
+							TalaoCheque.class)
+					.setParameter("numeroConta", numeroConta.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.setParameter("agenciaId", agencia.getId()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+}

@@ -1,0 +1,185 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.Version;
+
+//import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+//import org.hibernate.validator.constraints.NotEmpty;
+
+/**
+ *
+ * @author Danilo
+ */
+@Entity
+@Table(name = "funcionario")
+public class Funcionario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(generator = "foreignFuncionario")
+	@GenericGenerator(name = "foreignFuncionario", strategy = "foreign", parameters = {
+			@Parameter(name = "property", value = "pessoa") })
+	@Column(name = "funcionario_id")
+	private Long id;
+	@OneToOne(targetEntity = Pessoa.class, optional = false)
+	@PrimaryKeyJoinColumn
+	@Cascade(CascadeType.ALL)
+	private Pessoa pessoa;
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "funcao_id")
+	private Funcao funcao;
+	@Column(name = "num_cart_trab", nullable = true)
+	private String numCarteiraTrabalho;
+	@Temporal(javax.persistence.TemporalType.DATE)
+	@Column(name = "data_admissao", nullable = false)
+	private Date dataAdmissao = new Date();
+	@Temporal(javax.persistence.TemporalType.DATE)
+	@Column(name = "data_demissao")
+	private Date dataDemissao;
+	@Version
+	private Long versao;
+	@OneToMany(cascade = {
+			javax.persistence.CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "funcionario", orphanRemoval = true)
+	private List<Agenda> agendas = new ArrayList<>();
+	@Column(name = "agenda_publica" , nullable = true)
+	private boolean agendaPublica = false;
+	@Column(name = "perm_edicao_agenda", nullable = true)
+	private boolean permiteEdicaoAgenda = false;
+
+	public Funcionario() {
+		this.pessoa = new Pessoa();
+		this.pessoa.setFuncionario(true);
+	}
+
+	public Funcionario(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
+
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public Funcao getFuncao() {
+		return funcao;
+	}
+
+	public void setFuncao(Funcao funcao) {
+		this.funcao = funcao;
+	}
+
+	public Date getDataAdmissao() {
+		return dataAdmissao;
+	}
+
+	public void setDataAdmissao(Date dataAdmissao) {
+		this.dataAdmissao = dataAdmissao;
+	}
+
+	public Date getDataDemissao() {
+		return dataDemissao;
+	}
+
+	public void setDataDemissao(Date dataDemissao) {
+		this.dataDemissao = dataDemissao;
+	}
+
+	public String getNumCarteiraTrabalho() {
+		return numCarteiraTrabalho;
+	}
+
+	public void setNumCarteiraTrabalho(String numCarteiraTrabalho) {
+		this.numCarteiraTrabalho = numCarteiraTrabalho;
+	}
+
+	public Long getVersao() {
+		return versao;
+	}
+
+	public void setVersao(Long versao) {
+		this.versao = versao;
+	}
+				
+	public List<Agenda> getAgendas() {
+		return agendas;
+	}
+
+	public void setAgendas(List<Agenda> agendas) {
+		this.agendas = agendas;
+	}
+	
+	
+
+	public boolean isAgendaPublica() {
+		return agendaPublica;
+	}
+
+	public void setAgendaPublica(boolean agendaPublica) {
+		this.agendaPublica = agendaPublica;
+	}
+
+	public boolean isPermiteEdicaoAgenda() {
+		return permiteEdicaoAgenda;
+	}
+
+	public void setPermiteEdicaoAgenda(boolean permiteEdicaoAgenda) {
+		this.permiteEdicaoAgenda = permiteEdicaoAgenda;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Funcionario other = (Funcionario) obj;
+		if (this.pessoa != other.pessoa && (this.pessoa == null || !this.pessoa.equals(other.pessoa))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 37 * hash + (this.pessoa != null ? this.pessoa.hashCode() : 0);
+		return hash;
+	}
+}

@@ -1,0 +1,35 @@
+package br.com.sistemacomercial.service;
+
+import java.io.Serializable;
+
+import javax.inject.Inject;
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.repository.UnidadeMedidas;
+import br.com.sistemacomercial.util.jpa.Transactional;
+
+public class CadastroUnidadeMedidaService implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private UnidadeMedidas unidadeMedidas;
+
+	@Transactional
+	public UnidadeMedida salvar(UnidadeMedida unidadeMedida) {
+		UnidadeMedida unidadeExiste = unidadeMedidas.porDescricaoUnico(unidadeMedida.getDescricao(),
+				unidadeMedida.getId());
+
+		if (unidadeExiste != null) {
+			throw new NegocioException("Já existe uma unidade de medida com a mesma descrição cadastrada.");
+		}
+
+		unidadeExiste = unidadeMedidas.porSiglaUnico(unidadeMedida.getSigla(), unidadeMedida.getId());
+
+		if (unidadeExiste != null) {
+			throw new NegocioException("Já existe uma unidade de medida com a mesma sigla cadastrada.");
+		}
+
+		return unidadeMedidas.salvar(unidadeMedida);
+	}
+
+}

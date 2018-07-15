@@ -1,0 +1,66 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import br.com.sistemacomercial.model.Deposito;
+import br.com.sistemacomercial.repository.filter.DepositoFilter;
+
+public class Depositos extends RepositoryAbstrato<Deposito> implements Serializable {
+
+	public Depositos() {
+		super(Deposito.class);
+	}
+	
+	private static final long serialVersionUID = 1L;
+	
+    @Override
+	public Deposito salvar(Deposito dep) {
+		return super.salvar(dep);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Deposito> filtrados(DepositoFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Deposito.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDesDeposito())) {
+			criteria.add(Restrictions.ilike("descricaoDeposito", filtro.getDesDeposito(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricaoDeposito")).list();
+	}
+
+	
+	
+	public Deposito porDescricaoUnico(String descricao, Long id) {
+		try {
+			return manager.createQuery("from Deposito where upper(descricaoDeposito) = :descricao and id <> :id", Deposito.class)
+					.setParameter("descricao", descricao.toUpperCase()).setParameter("id", (id == null ? -1L : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+	
+	public Deposito porCodidoDeposito(String codigoDep) {
+		try {
+			return manager.createQuery("from Deposito where codigoDeposito = :codigoDep", Deposito.class)
+					.setParameter("codigoDep", codigoDep.toUpperCase()).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	
+}

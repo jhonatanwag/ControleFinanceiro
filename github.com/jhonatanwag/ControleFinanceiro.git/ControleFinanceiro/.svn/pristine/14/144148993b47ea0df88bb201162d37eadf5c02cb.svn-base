@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Desconto" widgetVar="DlgDescontoVenda" modal="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogDescontoVenda">
+
+			<p:messages id="messagesDescontoVenda" closable="true"
+				autoUpdate="true" />
+
+
+			<div class="Fs24 Fright MarTop10 leaden Wid70">
+				<p:outputLabel
+					value="#{vendaBean.itemVendaSelecionado.produto.descricaoComPrecoAtual}" />
+			</div>
+
+			<div class="Container50 Responsive50 ui-fluid" >
+				<p:panelGrid columns="4" columnClasses="col1,col2,col1,col2">
+					<p:outputLabel value="Valor Desc." for="descontoValor" />
+					<p:inputText id="descontoValor" size="10" maxlength="10"
+						styleClass="moeda" required="true"
+						value="#{vendaBean.itemVendaSelecionado.valorDesconto}">
+						<p:ajax process="@this" update=":formVenda, :formDetalhes" />
+					</p:inputText>
+
+					<p:outputLabel value="%" for="percentDesconto" />
+					<p:inputText id="percentDesconto" size="10" maxlength="10"
+						styleClass="percent" required="true"
+						value="#{vendaBean.itemVendaSelecionado.valorDesconto}">
+						<p:ajax process="@this" update=":formVenda, :formDetalhes" />
+					</p:inputText>
+				</p:panelGrid>
+
+				<p:separator styleClass="Wid100"></p:separator>
+
+				<p:panelGrid rendered="true" columns="2" cellpadding="5"
+					style="margin: 0 auto;">
+
+					<p:commandButton id="bntConfirmar" value="Confirmar"
+						oncomplete="if (!args.validationFailed) PF('DlgDescontoVenda').hide();" />
+
+					<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+						oncomplete="PF('DlgDescontoVenda').hide();" />
+				</p:panelGrid>
+			</div>
+
+
+
+
+
+
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Fechar Venda" widgetVar="DlgFecharVenda" modal="true" responsive="true"
+		dynamic="true" resizable="true" toggleSpeed="500" appendTo="@(boby)">
+		<h:form id="formDialogFecharVenda">
+			<p:messages id="messagesFecharVenda" closable="true"
+				autoUpdate="true" />
+			<div align="center">
+				<p:panelGrid columns="2">
+					<p:selectOneRadio id="tipoVenda"
+						value="#{vendaBean.objeto.tipoVenda}">
+						<f:selectItem itemLabel="Á Vista" itemValue="A"/>
+						<f:selectItem itemLabel="Prazo" itemValue="P" />
+						<f:selectItem itemLabel="Orçamento" itemValue="O" />
+						<f:selectItem itemLabel="Transferência" itemValue="T"
+							itemDisabled="true" />
+					</p:selectOneRadio>
+				</p:panelGrid>
+			</div>			
+			<p:panelGrid columns="4" style="margin-top: 10px">
+				<p:outputLabel value="Cód. Cliente" for="codCli" />
+				<p:inputText id="codCli" size="6" maxlength="6"
+					onkeyup="onlyNumbers(this)" style="text-align: right"
+					value="#{vendaBean.pessoaSelecionada.id}">
+					<p:ajax event="change" process="@this"
+						listener="#{vendaBean.pessoaPorId()}" update="codCli, cliente" />
+				</p:inputText>
+
+				<p:commandButton icon="ui-icon-search" process="@this"
+					update="@none" action="#{pesquisaPessoaBean.abrirDialogo}">
+					<p:ajax event="dialogReturn" listener="#{vendaBean.pessoaSelecao}"
+						update="codCli, cliente" process="@this" />
+					<p:resetInput target="cliente, codCli" />
+				</p:commandButton>
+
+				<p:inputText id="cliente" size="100" maxlength="100" disabled="true"
+					value="#{vendaBean.objeto.cliente.pessoa.nome}" />
+			</p:panelGrid>
+
+			<p:panelGrid columns="2" style="margin-top: 10px">
+				<p:outputLabel value="Vendedor" for="vendedor" />
+				<p:selectOneMenu id="vendedor" required="true" style="width: 200px;"
+					value="#{vendaBean.objeto.vendedor}">
+					<f:selectItem itemLabel="Selecione um vendedor" />
+					<f:selectItems value="#{vendaBean.funcionarios}" var="vend"
+						itemLabel="#{vend.pessoa.nome}" itemValue="#{vend}" />
+				</p:selectOneMenu>
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{vendaBean.confirmarFechamento}" update=":formVenda, :formDetalhes"
+					oncomplete="if (!args.validationFailed) PF('DlgFecharVenda').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgFecharVenda').hide();" />
+			</h:panelGrid>
+
+
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

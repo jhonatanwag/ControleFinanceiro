@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Seleção de chques</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<h:outputStylesheet library="css" name="sistema.css" />
+</h:head>
+<h:body>
+
+	<h:form id="formListar">
+			<p:toolbar style="margin-top: 20px">
+				<p:toolbarGroup>
+					<p:commandButton value="Pesquisar"
+						action="#{selecaoChequesBean.pesquisar}" update="@form" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<h:panelGrid>
+				<p:growl id="messages" showDetail="true" autoUpdate="true"
+					sticky="true" />
+
+				<p:dataTable id="dataTableCheques" rows="5" resizableColumns="true"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false"
+					value="#{selecaoChequesBean.objetosFiltrados}" var="cheques"
+					paginator="true" style="text-align:center" widgetVar="chequesTable"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					emptyMessage="#{msg['msg.nenhum.registro.encontrado']}">
+
+					<p:column id="idpessoa" headerText="Código" sortBy="#{cheque.id}"
+						style="text-align: right; width: 50px">
+						<h:outputText value="#{cheque.id}" />
+					</p:column>
+					
+					<p:column id="numero" headerText="Número"
+						sortBy="#{cheque.numeroCheque}">
+						<h:outputText value="#{cheque.numeroCheque}" />
+					</p:column>
+														
+				</p:dataTable>
+			</h:panelGrid>
+	</h:form>
+</h:body>
+</html>

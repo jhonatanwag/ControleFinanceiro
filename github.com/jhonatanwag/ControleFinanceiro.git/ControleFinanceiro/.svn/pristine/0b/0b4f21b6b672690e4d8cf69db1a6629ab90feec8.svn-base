@@ -1,0 +1,297 @@
+package br.com.sistemacomercial.ws.retorno;
+
+import br.com.sistemacomercial.util.Propriedades;
+import br.com.sistemacomercial.util.StringUtil;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.KeyStore;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.PasswordProtection;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+public final class AssinadorNotaFiscal {
+	private static final Log LOG = LogFactory.getLog(AssinadorNotaFiscal.class);
+	private static final String ELEMENTO_NFE = "NFe";
+	private static final String ELEMENTO_NFE_PARA_ASSINAR = "infNFe";
+	private static final String ELEMENTO_CANCELAMENTO = "cancNFe";
+	private static final String ELEMENTO_CANCELAMENTO_CTE = "cancCTe";
+	private static final String ELEMENTO_DPEC = "envDPEC";
+	private static final String ELEMENTO_CTE = "CTe";
+	private static final String ELEMENTO_CANCELAMENTO_PARA_ASSINAR = "infCanc";
+	private static final String ELEMENTO_INUTILIZACAO = "inutNFe";
+	private static final String ELEMENTO_INUTILIZACAO_CTE = "inutCTe";
+	private static final String ELEMENTO_INUTILIZACAO_PARA_ASSINAR = "infInut";
+	private static final String ELEMENTO_DPEC_PARA_ASSINAR = "infDPEC";
+	private static final String ELEMENTO_CTE_PARA_ASSINAR = "infCte";
+	private static final String ELEMENTO_EVT = "evento";
+	private static final String ELEMENTO_EVT_PARA_ASSINAR = "infEvento";
+	private static final String ELEMENTO_CLE = "enviCLe";
+	private static final String ELEMENTO_CLE_PARA_ASSINAR = "CLe";
+	private static final String ELEMENTO_MDFE = "MDFe";
+	private static final String ELEMENTO_MDFE_PARA_ASSINAR = "infMDFe";
+	private static final String ELEMENTO_EVENTO_MDFE = "eventoMDFe";
+	private static final String ELEMENTO_EVENTO_CTE = "eventoCTe";
+	private static final String ELEMENTO_EVENTO_CTE_PARA_ASSINAR = "infEvento";
+
+	public static String assinarXML(String xml, CertificadoDigital certificado) {
+		try {
+			Document documento = normalizarXML(xml);
+			
+			Element raiz = documento.getDocumentElement();
+			removerAssinatura(raiz);
+			if ("NFe".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML do tipo NF-e individual");
+				assinarElementosXML(documento, "infNFe", certificado);
+			} else if (("cancNFe".equals(raiz.getNodeName())) || ("cancCTe".equals(raiz.getNodeName()))) {
+				LOG.debug("Assinando XML do tipo Cancelamento");
+				assinarElementosXML(documento, "infCanc", certificado);
+			} else if (("inutNFe".equals(raiz.getNodeName())) || ("inutCTe".equals(raiz.getNodeName()))) {
+				LOG.debug("Assinando XML do tipo Inutilizacao");
+				assinarElementosXML(documento, "infInut", certificado);
+			} else if ("envDPEC".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML do tipo Contingencia DPEC");
+				assinarElementosXML(documento, "infDPEC", certificado);
+			} else if ("CTe".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML do tipo CT-e");
+				assinarElementosXML(documento, "infCte", certificado);
+			} else if ("evento".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML do tipo Evt");
+				assinarElementosXML(documento, "infEvento", certificado);
+			} else if ("enviCLe".equals(raiz.getNodeName())) {
+				LOG.debug("Assinado XML do tipo CLe");
+				assinarElementosXML(documento, "CLe", certificado);
+			} else if ("MDFe".equals(raiz.getNodeName())) {
+				LOG.debug("Assinado XML do tipo MDFe");
+				assinarElementosXML(documento, "infMDFe", certificado);
+			} else if ("eventoMDFe".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML de evento de cancelamento do tipo MDFe");
+				assinarElementosXML(documento, "infEvento", certificado);
+			} else if ("eventoCTe".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML de evento de evento de CTe");
+				assinarElementosXML(documento, "infEvento", certificado);
+			} else if ("consStatServ".equals(raiz.getNodeName())) {
+				LOG.debug("Assinando XML de evento de cancelamento do tipo consStatServ");
+				assinarElementosXML(documento, "consStatServ", certificado);
+			} else {
+				LOG.error("O documento XML especificado nao e do tipo esperado: raiz = " + raiz.getNodeName());
+				throw new AssinadorException("O documento XML nao e do tipo esperado: raiz = " + raiz.getNodeName());
+			}
+			return "";
+			//return XMLUtil.toString(documento);
+		} catch (Exception e) {
+			LOG.error("Erro ao tentar assinar o documento XML.", e);
+			throw new AssinadorException("Erro ao tentar assinar o documento XML", e);
+		}
+	}
+
+	private static void removerAssinatura(Element raiz) {
+		//Node noAssinatura = XMLUtil.getFilho(raiz, "Signature");
+		//if (noAssinatura != null) {
+	//		raiz.removeChild(noAssinatura);
+		//}
+	}
+
+	private static Document normalizarXML(String xml) {
+		// Propriedades prop = Propriedades.getInstancia();
+		//
+		// String normalizado = StringUtil.removerAcentos(xml,
+		// prop.asBoolean("remove.caracter.especial.nf").booleanValue());
+		String normalizado = xml;
+		normalizado = normalizado.replaceAll("  +", " ");
+		if (xml.contains("<evCCeCTe>")) {
+			int inicio = normalizado.indexOf("<xCondUso>") + "<xCondUso>".length();
+			int fim = normalizado.indexOf("</xCondUso>");
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(normalizado.substring(0, inicio));
+			sb.append(
+					"A Carta de Correcao e disciplinada pelo Art. 58-B do CONVENIO/SINIEF 06/89: Fica permitida a utilizacao de carta de correcao, para regularizacao de erro ocorrido na emissao de documentos fiscais relativos a prestacao de servico de transporte, desde que o erro nao esteja relacionado com: I - as variaveis que determinam o valor do imposto tais como: base de calculo, aliquota, diferenca de preco, quantidade, valor da prestacao;II - a correcao de dados cadastrais que implique mudanca do emitente, tomador, remetente ou do destinatario;III - a data de emissao ou de saida.");
+			sb.append(normalizado.substring(fim));
+
+			normalizado = sb.toString();
+			normalizado = normalizado.replaceAll("  +", " ");
+		}
+		Document documento = null ;// XMLUtil.parseXML(normalizado);
+
+		//aplicarTrimEmNosComTexto(documento.getDocumentElement().getChildNodes());
+
+		return documento;
+
+	}
+
+	private static void aplicarTrimEmNosComTexto(NodeList childNodes) {
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node item = childNodes.item(i);
+			if (item.getNodeType() == 3) {
+				item.setTextContent(item.getTextContent().trim());
+			}
+			aplicarTrimEmNosComTexto(item.getChildNodes());
+		}
+	}
+
+	private static void assinarElementosXML(Document documento, String nomeElemento, CertificadoDigital certificado)
+			throws Exception {
+		//KeyStore.PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry(certificado);
+		
+		KeyStore ks = KeyStore.getInstance("JKS");
+		ks.load(getKeystorePath(), getKeystorePassword().toCharArray());
+		
+		KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(
+				"w a moreira e moreira ltd:9245541",
+				new KeyStore.PasswordProtection(getPrivatePassword().toCharArray()));
+		
+		X509Certificate certificate = (X509Certificate) privateKeyEntry.getCertificate();
+		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+
+		Element element = null;
+		NodeList elementos = documento.getElementsByTagName(nomeElemento);
+		if (elementos.getLength() != 1) {
+			throw new AssinadorException("A ocorrencia do elemento " + nomeElemento + " deve ser igual a 1");
+		}
+		element = (Element) elementos.item(0);
+
+		LOG.debug("Assinando o elemento: " + element.getLocalName());
+
+		String elementId = element.getAttribute("Id");
+		
+		 
+		element.setIdAttribute("Id", true);  
+		
+		XMLSignature signature = getXMLSignature(elementId, getXMLSignatureFactory(), certificate);
+		DOMSignContext dsc = new DOMSignContext(privateKey, element.getParentNode());
+		signature.sign(dsc);
+		//System.out.println(signature.getSignatureValue());
+	}
+
+	private static XMLSignature getXMLSignature(String tagId, XMLSignatureFactory xmlSigFactory,
+			X509Certificate certificate) throws Exception {
+		TransformParameterSpec transParamSpec = null;
+		List<Transform> transformList = Arrays
+				.asList(new Transform[] {
+						xmlSigFactory.newTransform("http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+								transParamSpec),
+				xmlSigFactory.newTransform("http://www.w3.org/TR/2001/REC-xml-c14n-20010315", transParamSpec) });
+
+		KeyInfoFactory keyInfoFactory = xmlSigFactory.getKeyInfoFactory();
+		X509Data x509data = keyInfoFactory.newX509Data(Arrays.asList(new X509Certificate[] { certificate }));
+		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509data));
+
+		DigestMethod digestMethod = xmlSigFactory.newDigestMethod("http://www.w3.org/2000/09/xmldsig#sha1", null);
+		Reference reference = xmlSigFactory.newReference("#" + tagId, digestMethod, transformList, null, null);
+
+		CanonicalizationMethod c14nMethod = xmlSigFactory.newCanonicalizationMethod(
+				"http://www.w3.org/TR/2001/REC-xml-c14n-20010315", (C14NMethodParameterSpec) null);
+		SignatureMethod signMethod = xmlSigFactory.newSignatureMethod("http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+				null);
+
+		SignedInfo signetInfo = xmlSigFactory.newSignedInfo(c14nMethod, signMethod,
+				Collections.singletonList(reference));
+
+		return xmlSigFactory.newXMLSignature(signetInfo, keyInfo);
+	}
+
+	private static XMLSignatureFactory getXMLSignatureFactory() throws Exception {
+		String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+		Provider provider = (Provider) Class.forName(providerName).newInstance();
+		return XMLSignatureFactory.getInstance("DOM", provider);
+	}
+
+	private static KeyStore.PrivateKeyEntry getPrivateKeyEntry(CertificadoDigital certificado) throws Exception {
+		char[] senha = getKeystorePassword().toCharArray();
+		KeyStore keyStore = KeyStore.getInstance("JKS");
+		keyStore.load(getKeystorePath(), senha);
+		for (Enumeration<String> e = keyStore.aliases(); e.hasMoreElements();) {
+			String alias = (String) e.nextElement();
+			if (keyStore.isKeyEntry(alias)) {
+				return (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias, new KeyStore.PasswordProtection(senha));
+			}
+		}
+		return null;
+	}
+
+	private static InputStream getKeystorePath() throws FileNotFoundException {
+		return new FileInputStream("D:/NF-e/w.a.moreira.jks");
+	}
+
+	private static String getKeystorePassword() {
+		return "123456";
+	}
+
+	private static String getPrivatePassword() {
+		return "1234";
+	}
+
+	public static void main(String[] args) {
+		
+		String dados;
+		File fileXML = new File("D:\\NF-e\\xml_exemplo_COMB.xml");
+
+		String linha = "";
+		StringBuilder xml = new StringBuilder();
+
+		BufferedReader in;
+		try {
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileXML)));
+			while ((linha = in.readLine()) != null) {
+				xml.append(linha);
+			}
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		dados = xml.toString();
+		
+		//dados = "<cancNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"3.10\"> <infCanc Id=\"ID15120608690243000100550000000000011000000019\"> <tpAmb>2</tpAmb> <xServ>CANCELAR</xServ> <chNFe>15120608690243000100550000000000011000000019</chNFe> <nProt>154000000110265</nProt> <xJust>ATENÇÃO - se você está utilizando Windows Vista/7/Server, salvar na Unidade C</xJust> </infCanc> </cancNFe>";
+				
+	
+		AssinadorNotaFiscal assinadorNotaFiscal = new AssinadorNotaFiscal();
+		
+		
+		
+		dados = assinadorNotaFiscal.assinarXML(dados, null);
+		System.out.println(dados);
+		
+		Webservice retornoLote = Webservice.get("2", "pr", "recepcao");
+        System.out.println(retornoLote);
+		// String dadosConsulta = "<consReciNFe
+		// xmlns=\"http://www.portalfiscal.inf.br/nfe\"
+		// versao=\"3.10\"><tpAmb>2</tpAmb><nRec>411110200138987</nRec></consReciNFe>";
+		System.out.println(retornoLote.call("41", dados));
+
+	}
+
+}

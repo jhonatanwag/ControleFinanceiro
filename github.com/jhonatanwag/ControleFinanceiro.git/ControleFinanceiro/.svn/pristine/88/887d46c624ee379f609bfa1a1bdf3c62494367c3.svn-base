@@ -1,0 +1,80 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.UnidadeMedida;
+import br.com.sistemacomercial.repository.filter.UnidadeMedidaFilter;
+
+public class UnidadeMedidas extends RepositoryAbstrato<UnidadeMedida> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public UnidadeMedidas() {
+		super(UnidadeMedida.class);
+	}
+
+	@Override
+	public UnidadeMedida salvar(UnidadeMedida objeto) {
+		return super.salvar(objeto);
+	}
+		
+	@SuppressWarnings("unchecked")
+	public List<UnidadeMedida> filtrados(UnidadeMedidaFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(UnidadeMedida.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getDescricao())) {
+			criteria.add(Restrictions.ilike("descricao", filtro.getDescricao(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getSigla())) {
+			criteria.add(Restrictions.ilike("sigla", filtro.getSigla(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("descricao")).list();
+	}
+
+	public UnidadeMedida porDescricaoUnico(String descricao, Long id) {
+		try {
+			return manager
+					.createQuery("from UnidadeMedida where upper(descricao) = :descricao and id <> :id",
+							UnidadeMedida.class)
+					.setParameter("descricao", descricao.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public UnidadeMedida porSiglaUnico(String sigla, Long id) {
+		try {
+			return manager
+					.createQuery("from UnidadeMedida where upper(sigla) = :sigla and id <> :id", UnidadeMedida.class)
+					.setParameter("sigla", sigla.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public List<UnidadeMedida> porNome(String descricao) {
+		return this.manager
+				.createQuery("from UnidadeMedida where upper(descricao) like :descricao", UnidadeMedida.class)
+				.setParameter("descricao", descricao.toUpperCase() + "%").getResultList();
+	}
+
+}

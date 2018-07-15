@@ -1,0 +1,49 @@
+package br.com.sistemacomercial.repository.filter;
+
+import java.io.Serializable;
+
+import br.com.sistemacomercial.model.Pessoa;
+import br.com.sistemacomercial.model.TipoDespesa;
+
+public class LancFluxoCaixaFilter implements Serializable, Filter {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long idDe;
+	private Long idAte;
+	private Pessoa pessoa;
+	private TipoDespesa tipoDespesa;
+
+	public Long getIdDe() {
+		return idDe;
+	}
+
+	public void setIdDe(Long idDe) {
+		this.idDe = idDe;
+	}
+
+	public Long getIdAte() {
+		return idAte;
+	}
+
+	public void setIdAte(Long idAte) {
+		this.idAte = idAte;
+	}
+
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
+
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public TipoDespesa getTipoDespesa() {
+		return tipoDespesa;
+	}
+
+	public void setTipoDespesa(TipoDespesa tipoDespesa) {
+		this.tipoDespesa = tipoDespesa;
+	}
+
+}

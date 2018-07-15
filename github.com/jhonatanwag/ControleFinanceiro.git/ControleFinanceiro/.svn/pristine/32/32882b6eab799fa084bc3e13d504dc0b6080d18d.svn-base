@@ -1,0 +1,426 @@
+package nfe;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+public final class XMLUtil
+{
+  public static final String QUEBRA_LINHA = "\\\\n";
+  
+  public static Document parseXML(String xml)
+    throws DB1EdigException
+  {
+    try
+    {
+      return newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+    }
+    catch (Exception e)
+    {
+      throw new DB1EdigException("Erro ao fazer parse do xml", e);
+    }
+  }
+  
+  public static Document parseXMLFile(File arquivo)
+    throws DB1EdigException
+  {
+    try
+    {
+      return newDocumentBuilder().parse(arquivo);
+    }
+    catch (Exception e)
+    {
+      throw new DB1EdigException("Erro ao fazer parse do xml", e);
+    }
+  }
+  
+  public static Document parseXMLFile(String arquivo)
+    throws DB1EdigException
+  {
+    return parseXMLFile(new File(arquivo));
+  }
+  
+  public static Document newDocument()
+    throws DB1EdigException
+  {
+    try
+    {
+      return newDocumentBuilder().newDocument();
+    }
+    catch (Exception e)
+    {
+      throw new DB1EdigException("Erro ao criar nova instancia de org.w3c.dom.Document", e);
+    }
+  }
+  
+  public static String toString(Node no)
+    throws DB1EdigException
+  {
+    try
+    {
+      StringWriter sw = new StringWriter();
+      
+      TransformerFactory factory = TransformerFactory.newInstance();
+      factory.newTransformer().transform(new DOMSource(no), new StreamResult(sw));
+      return sw.toString();
+    }
+    catch (Exception e)
+    {
+      throw new DB1EdigException("Erro ao transformar doc para String", e);
+    }
+  }
+  
+  private static DocumentBuilder newDocumentBuilder()
+    throws ParserConfigurationException
+  {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    factory.setNamespaceAware(true);
+    return factory.newDocumentBuilder();
+  }
+  
+  public static String getValorElemento(Element rootDocXml, String paramElemento)
+    throws NullPointerException
+  {
+    NodeList el = rootDocXml.getElementsByTagName(paramElemento);
+    if ((el == null) || (el.item(0) == null)) {
+      return null;
+    }
+    Node firstChild = el.item(0).getFirstChild();
+    if (firstChild != null) {
+      return firstChild.getNodeValue();
+    }
+    return "";
+  }
+  
+  public static String getValorFilho(Node noPai, String nomeFilho)
+  {
+    ValidatorUtil.checarNull("noPai", noPai);
+    ValidatorUtil.checarNull("nomeFilho", nomeFilho);
+    
+    Node filho = getFilho(noPai, nomeFilho);
+    if (filho != null) {
+      return filho.getTextContent();
+    }
+    return null;
+  }
+  
+  public static String getValorAtributo(Node no, String nomeAtributo)
+  {
+    ValidatorUtil.checarNull("no", no);
+    ValidatorUtil.checarNull("nomeAtributo", nomeAtributo);
+    
+    Node namedItem = no.getAttributes().getNamedItem(nomeAtributo);
+    if (namedItem == null) {
+      return null;
+    }
+    return namedItem.getNodeValue();
+  }
+  
+  public static void setValorAtributo(Node no, String nomeAtributo, String valor)
+  {
+    ValidatorUtil.checarNull("no", no);
+    ValidatorUtil.checarNull("nomeAtributo", nomeAtributo);
+    
+    Node namedItem = no.getAttributes().getNamedItem(nomeAtributo);
+    if (namedItem != null) {
+      namedItem.setNodeValue(valor);
+    }
+  }
+  
+  public static Long getValorFilhoComoLong(Node noPai, String nomeFilho)
+  {
+    String valor = getValorFilho(noPai, nomeFilho);
+    if (StringUtil.isInteiro(valor)) {
+      return new Long(valor);
+    }
+    return Long.valueOf(0L);
+  }
+  
+  public static Integer getValorFilhoComoInteiro(Node noPai, String nomeFilho)
+  {
+    String valor = getValorFilho(noPai, nomeFilho);
+    if (StringUtil.isInteiro(valor)) {
+      return new Integer(valor);
+    }
+    return Integer.valueOf(0);
+  }
+  
+  public static Node getFilho(Node noPai, String nomeFilho)
+  {
+    ValidatorUtil.checarNull("noPai", noPai);
+    ValidatorUtil.checarNull("nomeFilho", nomeFilho);
+    
+    NodeList filhos = noPai.getChildNodes();
+    for (int i = 0; i < filhos.getLength(); i++)
+    {
+      Node filho = filhos.item(i);
+      if (filho.getNodeName().equals(nomeFilho)) {
+        return filho;
+      }
+    }
+    return null;
+  }
+  
+  public static Node[] getFilhos(Element noPai, String nomeFilho)
+  {
+    ValidatorUtil.checarNull("noPai", noPai);
+    ValidatorUtil.checarNull("nomeFilho", nomeFilho);
+    
+    ArrayList<Node> lista = new ArrayList();
+    
+    NodeList filhos = noPai.getChildNodes();
+    for (int i = 0; i < filhos.getLength(); i++)
+    {
+      Node filho = filhos.item(i);
+      if (filho.getNodeName().equals(nomeFilho)) {
+        lista.add(filho);
+      }
+    }
+    return (Node[])lista.toArray(new Node[lista.size()]);
+  }
+  
+  public static Element criaElementoAdicionaNoPai(Document xmlDocument, Node elementoPai, String nomeElemento, Object valorElemento)
+  {
+    Element elementoCriado = xmlDocument.createElement(nomeElemento);
+    if (valorElemento != null) {
+      elementoCriado.setTextContent(valorElemento.toString());
+    }
+    elementoPai.appendChild(elementoCriado);
+    
+    return elementoCriado;
+  }
+  
+  public static Element criaElementoAdicionaNoPai(Document xmlDocument, Node elementoPai, String nomeElemento, Date valorElemento)
+  {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    String dataFormatada = null;
+    if (valorElemento != null) {
+      dataFormatada = sdf.format(valorElemento);
+    }
+    return criaElementoAdicionaNoPai(xmlDocument, elementoPai, nomeElemento, dataFormatada);
+  }
+  
+  public static boolean xmlValido(String xml)
+  {
+    try
+    {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      builder.setErrorHandler(new ErrorHandler()
+      {
+        public void error(SAXParseException exception)
+          throws SAXException
+        {}
+        
+        public void fatalError(SAXParseException exception)
+          throws SAXException
+        {}
+        
+        public void warning(SAXParseException exception)
+          throws SAXException
+        {}
+      });
+      builder.parse(new InputSource(new StringReader(xml)));
+    }
+    catch (Exception e)
+    {
+      return false;
+    }
+    return true;
+  }
+  
+  public static String trocaQuebraLinha(String xmlNfe, String novaQuebra)
+  {
+    if (!StringUtil.isVazia(xmlNfe))
+    {
+      Document xml = parseXML(xmlNfe);
+      trocaQuebraLinha(xml, novaQuebra);
+      return toString(xml);
+    }
+    return xmlNfe;
+  }
+  
+  public static void trocaQuebraLinha(Node noh, String novaQuebra)
+  {
+    if (noh == null) {
+      return;
+    }
+    String valor = noh.getNodeValue();
+    if (!StringUtil.isVazia(valor))
+    {
+      valor = StringUtil.trocaQuebraLinha(valor, novaQuebra);
+      noh.setNodeValue(valor);
+    }
+    Node filho = noh.getFirstChild();
+    while (filho != null)
+    {
+      trocaQuebraLinha(filho, novaQuebra);
+      filho = filho.getNextSibling();
+    }
+  }
+  
+  public static void validateWithSchema(Node document, InputStream schemaStream)
+    throws SAXException, IOException
+  {
+    SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+    Schema schema = factory.newSchema(new StreamSource(schemaStream));
+    Validator validator = schema.newValidator();
+    validator.validate(new DOMSource(document));
+  }
+  
+  public static String evalXPath(String xml, String expression, String namespace, String prefix)
+    throws XPathExpressionException
+  {
+    if ((namespace == null) || (prefix == null)) {
+      return (String)evalXPath(xml, expression, null, (QName)null);
+    }
+    Map<String, String> ns = new HashMap();
+    ns.put(prefix, namespace);
+    return (String)evalXPath(xml, expression, ns, (QName)null);
+  }
+  
+  public static String evalXPath(String xml, String expression)
+    throws XPathExpressionException
+  {
+    return (String)evalXPath(xml, expression, null, (QName)null);
+  }
+  
+  public static Object evalXPath(String xml, String expression, Map<String, String> namespaceMap, QName type)
+    throws XPathExpressionException
+  {
+    XPathFactory factory = getXPathFactory();
+    XPath xPath = factory.newXPath();
+    InputSource xmlRetornoSource = new InputSource(new StringReader(xml));
+    
+    setNamespaceContext(xPath, namespaceMap);
+    if (type != null) {
+      return xPath.evaluate(expression, xmlRetornoSource, type);
+    }
+    return xPath.evaluate(expression, xmlRetornoSource);
+  }
+  
+  public static Object evalXPath(Object node, String expression, Map<String, String> namespaceMap, QName type)
+    throws XPathExpressionException
+  {
+    XPathFactory factory = getXPathFactory();
+    XPath xPath = factory.newXPath();
+    
+    setNamespaceContext(xPath, namespaceMap);
+    if (type != null) {
+      return xPath.evaluate(expression, node, type);
+    }
+    return xPath.evaluate(expression, node);
+  }
+  
+  private static XPathFactory getXPathFactory()
+  {
+    return XPathFactory.newInstance();
+  }
+  
+  private static void setNamespaceContext(XPath xPath, Map<String, String> namespaceMap)
+  {
+    if (namespaceMap != null)
+    {
+      Map<String, String> finalMap = namespaceMap;
+      
+      NamespaceContext namespaceContext = new NamespaceContext()
+      {
+        public Iterator<String> getPrefixes(String ns)
+        {
+          List<String> nss = new ArrayList();
+          
+          for (Map.Entry<String, String> entry : finalMap.entrySet()) {
+            if (((String)entry.getValue()).equals(ns)) {
+              nss.add(entry.getKey());
+            }
+          }
+          return nss.iterator();
+        }
+        
+        public String getPrefix(String ns)
+        {
+          for (Map.Entry<String, String> entry : finalMap.entrySet()) {
+            if (((String)entry.getValue()).equals(ns)) {
+              return (String)entry.getKey();
+            }
+          }
+          return null;
+        }
+        
+        public String getNamespaceURI(String prefix)
+        {
+          return (String)finalMap.get(prefix);
+        }
+      };
+      xPath.setNamespaceContext(namespaceContext);
+    }
+  }
+  
+  private static String fixParenteses(String str)
+  {
+    return str.replaceAll("\\(", "[").replaceAll("\\)", "]");
+  }
+  
+  public static String fixXPathId(String str, String prefix)
+  {
+    String prefix2 = "/" + prefix + ":";
+    int lastIndexOf = str.lastIndexOf(".");
+    String x = str.substring(0, lastIndexOf) + "/@" + str.substring(lastIndexOf + 1);
+    return fixParenteses("/" + prefix2 + x.replaceAll("[.]", prefix2));
+  }
+  
+  public static String fixXPath(String str, String prefix)
+  {
+    String prefix2 = "/" + prefix + ":";
+    String x = str.replaceAll("[.]", prefix2);
+    return fixParenteses("/" + prefix2 + x);
+  }
+  
+  public static String getConteudoUltimaTagPura(String xml, String tagName)
+  {
+    String[] splitOne = xml.split("<" + tagName + ">");
+    if (splitOne.length == 1) {
+      return "";
+    }
+    String xmlSplittedOne = splitOne[(splitOne.length - 1)];
+    String[] splitTwo = xmlSplittedOne.split("</" + tagName + ">");
+    return splitTwo[0];
+  }
+}
+

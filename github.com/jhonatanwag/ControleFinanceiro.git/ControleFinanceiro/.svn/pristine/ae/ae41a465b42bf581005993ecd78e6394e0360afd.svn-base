@@ -1,0 +1,45 @@
+package br.com.sistemacomercial.converter;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
+import br.com.sistemacomercial.model.Sabor;
+import br.com.sistemacomercial.repository.Sabores;
+
+@FacesConverter(forClass = Sabor.class)
+public class SaborConverter implements Converter {
+
+	@Inject
+	private Sabores sabores;
+
+	// public SaborConverter() {
+	// sabores = CDIServiceLocator.getBean(Sabores.class);
+	// }
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		Sabor retorno = null;
+		if (StringUtils.isNotEmpty(value)) {
+			Long id = new Long(value);
+			retorno = sabores.porId(id);
+		}
+
+		return retorno;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value != null) {
+			Sabor marca = (Sabor) value;
+			return marca.getId() == null ? null : marca.getId().toString();
+		}
+
+		return "";
+	}
+
+}

@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:tab title="Estoque">		
+		<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+			<p:toolbarGroup>
+				<p:commandButton value="Novo" process="@this"
+					oncomplete="PF('DlgProdutoEstoque').show()"
+					action="#{cadastroProdutoBean.novoEstoque()}"
+					update=":formDlgProdutoEstoque" />
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<p:dataTable value="#{cadastroProdutoBean.objeto.produtoEstoques}"
+			var="estoque" rowIndexVar="linha" id="tabelaEstoques">
+
+			<p:column id="dep" headerText="Dep./Filial"
+				style="text-align: left;">
+				<h:outputText value=" #{estoque.deposito.descricaoDepFilial}">
+				</h:outputText>
+			</p:column>
+
+			<p:column id="saldo" headerText="Saldo" style="width: 15%"
+				sortBy="#{estoque.saldo}">
+				<h:outputText value="#{estoque.saldo}" />
+			</p:column>
+
+			<p:column id="minimo" headerText="Mínimo" style="width: 10%"
+				sortBy="#{estoque.qtdMinimo}">
+				<h:outputText value="#{estoque.qtdMinimo}" />
+			</p:column>
+
+			<p:column id="maximo" headerText="Máximo" style="width: 10%"
+				sortBy="#{estoque.qtdMaximo}">
+				<h:outputText value="#{estoque.qtdMaximo}" />
+			</p:column>
+
+			<p:column id="dtUltCompra" headerText="Data Últ. Compra"
+				style="text-align: center; width: 10%">
+				<h:outputText value="#{estoque.dataUltimaCompra}">
+					<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+				</h:outputText>
+			</p:column>
+
+			<p:column id="dtUltVenda" headerText="Data Últ. Venda"
+				style="text-align: center; width: 10%" >
+				<h:outputText value="#{estoque.dataUltimaVenda}">
+					<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+				</h:outputText>
+			</p:column>
+
+
+			<p:column style="width: 100px; text-align: center">
+				<p:commandButton icon="ui-icon-pencil"
+					action="#{cadastroProdutoBean.alterarEstoque()}"
+					oncomplete="PF('DlgProdutoEstoque').show();" process="@this"
+					update=":formDlgProdutoEstoque"
+					title="#{msg['label.editar']} #{estoque.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroProdutoBean.produtoEstoqueSelecionado}"
+						value="#{estoque}" />
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-trash"
+					oncomplete="PF('confirmationEstoque').show()" process="@this"
+					title="#{msg['label.excluir']} #{estoque.id}">
+					<f:setPropertyActionListener
+						target="#{cadastroProdutoBean.produtoEstoqueSelecionado}"
+						value="#{estoque}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:confirmDialog id="confirmDialogEstoque" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationEstoque">
+			<h:form>
+				<p:commandButton id="confirm" value="#{msg['confirma.sim']}"
+					update=":form:tabViewPrincipal:tabelaEstoques"
+					oncomplete="PF('confirmationEstoque').hide();" immediate="true"
+					actionListener="#{cadastroProdutoBean.excluirProdutoEstoque()}">
+				</p:commandButton>
+				<p:commandButton id="decline" value="#{msg['confirma.nao']}"
+					onclick="PF('confirmationEstoque').hide();" ajax="false" />
+			</h:form>
+		</p:confirmDialog>
+
+	</p:tab>
+</ui:composition>

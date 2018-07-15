@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<p:tab id="tabInfBancarias" title="Inf. Bancária"
+		style="width:50%, text-align:center;">
+		<p:panel>
+			<p:toolbar style="margin-top: 10px; margin-bottom:10px">
+				<p:toolbarGroup>
+					<p:commandButton value="Novo"
+						oncomplete="PF('DlgInfBancaria').show()" process="@this"
+						action="#{cadastroPessoaBean.novaInfBancaria()}"
+						update=":formDialogInfBancaria" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:dataTable id="dataTableInfBancarias" rows="10"
+				paginatorPosition="bottom"
+				value="#{cadastroPessoaBean.objeto.informacoesBancarias}"
+				var="infBancaria" paginator="true"
+				style="text-align:center, width: 50%;"
+				emptyMessage="#{msg['msg.nenhum.registro.encontrado']}"
+				reflow="true">
+
+				<p:column headerText="Banco-Agência" style="text-align: left"
+					sortBy="#{infBancaria.agencia.nomeBancoAgencia}">
+					<h:outputText value="#{infBancaria.agencia.nomeBancoAgencia}" />
+				</p:column>
+
+				<p:column headerText="Nº. Conta" sortBy="#{infBancaria.nrConta}">
+					<h:outputText value="#{infBancaria.nrConta}" />
+				</p:column>
+
+				<p:column headerText="Operação" sortBy="#{infBancaria.operacao}">
+					<h:outputText value="#{infBancaria.operacao}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-pencil"
+						oncomplete="PF('DlgInfBancaria').show();" process="@this"
+						action="#{cadastroPessoaBean.alterarInfBancaria()}"
+						update=":formDialogInfBancaria:painelInfBancaria"
+						title="#{msg['label.editar']} #{infBancaria.id}">
+						<f:setPropertyActionListener
+							target="#{cadastroPessoaBean.informacoesBancariaSelecionada}"
+							value="#{infBancaria}" />
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('confirmationInfBancaria').show()" process="@this"
+						title="#{msg['label.excluir']} #{infBancaria.id}">
+						<f:setPropertyActionListener
+							target="#{cadastroPessoaBean.informacoesBancariaSelecionada}"
+							value="#{infBancaria}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+		<p:confirmDialog id="confirmDialogInfBancaria" showEffect="bounce"
+			appendToBody="false" hideEffect="explode"
+			message="#{msg['excluir.confirma']}" header="#{msg['label.excluir']}"
+			severity="alert" widgetVar="confirmationInfBancaria">
+
+			<p:commandButton value="#{msg['confirma.sim']}"
+				update=":formCadastroPessoa:tabViewPrincipal:dataTableInfBancarias"
+				oncomplete="PF('confirmationInfBancaria').hide();" immediate="true"
+				actionListener="#{cadastroPessoaBean.excluirInfBancaria()}">
+			</p:commandButton>
+			<p:commandButton value="#{msg['confirma.nao']}"
+				onclick="PF('confirmationInfBancaria').hide();" ajax="false" />
+
+		</p:confirmDialog>
+	</p:tab>
+</ui:composition>

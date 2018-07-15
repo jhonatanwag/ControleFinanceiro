@@ -1,0 +1,55 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.com.sistemacomercial.enums;
+
+/**
+ *
+ * @author Danilo
+ */
+public enum Opcao {
+
+	SALVAR("Salvar"), 
+	PESQUISAR("Pesquisar"), 
+	ALTERAR("Alterar"), 
+	EXCLUIR("Excluir"), 
+	IMPRIMIR("Imprimir"),
+	FINALIZAR("Finalizar"),
+	EXPORTAR_REGISTROS("Exportar registros"), 
+	ENVIAR_EMAIL("Enviar email");
+	private String value;
+
+	private Opcao(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return this.value;
+	}
+
+	public static Opcao getSexo(Integer value) {
+		switch (value) {
+		case 0:
+			return SALVAR;
+		case 1:
+			return PESQUISAR;
+		case 2:
+			return ALTERAR;
+		case 3:
+			return EXCLUIR;
+		case 4:
+			return IMPRIMIR;
+		case 5:
+			return FINALIZAR;			
+		case 6:
+			return EXPORTAR_REGISTROS;
+		case 7:
+			return ENVIAR_EMAIL;
+			
+		default:
+			return null;
+		}
+	}
+}

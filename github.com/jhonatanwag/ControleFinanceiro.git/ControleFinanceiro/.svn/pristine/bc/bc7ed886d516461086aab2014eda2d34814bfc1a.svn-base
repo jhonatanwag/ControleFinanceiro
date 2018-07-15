@@ -1,0 +1,83 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import br.com.sistemacomercial.model.Deposito;
+import br.com.sistemacomercial.model.Filial;
+import br.com.sistemacomercial.repository.Empresas;
+import br.com.sistemacomercial.service.CadastroDepositoService;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class CadastroDepositoBean extends BeanAbstrato<Deposito>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private CadastroDepositoService cadastroDepositoService;
+	@Inject
+	private Empresas empresas;
+	private Filial filial;
+	private List<Filial> todasFiliais;
+
+	@Override
+	public void inicializar() {
+			if(this.getObjeto() == null){
+				limpar();
+			}
+	   todasFiliais =empresas.todasFiliais();
+	}
+
+	@Override
+	protected void limpar() {
+		setObjeto(new Deposito());
+	}
+	
+	@Override
+	public void setObjeto(Deposito objeto) {
+		super.setObjeto(objeto);
+		if (getObjeto() != null) {
+			if (getObjeto().getFilial() != null) {
+				this.filial = getObjeto().getFilial();
+			}
+		}
+	}
+
+
+	@Override
+	public void salvar() {
+		setObjeto(cadastroDepositoService.salvar(getObjeto()));
+		limpar();
+		FacesUtil.addInfoMessage("Depósito salvo com sucesso!");
+	}
+
+	@Override
+	public boolean isEditando() {
+		return this.getObjeto().getId() != null;
+	}
+
+	
+	public Filial getFilial() {
+		return filial;
+	}
+
+	public void setFilial(Filial filial) {
+		this.filial = filial;
+	}
+
+	public List<Filial> getTodasFiliais() {
+		return todasFiliais;
+	}
+
+	public void setTodasFiliais(List<Filial> todasFiliais) {
+		this.todasFiliais = todasFiliais;
+	}
+	
+	
+
+}

@@ -1,0 +1,162 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">Agenda</ui:define>
+
+	<ui:define name="corpo">
+
+		<script type="text/javascript">
+                PrimeFaces.locales['pt'] = {  
+                    closeText: 'Fechar',  
+                    prevText: 'Anterior',  
+                    nextText: 'Próximo',  
+                    currentText: 'Começo',  
+                    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],  
+                    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],  
+                    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],  
+                    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],  
+                    dayNamesMin: ['D','S','T','Q','Q','S','S'],  
+                    weekHeader: 'Semana',  
+                    firstDay: 1,  
+                    isRTL: false,  
+                    showMonthAfterYear: false,  
+                    yearSuffix: '',  
+                    timeOnlyTitle: 'Só Horas',  
+                    timeText: 'Tempo',  
+                    hourText: 'Hora',  
+                    minuteText: 'Minuto',  
+                    secondText: 'Segundo',  
+                    currentText: 'Data Atual',  
+                    ampm: false,  
+                    month: 'Mês',  
+                    week: 'Semana',  
+                    day: 'Dia',  
+                    allDayText : 'Todo Dia'  
+                };  
+        </script>
+
+		<f:metadata>
+			<f:viewAction action="#{agendaBean.inicializar}" />
+		</f:metadata>
+
+
+
+		<h:form id="formAgenda">
+			<div class="ContainerIndent">
+
+				<h:panelGrid>
+					<h:outputText value="Agenda de:" />
+
+					<p:selectOneMenu id="funcionario" filter="true"
+						filterMatchMode="startsWith"
+						value="#{agendaBean.funcionarioSelecionado}" required="true">
+						<p:ajax event="change"
+							listener="#{agendaBean.montaAgendaFuncionarioSelecionado()}"
+							update=":formAgenda:meucalendario" process="@this" />
+						<f:selectItems value="#{agendaBean.funcionarios}" var="func"
+							itemValue="#{func}" itemLabel="#{func.pessoa.nome}" />
+					</p:selectOneMenu>
+				</h:panelGrid>
+
+				<p:messages id="mensagens" showDetail="true" />
+
+				<p:schedule id="meucalendario" widgetVar="meucalendario" locale="pt"
+					timeZone="GMT-3" value="#{agendaBean.eventModel}">
+					<!-- eventos -->
+					<p:ajax event="dateSelect" listener="#{agendaBean.quandoNovo}"
+						update="eventDetails" oncomplete="PF('caixaDialogo').show();" />
+					<p:ajax event="eventSelect"
+						listener="#{agendaBean.quandoSelecionado}" update="eventDetails"
+						oncomplete="PF('caixaDialogo').show();" />
+					<p:ajax event="eventMove" listener="#{agendaBean.quandoMovido}"
+						update="mensagens" oncomplete="PF('meucalendario').update();" />
+					<p:ajax event="eventResize"
+						listener="#{agendaBean.quandoRedimensionado}" update="mensagens"
+						oncomplete="PF('meucalendario').update();" />
+				</p:schedule>
+
+				<p:dialog showEffect="explode" closable="true" hideEffect="explode"
+					responsive="false" header="Evento" widgetVar="caixaDialogo"
+					modal="false" dynamic="true" resizable="true" toggleSpeed="500"
+					appendTo="@(boby)">
+
+					<p:outputPanel id="eventDetails">
+						<p:panelGrid id="painel" columns="2"
+							columnClasses="rotuno,campo" layout="tabular"
+							styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+
+							<p:outputLabel for="tipo" value="Tipo:" />
+							<p:selectOneMenu id="tipo" value="#{agendaBean.tipoAgenda}">
+								<f:selectItems value="#{agendaBean.tiposAgenda}" />
+							</p:selectOneMenu>
+
+
+							<p:outputLabel for="descricao" value="Descrição:" />
+							
+								<p:inputText id="descricao" maxlength="100" required="true"
+									autocomplete="false" size="100" styleClass="input-xxlarge"
+									requiredMessage="#{msg['msg.erro.campo.obrigatorio']}"
+									value="#{agendaBean.objeto.descricao}" />
+								<p:message id="descricaoMessage" for="descricao" display="icon" />
+							
+
+
+							<p:outputLabel for="inicio" value="Inicio:" />
+							
+								<p:calendar id="inicio" required="true"
+									requiredMessage="#{msg['msg.erro.campo.obrigatorio']}"
+									value="#{agendaBean.objeto.dataInicio}"
+									pattern="dd/MM/yyyy HH:mm">
+									<p:ajax event="blur"
+										listener="#{agendaBean.autoCompletaDataFim()}" update="fim" />
+								</p:calendar>
+								<p:message id="inicioMessage" for="inicio" display="icon" />
+							
+
+
+
+							<p:outputLabel for="fim" value="Fim:" />
+							
+								<p:calendar id="fim" required="true" validator="validaDataFim"
+									value="#{agendaBean.objeto.dataFim}" immediate="true"
+									requiredMessage="#{msg['msg.erro.campo.obrigatorio']}"
+									pattern="dd/MM/yyyy HH:mm">
+									<f:attribute name="paramDataInicio"
+										value="#{agendaBean.objeto.dataInicio}" />
+									<p:ajax event="blur" update="fim, fimMessage" />
+								</p:calendar>
+								<p:message id="fimMessage" for="fim" display="icon" />
+							
+
+							<p:outputLabel for="diaTodo" value="Dia todo?:" />
+							<p:selectBooleanCheckbox id="diaTodo"
+								value="#{agendaBean.objeto.diaTodo}" />
+
+						</p:panelGrid>
+						<p:separator />
+
+
+
+						<p:commandButton value="Salvar"
+							actionListener="#{agendaBean.salvar()}"
+							onclick="PF('dlg').show();"
+							oncomplete="if (!args.validationFailed) PF('caixaDialogo').hide();  PF('meucalendario').update(); PF('dlg').hide();"
+							update="fimMessage, descricaoMessage" />
+
+						<p:commandButton value="Excluir?"
+							actionListener="#{agendaBean.excluir()}"
+							oncomplete="if (!args.validationFailed) PF('caixaDialogo').hide();  PF('meucalendario').update();" />
+
+					</p:outputPanel>
+
+				</p:dialog>
+			</div>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

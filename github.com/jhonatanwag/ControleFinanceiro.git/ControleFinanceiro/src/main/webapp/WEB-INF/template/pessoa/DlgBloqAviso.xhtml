@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Bloqueios/Aviso" widgetVar="DlgBloqAviso"
+		modal="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDlgBloqAviso">
+			<p:messages autoUpdate="true" closable="true" />
+			<p:panelGrid id="painelBloqueiAviso" columns="2"
+				columnClasses="rotuno,campo" layout="tabular"
+				styleClass="ui-panelgrid-blank"
+				style="border:0px none; background-color:transparent;">
+				
+					<p:outputLabel value="Ínicio" for="dataInicio" />
+				<p:inputText id="dataInicio" readonly="true"
+					value="#{cadastroPessoaBean.clienteBloqueioAvisoSelecionado.dataInicio}"
+					required="true">
+					<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+				</p:inputText>
+				
+				<p:outputLabel value="Tipo" for="tipo" />
+				<p:selectOneMenu id="tipo" required="true" class="campo50"
+					filterMatchMode="startsWith" filter="true"  
+					value="#{cadastroPessoaBean.clienteBloqueioAvisoSelecionado.tipoBloqueioAviso}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroPessoaBean.tipoBloqueioAvisos}"  />
+					<p:ajax process="@this" update="labelMotivo, motivoBloq" />
+				</p:selectOneMenu>
+				
+			
+
+				<p:outputLabel id="labelMotivo" value="Motivo do bloqueio:"
+					for="motivoBloq" />
+				<p:selectOneMenu id="motivoBloq"
+					required="#{cadastroPessoaBean.clienteBloqueioAvisoSelecionado.tipoBloqueioAviso.toString() eq 'Bloqueio'}"
+					class="campo50" filterMatchMode="startsWith" filter="true"
+					disabled="#{cadastroPessoaBean.clienteBloqueioAvisoSelecionado.tipoBloqueioAviso.toString() eq 'Aviso' || cadastroPessoaBean.clienteBloqueioAvisoSelecionado eq null}"
+					value="#{cadastroPessoaBean.clienteBloqueioAvisoSelecionado.motivoBloqueio}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems value="#{cadastroPessoaBean.todosMotivosBloqueios}" var="item" itemDisabled="#{item.situacaoCadastro.toString() eq 'Inativo'}"/>
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Motivo/Aviso:" for="aviso" />
+				<p:inputText
+					value="#{cadastroPessoaBean.clienteBloqueioAvisoSelecionado.aviso}"
+					id="aviso" required="true" class="campo50 uppercase" size="80"
+					converter="#{upperToCaseConverter}" maxlength="100" />
+
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="2" cellpadding="5"
+				style="margin: 0 auto;">
+
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{cadastroPessoaBean.confirmarBloqAviso}"
+					update=":formDlgBloqAviso, :formCadastroPessoa:tabViewPrincipal:tabViewCliente:dataTableMensagens"
+					oncomplete="if (!args.validationFailed) PF('DlgBloqAviso').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgBloqAviso').hide();" />
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+</ui:composition>

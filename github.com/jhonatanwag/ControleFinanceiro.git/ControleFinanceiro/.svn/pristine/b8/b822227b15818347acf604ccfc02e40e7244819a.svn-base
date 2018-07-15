@@ -1,0 +1,86 @@
+package br.com.sistemacomercial.repository;
+
+import java.io.Serializable;
+import java.text.ParseException;
+import java.util.List;
+
+import javax.persistence.NoResultException;
+import javax.swing.text.MaskFormatter;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import br.com.sistemacomercial.model.Terminal;
+import br.com.sistemacomercial.repository.filter.TerminalFilter;
+
+public class Terminais extends RepositoryAbstrato<Terminal> implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+
+	public Terminais() {
+		super(Terminal.class);
+	}
+
+	@Override
+	public Terminal salvar(Terminal objeto) {
+		return super.salvar(objeto);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Terminal> filtrados(TerminalFilter filtro) {
+		Session session = manager.unwrap(Session.class);
+		Criteria criteria = session.createCriteria(Terminal.class);
+
+		if (filtro.getIdDe() != null && filtro.getIdAte() != null) {
+			criteria.add(Restrictions.between("id", filtro.getIdDe(), filtro.getIdAte()));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getUsuarioSo())) {
+			criteria.add(Restrictions.ilike("usuarioSO", filtro.getUsuarioSo(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotBlank(filtro.getIp())) {
+			criteria.add(Restrictions.ilike("ip", filtro.getIp(), MatchMode.ANYWHERE));
+		}
+
+		return criteria.addOrder(Order.asc("usuarioSO")).list();
+	}
+
+
+	public Terminal porUsuarioSoUnico(String usuarioSo, Long id) {
+		try {
+			return manager
+					.createQuery("from Terminal where upper(usuarioSO) = :usuarioSo and id <> :id", Terminal.class)
+					.setParameter("usuarioSo", usuarioSo.toUpperCase()).setParameter("id", (id == null ? -1 : id))
+					.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+
+	public Terminal porIpUnico(String ip, Long id) {
+		String enderecoIpFormatado = ip.replaceAll("(?<=^|\\.)\\d{2}(?=\\.|$)","0$0").replaceAll("(?<=^|\\.)\\d{1}(?=\\.|$)","00$0");
+		try {
+			return manager.createQuery("from Terminal where upper(ip) = :ip and id <> :id", Terminal.class)
+					.setParameter("ip", enderecoIpFormatado.toUpperCase()).setParameter("id", (id == null ? -1 : id)).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
+	
+	private String formatString(String mask, String value) {  
+        try {  
+            MaskFormatter formatter = new MaskFormatter(mask);  
+            formatter.setValueContainsLiteralCharacters(false);  
+            return formatter.valueToString(value);  
+        } catch (ParseException e) {  
+            e.printStackTrace();  
+        }  
+        return "";  
+    }  
+
+}

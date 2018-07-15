@@ -1,0 +1,138 @@
+package br.com.sistemacomercial.nfe;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import nfe.XMLUtil;
+
+public class TestMontagem {
+
+	// private MontadorXmlNfe montadorXmlNfe;
+
+	//http://www.javac.com.br/jc/posts/list/92-nfe-envinfe-utilizando-jaxb-xml-nfe-completo.page
+	
+	public static void main(String[] args) {
+		TestMontagem teste = new TestMontagem();
+		NfeNf e = new NfeNf();
+		e.setXmlns("http://www.portalfiscal.inf.br/nfe");
+		e.setIdeCuf(new Byte("41"));
+	//	e.setIdeCnf(13134957);
+	//	e.setIdeNatop("Venda de mercadoria adquirida ou recebida de terceiros");
+	//	e.setIdeMod(new Byte("55"));
+	//	e.setIdeSerie((short) 1);
+	//	e.setIdeNnf(93);
+//		e.setIdeTpnf("1");
+		// <ide>
+		// <cUF>41</cUF>
+		// <cNF>13134957</cNF>
+		// <natOp>Venda de mercadoria adquirida ou recebida de terceiros</natOp>
+		// <indPag>1</indPag>
+		// <mod>55</mod>
+		// <serie>1</serie>
+		// <nNF>93</nNF>
+		// <dhEmi>2017-11-08T16:04:07-02:00</dhEmi>
+		// <dhSaiEnt>2017-11-08T16:04:07-02:00</dhSaiEnt>
+		// <tpNF>1</tpNF>
+		// <idDest>1</idDest>
+		// <cMunFG>4118006</cMunFG>
+		// <tpImp>1</tpImp>
+		// <tpEmis>1</tpEmis>
+		// <cDV>9</cDV>
+		// <tpAmb>1</tpAmb>
+		// <finNFe>1</finNFe>
+		// <indFinal>1</indFinal>
+		// <indPres>1</indPres>
+		// <procEmi>0</procEmi>
+		// <verProc>0.0.1</verProc>
+		// </ide>
+	//	NfeProdutos nfeProdutos = new NfeProdutos();
+		//nfeProdutos.setProdNcm("9999999");
+		//e.getNfeProdutos().add(nfeProdutos);
+		StringWriter swXml = new StringWriter();
+		String chnfe = teste.montadorXmlNfe(e, swXml);
+		//String xmlNFe = swXml.toString();
+		File file2 = new File("D:\\file.xml");
+		//File file2 = new File("D:\\xml\\41171126677109000151550010000000931131349579-procNFe.xml");
+		
+		teste.validaXML(file2);
+		
+	}
+	
+	
+	 public String versao()
+	  {
+	    return "3.10";
+	  }
+	  
+	  public String getAttributeXmlns()
+	  {
+	    return "http://www.portalfiscal.inf.br/nfe";
+	  }
+	  
+	  public String getElementoProt()
+	  {
+	    return "protNFe";
+	  }
+	  
+	  public String getElementoRaiz()
+	  {
+	    return "nfeProc";
+	  }
+	  
+
+	  public static boolean validaXML(File xml) {
+	        File f = new File(xml.getAbsolutePath());
+	        try {
+	            SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+	            File schemaLocation = new File("leiauteNFe_v3.10.xsd");
+	            Schema schema = factory.newSchema(schemaLocation);
+	            Validator validator = schema.newValidator();
+	            Source source = new StreamSource(xml);
+	            validator.validate(source);
+	            return true;
+	        } catch (SAXException ex) {
+	         
+	            ex.printStackTrace();
+	            return false;
+	        } catch (IOException e) {
+	           //JOptionPane.showConfirmDialog(null, e.getLocalizedMessage());
+	            e.printStackTrace();
+	            return false;
+	        }
+	    }
+	  
+	private String montadorXmlNfe(NfeNf e, StringWriter swXml) {
+		try {
+
+			File file = new File("D:\\file.xml");
+			JAXBContext jaxbContext = JAXBContext.newInstance(NfeNf.class);
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+			// output pretty printed
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+			jaxbMarshaller.marshal(e, file);
+			jaxbMarshaller.marshal(e, System.out);
+
+		} catch (JAXBException ex) {
+			ex.printStackTrace();
+		}
+
+		return "";
+
+	}
+}

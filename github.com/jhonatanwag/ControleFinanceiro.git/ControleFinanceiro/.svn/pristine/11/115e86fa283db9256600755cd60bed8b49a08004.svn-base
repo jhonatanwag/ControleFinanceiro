@@ -1,0 +1,77 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroTerminalBean.editando ? 'Edição do terminal' : 'Novo terminal'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="terminal" value="#{cadastroTerminalBean.objeto}" />
+			<f:viewAction action="#{cadastroTerminalBean.inicializar}" />
+		</f:metadata>
+
+		<h:form>
+			<h1>#{cadastroTerminalBean.editando ? 'Edição do terminal' :
+				'Novo terminal'}</h1>
+
+			<p:messages autoUpdate="true" closable="true" />
+
+			<p:toolbar style="margin-top: 20px">
+				<p:toolbarGroup>
+					<p:button value="Novo" outcome="/terminal/CadastroTerminal" />
+					<p:commandButton value="Salvar" id="botaoSalvar"
+						action="#{cadastroTerminalBean.salvar}" update="@form" />
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<p:button value="Pesquisa" outcome="/terminal/PesquisaTerminal" />
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:panelGrid columns="2" id="painel"
+				style="width: 100%; margin-top: 20px" columnClasses="rotulo, campo">
+
+				<p:outputLabel value="Computador" for="comput" />
+				<p:inputText id="comput" size="60" maxlength="80"
+					value="#{cadastroTerminalBean.objeto.usuarioSO}" required="true" />
+
+				<p:outputLabel value="End. Ip" for="ip" />
+				<p:inputMask id="ip" size="15" maxlength="15" mask="999.999.999.999"
+					value="#{cadastroTerminalBean.objeto.ip}" required="true" />
+
+				<p:outputLabel value="Faz backup" for="backup" />
+				<p:selectBooleanCheckbox id="backup" required="true"
+					value="#{cadastroTerminalBean.objeto.fazBackup}" disabled="false" />
+
+				<p:outputLabel value="Atualiza preço" for="atuPreco" />
+				<p:selectBooleanCheckbox id="atuPreco" required="true"
+					value="#{cadastroTerminalBean.objeto.atualizaPreco}"
+					disabled="false" />
+
+				<p:outputLabel value="Faz estorno" for="estorno" />
+				<p:selectBooleanCheckbox id="estorno" required="true"
+					value="#{cadastroTerminalBean.objeto.fazEstorno}" disabled="false" />
+
+				<p:outputLabel value="Caixa" for="caixa" />
+				<p:selectBooleanCheckbox id="caixa" required="true"
+					value="#{cadastroTerminalBean.objeto.caixa}" disabled="false" />
+
+				<p:outputLabel value="Gerenciador de Caixa" for="gerenciador" />
+				<p:selectBooleanCheckbox id="gerenciador" required="true"
+					value="#{cadastroTerminalBean.objeto.gerenciadorCaixa}"
+					disabled="false" />
+
+				<p:outputLabel value="Recebe" for="recebe" />
+				<p:selectBooleanCheckbox id="recebe" required="true"
+					value="#{cadastroTerminalBean.objeto.recebe}" disabled="false" />
+					
+			    <p:outputLabel value="Mulplica/Incrementar item(Tela de venda)" for="multiplica" />
+				<p:selectBooleanCheckbox id="multiplica" required="true"
+					value="#{cadastroTerminalBean.objeto.multiplica}" disabled="false" />		
+
+			</p:panelGrid>
+		</h:form>
+	</ui:define>
+</ui:composition>

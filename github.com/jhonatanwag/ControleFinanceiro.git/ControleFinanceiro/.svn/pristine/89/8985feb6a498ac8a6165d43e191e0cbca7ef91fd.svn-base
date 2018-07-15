@@ -1,0 +1,286 @@
+package br.com.sistemacomercial.nfe;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumns;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+@Entity
+@Table(name = "NFE_NF_PRODUTOS")
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+public class NfeProdutos implements Serializable, Comparable<NfeProdutos> {
+	private static final long serialVersionUID = 1L;
+	@Id
+	@Column(name = "ID_NF_PROD", unique = true, nullable = false, length = 45, updatable = false)
+	private String id;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "ID_NOTA_FISCAL", nullable = false, insertable = false, updatable = false)
+	private NfeNf nfeNf;
+	@Column(name = "PROD_CPROD", nullable = false, length = 60)
+	private String prodCprod;
+	@Column(name = "PROD_CEAN", length = 14)
+	private String prodCean;
+	@Column(name = "PROD_XPROD", nullable = false, length = 120)
+	private String prodXprod;
+	@Column(name = "PROD_NCM", length = 8)
+	private String prodNcm;
+	@Column(name = "PROD_NVE", length = 6, updatable = false)
+	private String prodNve;
+	// @OneToMany(cascade={javax.persistence.CascadeType.ALL},
+	// fetch=FetchType.LAZY, mappedBy="edigNfProdutos")
+	// @Fetch(FetchMode.SELECT)
+	// private List<EdigNfProdutosNve> edigNfProdutosNve;
+	@Column(name = "PROD_EXTIPI", length = 3)
+	private String prodExtipi;
+	@Column(name = "PROD_GENERO", precision = 2, scale = 0)
+	private Byte prodGenero;
+	@Column(name = "PROD_CFOP", nullable = false, precision = 4, scale = 0)
+	private short prodCfop;
+	@Column(name = "PROD_UCOM", nullable = false, length = 6)
+	private String prodUcom;
+	@Column(name = "PROD_QCOM", nullable = false, precision = 15, scale = 4)
+	private BigDecimal prodQcom;
+	@Column(name = "PROD_VUNCOM", nullable = false, precision = 21, scale = 10)
+	private BigDecimal prodVuncom;
+	@Column(name = "PROD_VPROD", nullable = false, precision = 15)
+	private BigDecimal prodVprod;
+	@Column(name = "PROD_CEANTRIB", length = 14)
+	private String prodCeantrib;
+	@Column(name = "PROD_UTRIB", nullable = false, length = 6)
+	private String prodUtrib;
+	@Column(name = "PROD_QTRIB", nullable = false, precision = 15, scale = 4)
+	private BigDecimal prodQtrib;
+	@Column(name = "PROD_VUNTRIB", nullable = false, precision = 21, scale = 10)
+	private BigDecimal prodVuntrib;
+	@Column(name = "PROD_VFRETE", precision = 15)
+	private BigDecimal prodVfrete;
+	@Column(name = "PROD_VSEG", precision = 15)
+	private BigDecimal prodVseg;
+	@Column(name = "PROD_VDESC", precision = 15)
+	private BigDecimal prodVdesc;
+	@Column(name = "PROD_INFADPROD", length = 500)
+	private String prodInfadprod;
+	@Column(name = "PROD_VOUTRO", precision = 15)
+	private BigDecimal prodVoutro;
+	@Column(name = "PROD_INDTOT", precision = 1)
+	private Byte prodIndTot;
+	@Column(name = "PROD_XPED", length = 15)
+	private String prodXped;
+
+	@XmlTransient
+	public NfeNf getNfeNf() {
+		return nfeNf;
+	}
+
+	public void setNfeNf(NfeNf nfeNf) {
+		this.nfeNf = nfeNf;
+	}
+
+	public String getProdCprod() {
+		return prodCprod;
+	}
+
+	public void setProdCprod(String prodCprod) {
+		this.prodCprod = prodCprod;
+	}
+
+	public String getProdCean() {
+		return prodCean;
+	}
+
+	public void setProdCean(String prodCean) {
+		this.prodCean = prodCean;
+	}
+
+	public String getProdXprod() {
+		return prodXprod;
+	}
+
+	public void setProdXprod(String prodXprod) {
+		this.prodXprod = prodXprod;
+	}
+
+	public String getProdNcm() {
+		return prodNcm;
+	}
+
+	public void setProdNcm(String prodNcm) {
+		this.prodNcm = prodNcm;
+	}
+
+	public String getProdNve() {
+		return prodNve;
+	}
+
+	public void setProdNve(String prodNve) {
+		this.prodNve = prodNve;
+	}
+
+	public String getProdExtipi() {
+		return prodExtipi;
+	}
+
+	public void setProdExtipi(String prodExtipi) {
+		this.prodExtipi = prodExtipi;
+	}
+
+	public Byte getProdGenero() {
+		return prodGenero;
+	}
+
+	public void setProdGenero(Byte prodGenero) {
+		this.prodGenero = prodGenero;
+	}
+
+	public short getProdCfop() {
+		return prodCfop;
+	}
+
+	public void setProdCfop(short prodCfop) {
+		this.prodCfop = prodCfop;
+	}
+
+	public String getProdUcom() {
+		return prodUcom;
+	}
+
+	public void setProdUcom(String prodUcom) {
+		this.prodUcom = prodUcom;
+	}
+
+	public BigDecimal getProdQcom() {
+		return prodQcom;
+	}
+
+	public void setProdQcom(BigDecimal prodQcom) {
+		this.prodQcom = prodQcom;
+	}
+
+	public BigDecimal getProdVuncom() {
+		return prodVuncom;
+	}
+
+	public void setProdVuncom(BigDecimal prodVuncom) {
+		this.prodVuncom = prodVuncom;
+	}
+
+	public BigDecimal getProdVprod() {
+		return prodVprod;
+	}
+
+	public void setProdVprod(BigDecimal prodVprod) {
+		this.prodVprod = prodVprod;
+	}
+
+	public String getProdCeantrib() {
+		return prodCeantrib;
+	}
+
+	public void setProdCeantrib(String prodCeantrib) {
+		this.prodCeantrib = prodCeantrib;
+	}
+
+	public String getProdUtrib() {
+		return prodUtrib;
+	}
+
+	public void setProdUtrib(String prodUtrib) {
+		this.prodUtrib = prodUtrib;
+	}
+
+	public BigDecimal getProdQtrib() {
+		return prodQtrib;
+	}
+
+	public void setProdQtrib(BigDecimal prodQtrib) {
+		this.prodQtrib = prodQtrib;
+	}
+
+	public BigDecimal getProdVuntrib() {
+		return prodVuntrib;
+	}
+
+	public void setProdVuntrib(BigDecimal prodVuntrib) {
+		this.prodVuntrib = prodVuntrib;
+	}
+
+	public BigDecimal getProdVfrete() {
+		return prodVfrete;
+	}
+
+	public void setProdVfrete(BigDecimal prodVfrete) {
+		this.prodVfrete = prodVfrete;
+	}
+
+	public BigDecimal getProdVseg() {
+		return prodVseg;
+	}
+
+	public void setProdVseg(BigDecimal prodVseg) {
+		this.prodVseg = prodVseg;
+	}
+
+	public BigDecimal getProdVdesc() {
+		return prodVdesc;
+	}
+
+	public void setProdVdesc(BigDecimal prodVdesc) {
+		this.prodVdesc = prodVdesc;
+	}
+
+	public String getProdInfadprod() {
+		return prodInfadprod;
+	}
+
+	public void setProdInfadprod(String prodInfadprod) {
+		this.prodInfadprod = prodInfadprod;
+	}
+
+	public BigDecimal getProdVoutro() {
+		return prodVoutro;
+	}
+
+	public void setProdVoutro(BigDecimal prodVoutro) {
+		this.prodVoutro = prodVoutro;
+	}
+
+	public Byte getProdIndTot() {
+		return prodIndTot;
+	}
+
+	public void setProdIndTot(Byte prodIndTot) {
+		this.prodIndTot = prodIndTot;
+	}
+
+	public String getProdXped() {
+		return prodXped;
+	}
+
+	public void setProdXped(String prodXped) {
+		this.prodXped = prodXped;
+	}
+
+	@Override
+	public int compareTo(NfeProdutos arg0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

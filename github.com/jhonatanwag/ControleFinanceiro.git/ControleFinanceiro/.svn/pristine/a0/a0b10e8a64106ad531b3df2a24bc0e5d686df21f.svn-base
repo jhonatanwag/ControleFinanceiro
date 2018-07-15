@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		header="Filial" widgetVar="DlgFilial" modal="true" dynamic="true"
+		responsive="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formDialogFilial">
+			<p:messages id="messagesEmail" closable="true" autoUpdate="true" />
+			<p:panelGrid id="painelFilial" columns="2" style="margin-top: 20px">
+				
+				<p:outputLabel value="Pessoa:" for="pes" />
+				<p:selectOneMenu id="pes" required="true" filter="true"
+					filterMatchMode="startsWith"
+					value="#{cadastroEmpresaBean.pessoaSelecionada.cliente}">
+					<f:selectItem itemLabel="--Selecione--" />
+					<f:selectItems var="tp" itemLabel="#{tp.nome}"
+						itemValue="#{tp.cliente}"
+						value="#{cadastroEmpresaBean.todasPessoas}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Fecha caixa por terminal" for="fechaCaixa" />
+				<p:selectBooleanCheckbox id="fechaCaixa" required="true"
+					value="#{cadastroEmpresaBean.filialSelecionada.fechaCaixaTerminal}"
+					disabled="false" />
+
+				<p:outputLabel value="Sede" for="sede" />
+				<p:selectBooleanCheckbox id="sede" required="true"
+					value="#{cadastroEmpresaBean.filialSelecionada.sede}"
+					disabled="false" />
+			</p:panelGrid>
+
+			<h:panelGrid rendered="true" columns="3" cellpadding="5"
+				style="margin: 0 auto;">
+				<p:commandButton id="bntConfirmar" value="Confirmar"
+					actionListener="#{cadastroEmpresaBean.confirmarFilial}"
+					update=":formDialogFilial, :form:tabView:tabelaFilial"
+					oncomplete="if (!args.validationFailed) PF('DlgFilial').hide();" />
+
+				<p:commandButton id="bntCancelar" value="Cancelar" immediate="true"
+					oncomplete="PF('DlgFilial').hide();">
+				</p:commandButton>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

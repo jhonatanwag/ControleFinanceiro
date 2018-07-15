@@ -1,0 +1,39 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.Banco;
+import br.com.sistemacomercial.repository.Bancos;
+import br.com.sistemacomercial.repository.filter.BancoFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaBancoBean extends PesquisaBeanAbstrato<Banco, BancoFilter>implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Bancos bancos;
+
+	public PesquisaBancoBean() {
+		setFiltro(new BancoFilter());
+	}
+
+	@Override
+	public void excluir() {
+		bancos.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("Banco " + getObjetoSelecionado().getNomeBanco() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(bancos.filtrados(getFiltro()));
+	}
+	
+}

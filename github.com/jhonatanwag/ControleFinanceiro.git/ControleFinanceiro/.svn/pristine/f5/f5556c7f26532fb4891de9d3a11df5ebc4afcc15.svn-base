@@ -1,0 +1,40 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import br.com.sistemacomercial.model.EstadoCivil;
+import br.com.sistemacomercial.repository.EstadoCivis;
+import br.com.sistemacomercial.repository.filter.EstadoCivilFilter;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+
+@Named
+@ViewScoped
+public class PesquisaEstadoCivilBean extends PesquisaBeanAbstrato<EstadoCivil, EstadoCivilFilter>
+		implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private EstadoCivis paises;
+
+	public PesquisaEstadoCivilBean() {
+		setFiltro(new EstadoCivilFilter());
+	}
+
+	@Override
+	public void excluir() {
+		paises.remover(getObjetoSelecionado().getId());
+		getObjetosFiltrados().remove(getObjetoSelecionado());
+		FacesUtil.addInfoMessage("EstadoCivil " + getObjetoSelecionado().getDescricao() + " excluído com sucesso.");
+	}
+
+	@Override
+	public void pesquisar() {
+		setObjetosFiltrados(paises.filtrados(getFiltro()));
+	}
+
+}

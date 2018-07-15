@@ -1,0 +1,84 @@
+package br.com.sistemacomercial.controle;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import com.outjected.email.api.MailMessage;
+
+import br.com.sistemacomercial.model.Email;
+import br.com.sistemacomercial.model.Funcionario;
+import br.com.sistemacomercial.repository.Pessoas;
+import br.com.sistemacomercial.security.FuncionarioLogado;
+import br.com.sistemacomercial.util.jsf.FacesUtil;
+import br.com.sistemacomercial.util.mail.Mailer;
+
+@Named
+@RequestScoped
+public class FaleConoscoBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private Mailer mailer;
+	@Inject
+	private Pessoas pessoas;
+	@Inject
+	@FuncionarioLogado
+	private Funcionario funcionarioLogado;
+
+	private String assunto;
+	private String mensagem;
+	private String email;
+
+	
+	
+	public String getAssunto() {
+		return assunto;
+	}
+
+	public void setAssunto(String assunto) {
+		this.assunto = assunto;
+	}
+
+	public String getMensagem() {
+		return mensagem;
+	}
+
+	public void setMensagem(String mensagem) {
+		this.mensagem = mensagem;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public List<Email> getEmails() {
+		return pessoas.listaEmailsPessoaPorId(funcionarioLogado.getPessoa().getId());
+	}
+
+	public void enviarEmail() {
+		MailMessage message = mailer.novaMensagem();
+
+		// message.to(this.pedido.getCliente().getEmail())
+		// .subject("Pedido " + this.pedido.getId())
+		// .bodyHtml(new
+		// VelocityTemplate(getClass().getResourceAsStream("/emails/pedido.template")))
+		// .put("pedido", this.pedido)
+		// .put("numberTool", new NumberTool())
+		// .put("locale", new Locale("pt", "BR"))
+		// .send();
+
+		message.to("nilodp@hotmail.com").subject("teste").send();
+
+		FacesUtil.addInfoMessage("Pedido enviado por e-mail com sucesso!");
+	}
+
+}

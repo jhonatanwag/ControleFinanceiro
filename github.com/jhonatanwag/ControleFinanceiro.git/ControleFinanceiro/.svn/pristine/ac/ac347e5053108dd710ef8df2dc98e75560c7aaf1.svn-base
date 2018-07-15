@@ -1,0 +1,55 @@
+package br.com.sistemacomercial.enums;
+
+public enum TipoVenda {
+
+	A("A vista"), 
+	P("A Prazo"), 
+	C("Crediário"),
+	O("Orçamento"), 
+	T("Transferência");
+	
+	private String value;
+
+	private TipoVenda(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return this.value;
+	}
+
+	public static TipoVenda getTipoVenda(Integer value) {
+		switch (value) {
+		case 0:
+			return A;
+		case 1:
+			return P;
+		case 2:
+			return C;
+		case 3:
+			return O;
+		case 4:
+			return T;
+		default:
+			return null;
+		}
+	}
+
+	public static String getTipoVenda(TipoVenda tipoVenda) {
+		switch (tipoVenda) {
+		case A:
+			return "A";
+		case P:
+			return "P";
+		case C:
+			return "C";	
+		case O:
+			return "O";
+		case T:
+			return "T";
+		default:
+			return null;
+		}
+	}
+}

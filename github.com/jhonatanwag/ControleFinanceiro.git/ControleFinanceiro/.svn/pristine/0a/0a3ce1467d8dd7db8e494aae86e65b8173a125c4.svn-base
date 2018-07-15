@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+
+
+
+	<p:dialog showEffect="explode" closable="false" hideEffect="explode"
+		responsive="true" header="Alterar Status" widgetVar="DlgAlterarStatus"
+		modal="true" dynamic="true" resizable="true" toggleSpeed="500"
+		appendTo="@(boby)">
+		<h:form id="formAlterarStatus">
+			<p:messages id="messagesAlterarStatus" closable="true"
+				autoUpdate="true" />
+
+			<p:panelGrid columns="2" layout="grid"
+				styleClass="ui-panelgrid-blank"
+				style="border:0px none; background-color:transparent;">
+				<p:outputLabel value="Status do Cheque" for="status" />
+				<p:selectOneMenu id="status" required="true"
+					value="#{gerenciadorChequeBean.situacaoChequeSelecioando}">
+					<f:selectItems value="#{gerenciadorChequeBean.situacaoCheques}" />
+				</p:selectOneMenu>
+
+			</p:panelGrid>
+
+
+			<p:panelGrid rendered="true" columns="2" cellpadding="5"
+				layout="grid" styleClass="ui-panelgrid-blank"
+				style="border:0px none; background-color:transparent;">
+
+				<p:commandButton id="bntConfirmarAlterarStatus" value="Confirmar"
+					actionListener="#{gerenciadorChequeBean.alterarStatus}"
+					update=":formAlterarStatus :formGerenciadorCheque"
+					oncomplete="if (!args.validationFailed) PF('DlgAlterarStatus').hide();" />
+
+				<p:commandButton id="bntCancelarAlterarStatus" value="Cancelar"
+					immediate="true" oncomplete="PF('DlgAlterarStatus').hide();" />
+			</p:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,56 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">#{cadastroPaisBean.editando ? 'Edição do País' : 'Novo País'}</ui:define>
+
+	<ui:define name="corpo">
+		<f:metadata>
+			<o:viewParam name="pais" value="#{cadastroPaisBean.objeto}" />
+			<f:viewAction action="#{cadastroPaisBean.inicializar}" />
+		</f:metadata>
+
+		<h:form>
+			<div class="ContainerIndent">
+				<p:panel>
+					<h1>
+						<div class="FontBold Fs18 hardblue">
+							#{cadastroPaisBean.editando ? 'Edição do País' : 'Novo País'}</div>
+					</h1>
+
+					<p:messages autoUpdate="true" closable="true" />
+
+					<p:toolbar style="margin-top: 20px">
+						<p:toolbarGroup>
+							<p:button value="Novo" outcome="/pais/CadastroPais" />
+							<p:commandButton value="Salvar" id="botaoSalvar"
+								action="#{cadastroPaisBean.salvar}" update="@form" />
+						</p:toolbarGroup>
+						<p:toolbarGroup align="right">
+							<p:button value="Pesquisa" outcome="/pais/PesquisaPais" />
+						</p:toolbarGroup>
+					</p:toolbar>
+
+					<p:panelGrid columns="2" id="painel"
+						style="width: 100%; margin-top: 20px"
+						columnClasses="rotulo, campo">
+
+						<p:outputLabel value="Código:" for="codigo" />
+						<p:inputText id="codigo" value="#{cadastroPaisBean.objeto.id}"
+							required="false" size="10" maxlength="10" readonly="true" />
+
+						<p:outputLabel value="Nome" for="nome" />
+						<p:inputText id="nome" maxlength="80"
+							value="#{cadastroPaisBean.objeto.nome}" required="true"
+							class="uppercase" converter="#{upperToCaseConverter}" />
+
+					</p:panelGrid>
+				</p:panel>
+			</div>
+		</h:form>
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,227 @@
+<ui:composition template="/WEB-INF/template/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="titulo">Gerenciador de Cartão(ões)</ui:define>
+
+	<ui:define name="corpo">
+		<div class="ContainerIndent ui-fluid">
+			<div class="ContainerIndent">
+				<h:form id="formGerenciadorCheque">
+					<p:panel>
+						<div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Gerenciador
+							de cheque(s)</div>
+						<div class="Separator"></div>
+						<p:panelGrid columns="4"
+							columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+							<p:outputLabel value="Código" />
+
+							<p:inputText size="10"
+								value="#{gerenciadorChequeBean.filtro.idDe}" maxlength="6" />
+	    			a
+	    			<p:inputText size="10"
+								value="#{gerenciadorChequeBean.filtro.idAte}" maxlength="6" />
+
+
+						</p:panelGrid>
+
+						<p:toolbar style="margin-top: 10px">
+							<p:toolbarGroup align="left">
+								<p:commandButton value="Pesquisar" id="botaoPesquisar"
+									action="#{gerenciadorChequeBean.pesquisar}" update="@form" />
+							</p:toolbarGroup>
+						</p:toolbar>
+
+						<p:messages autoUpdate="true" closable="true" />
+
+					</p:panel>
+
+
+					<p:dataTable id="dataTableItem" scrollHeight="150"
+						scrollable="true"
+						value="#{gerenciadorChequeBean.objetosFiltrados}" reflow="true"
+						selection="#{gerenciadorChequeBean.chequesSelecionados}"
+						var="item" rowKey="#{item.id}">
+
+						<f:facet name="header">
+                   Cheque(s)
+                     </f:facet>
+
+						<p:ajax event="toggleSelect"
+							update=":formGerenciadorCheque:painelOpcoes" />
+
+						<p:ajax event="rowSelectCheckbox"
+							update=":formGerenciadorCheque:painelOpcoes" />
+
+						<p:ajax event="rowUnselectCheckbox"
+							update=":formGerenciadorCheque:painelOpcoes" />
+
+						<p:ajax event="rowSelect"
+							update=":formGerenciadorCheque:painelOpcoes" />
+
+						<p:ajax event="rowUnselect"
+							update=":formGerenciadorCheque:painelOpcoes" />
+
+						<p:column selectionMode="multiple" style="text-align:center">
+						</p:column>
+
+						<p:column id="situacaoCheque" headerText="Situação Cheque"
+							style="text-align: center;" sortBy="#{item.situacaoCheque}">
+							<h:outputText value="#{item.situacaoCheque}" />
+						</p:column>
+
+						<p:column id="situacaoDoc" headerText="Situação Documento"
+							style="text-align: center;" sortBy="#{item.situacaoDocumento}">
+							<h:outputText value="#{item.situacaoDocumento}" />
+						</p:column>
+
+						<p:column id="banco" headerText="Banco" style="text-align: left;"
+							sortBy="#{item.agencia.banco.nomeBanco}">
+							<h:outputText value=" #{item.agencia.banco.nomeBanco}" />
+						</p:column>
+
+						<p:column id="agencia" headerText="Agência"
+							style="text-align: left;" sortBy="#{item.agencia.nome}">
+							<h:outputText value=" #{item.agencia.nome}" />
+						</p:column>
+
+						<p:column id="dataEmissao" headerText="Data Emissão"
+							style="text-align: center;" sortBy="#{item.dataEmissao}">
+							<h:outputText value="#{item.dataEmissao}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date"
+									dateStyle="long" />
+							</h:outputText>
+						</p:column>
+
+						<p:column id="dataPre" headerText="Data Pré"
+							style="text-align: center;" sortBy="#{item.dataPre}">
+							<h:outputText value="#{item.dataPre}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date"
+									dateStyle="long" />
+							</h:outputText>
+						</p:column>
+
+						<p:column id="numeroCheque" headerText="Num. Cheque"
+							style="text-align: center;" sortBy="#{item.numeroCheque}">
+							<h:outputText value="#{item.numeroCheque}" />
+						</p:column>
+
+						<p:column id="valor" headerText="Valor" style="text-align: right;">
+							<h:outputText value="#{item.valorCheque}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+
+
+
+						<p:column style="text-align: center">
+
+							<p:menuButton iconPos="menuOpcoes" value="Opções"
+								disabled="#{item ne gerenciadorChequeBean.objetoSelecionado}">
+								<p:menuitem value="Estornar venda" icon="ui-icon-trash" />
+								<p:separator />
+								<p:menuitem value="Reimprimir venda" icon="ui-icon-print"
+									oncomplete="PF('DlgReimprimirVenda').show()"
+									update="formDialogReimprimirVenda" />
+							</p:menuButton>
+						</p:column>
+
+						<p:columnGroup type="footer">
+							<p:row>
+								<p:column footerText="" />
+								<p:column footerText="" />
+								<p:column footerText="" />
+								<p:column footerText="" />
+								<p:column footerText="" />
+								<p:column footerText="" />
+								<p:column style="text-align:right" footerText="Totais:" />
+
+								<p:column style="text-align: right;">
+									<f:facet name="footer">
+										<h:outputText value="#{gerenciadorChequeBean.totalCheques}">
+											<f:convertNumber type="currency" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+
+								<p:column footerText="" />
+							</p:row>
+						</p:columnGroup>
+
+					</p:dataTable>
+
+
+					<div class="Container100 BorBotLeaden ui-fluid">
+						<div class="ContainerIndent">
+							<div class="Container80 Responsive">
+								<div class="ContainerIndent">
+									<p:panelGrid columns="6" layout="grid"
+										styleClass="ui-panelgrid-blank" id="painelOpcoes"
+										style="border:0px none; background-color:transparent;">
+										<p:commandButton value="Alterar Status"
+											disabled="#{gerenciadorChequeBean.chequesSelecionados.size() == 0}"
+											oncomplete="PF('DlgAlterarStatus').show();"
+											update=":formAlterarStatus"></p:commandButton>
+										<p:commandButton value="Registrar Operação"
+											disabled="#{gerenciadorChequeBean.chequesSelecionados.size() == 0}"
+											oncomplete="PF('DlgRegistrarOperacao').show();"></p:commandButton>
+										<p:commandButton value="Incluir Restrição"
+											disabled="#{gerenciadorChequeBean.chequesSelecionados.size() == 0}"
+											oncomplete="PF('DlgIncluirRestricao').show();"></p:commandButton>
+										<p:commandButton value="Incluir"
+											oncomplete="PF('DlgIncluirCheque').show();"></p:commandButton>
+										<p:commandButton value="Alterar"
+											disabled="#{gerenciadorChequeBean.chequesSelecionados.size() == 0}"></p:commandButton>
+										<p:commandButton value="Excluir"
+											disabled="#{gerenciadorChequeBean.chequesSelecionados.size() == 0}"></p:commandButton>
+									</p:panelGrid>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="Container100 leaden-back BorBotLeaden">
+						<div class="ContainerIndent">
+							<div class="EmptyBox10"></div>
+
+							<div class="Container100 Responsive100 ui-fluid">
+								<div class="ContainerIndent">
+									<p:panel>
+										<div class="Container50 Responsive Fs20">Total de Itens:
+										</div>
+
+										<div class="Container50 Responsive Fs20">
+											Total Cheques:
+											<h:outputText value="#{gerenciadorChequeBean.totalCheques}">
+												<f:convertNumber type="currency" />
+											</h:outputText>
+										</div>
+										<div class="EmptyBox10"></div>
+
+									</p:panel>
+								</div>
+							</div>
+
+							<div class="EmptyBox10"></div>
+						</div>
+					</div>
+
+				</h:form>
+				<ui:include
+					src="/WEB-INF/template/gerenciadorCheque/DlgAlterarStatus.xhtml" />
+				<ui:include
+					src="/WEB-INF/template/gerenciadorCheque/DlgIncluirCheque.xhtml" />
+				<ui:include
+					src="/WEB-INF/template/gerenciadorCheque/DlgIncluirRestricao.xhtml" />
+				<ui:include
+					src="/WEB-INF/template/gerenciadorCheque/DlgRegistrarOperacao.xhtml" />
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

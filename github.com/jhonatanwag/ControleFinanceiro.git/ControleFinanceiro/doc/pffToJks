@@ -1,0 +1,3 @@
+Ambiente Java
+1º Passo:Converter .jks em .pfx C:\Arquivos de programas\Java\jdk1.6.0_04\bin>keytool -importkeystore –srckeystorec:\temp\certificado.jks -destkeystore c:\temp\certificado.pfx -srcstoretype JKS -deststoretype PKCS12
+2º Passo:Converter .pfxem .jks C:\Arquivos de programas\Java\jdk1.6.0_04\bin>keytool -importkeystore –srckeystore c:\temp\certificado.pfx -destkeystore c:\temp\certificado.jks -srcstoretype PKCS12 -deststoretype JKS

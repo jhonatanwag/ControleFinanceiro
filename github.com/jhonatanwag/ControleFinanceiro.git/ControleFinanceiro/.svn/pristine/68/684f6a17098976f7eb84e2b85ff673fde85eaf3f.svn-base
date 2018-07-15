@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:panelGrid columns="2" columnClasses="rotulo, campo">
+
+		<p:outputLabel value="Empresa/Filial" for="emfil" />
+		<p:selectOneMenu id="emfil" required="true" filter="true"
+			filterMatchMode="startsWith" value="#{notaEntradaBean.objeto.filial}">
+			<f:selectItems var="emfil" itemLabel="#{emfil.empresa.nomeFantasia}"
+				itemValue="#{emfil}" value="#{notaEntradaBean.filials}" />
+		</p:selectOneMenu>
+
+		<p:outputLabel value="Modelo" for="cfop" />
+		<p:selectOneMenu id="cfop" required="true" filter="true"
+			filterMatchMode="startsWith"
+			value="#{notaEntradaBean.objeto.modeloDocumentoFiscal}">
+			<f:selectItems var="modelo"
+				itemLabel="#{modelo.descricaoCompletaModelo}" itemValue="#{modelo}"
+				value="#{notaEntradaBean.documentosFiscais}" />
+		</p:selectOneMenu>
+
+
+		<p:outputLabel value="Cód. Fornecedor" for="codCli" />
+		<h:panelGroup>
+			<p:inputText id="codCli" size="6" maxlength="6"
+				onkeyup="onlyNumbers(this)" style="text-align: right"
+				value="#{notaEntradaBean.pessoaSelecionada.id}">
+				<p:ajax event="change" process="@this"
+					listener="#{notaEntradaBean.pessoaPorId()}"
+					update="codCli, cliente" />
+			</p:inputText>
+
+			<p:commandButton icon="ui-icon-search" process="@this" update="@none"
+				action="#{pesquisaPessoaBean.abrirDialogo}">
+				<p:ajax event="dialogReturn"
+					listener="#{notaEntradaBean.pessoaSelecao}"
+					update="codCli, cliente" process="@this" />
+				<p:resetInput target="cliente, codCli" />
+			</p:commandButton>
+
+			<p:inputText id="cliente" size="60" maxlength="100" disabled="true"
+				value="#{notaEntradaBean.objeto.fornecedor.pessoa.nome}" />
+		</h:panelGroup>
+
+		<p:outputLabel value="Número" for="numNota" />		
+			<p:inputText id="numNota"  maxlength="6"
+				onkeyup="onlyNumbers(this)"
+				value="#{notaEntradaBean.objeto.numeroNota}">
+			</p:inputText>
+			<p:outputLabel value="Série" for="serie" />
+			<p:inputText id="serie" maxlength="4"
+				onkeyup="onlyNumbers(this)" 
+				value="#{notaEntradaBean.objeto.serieNota}">
+			</p:inputText>
+
+
+			<p:outputLabel value="Data entrada" for="dataEntrada" />
+			<p:calendar id="dataEntrada" pattern="dd/MM/yyyy"
+				value="#{notaEntradaBean.objeto.dataEntrada}" />
+
+			<p:outputLabel value="Data emissão" for="dataEmissao" />
+			<p:calendar id="dataEmissao" pattern="dd/MM/yyyy"
+				value="#{notaEntradaBean.objeto.dataEmissao}" />
+		
+	</p:panelGrid>
+</ui:composition>
